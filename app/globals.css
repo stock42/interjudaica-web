@@ -1,0 +1,76 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f7f6f0;
+  --foreground: #17130d;
+  --paper: #fffdf7;
+  --ink: #17130d;
+  --muted: #625d53;
+  --line: rgba(23, 19, 13, 0.14);
+  --sapphire: #164a9f;
+  --jade: #126c63;
+  --sumac: #9b342c;
+  --gold: #d8a51d;
+  --font-body: "Avenir Next", "Segoe UI", "Helvetica Neue", sans-serif;
+  --font-heading: "Iowan Old Style", "Palatino Linotype", "Book Antiqua",
+    Georgia, serif;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-body);
+  --font-display: var(--font-heading);
+}
+
+* {
+  box-sizing: border-box;
+  min-width: 0;
+  letter-spacing: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 7rem;
+}
+
+body {
+  min-width: 320px;
+  background:
+    linear-gradient(90deg, rgba(22, 74, 159, 0.06), transparent 34%),
+    linear-gradient(180deg, rgba(216, 165, 29, 0.09), transparent 18rem),
+    var(--background);
+  color: var(--foreground);
+  font-family: var(--font-body);
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+::selection {
+  background: var(--gold);
+  color: var(--ink);
+}
+
+.font-display {
+  font-family: var(--font-heading);
+}
+
+.min-h-inherit {
+  min-height: inherit;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
