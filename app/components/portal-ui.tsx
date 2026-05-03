@@ -363,17 +363,19 @@ export function InfoList({ items }: { items: string[] }) {
 export function AuthPanel({
   title,
   text,
+  eyebrow = "Student access",
   children,
 }: {
   title: string;
   text: string;
+  eyebrow?: string;
   children: ReactNode;
 }) {
   return (
     <Section className="min-h-[calc(100vh-5rem)]" tone="transparent">
       <div className="mx-auto grid max-w-5xl gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
         <div>
-          <Eyebrow>Student access</Eyebrow>
+          <Eyebrow>{eyebrow}</Eyebrow>
           <h1 className="font-display text-4xl font-semibold leading-tight sm:text-5xl">
             {title}
           </h1>
@@ -426,6 +428,8 @@ export function AdminShell({
     { href: "/admin", label: "Overview" },
     { href: "/admin/usuarios", label: "Users" },
     { href: "/admin/cursos", label: "Courses" },
+    { href: "/admin/course-categories", label: "Course categories" },
+    { href: "/admin/instructors", label: "Instructors" },
     { href: "/admin/suscripciones", label: "Subscriptions" },
     { href: "/admin/pagos", label: "Payments" },
     { href: "/admin/papers", label: "Papers" },
@@ -439,9 +443,19 @@ export function AdminShell({
         <div className="grid gap-8 lg:grid-cols-[16rem_1fr]">
           <aside className="lg:sticky lg:top-28 lg:self-start">
             <div className="rounded-lg border border-[var(--line)] bg-white p-3">
-              <p className="px-3 py-2 text-xs font-bold uppercase text-[var(--muted)]">
-                Admin
-              </p>
+              <div className="flex items-center justify-between gap-2 px-3 py-2">
+                <p className="text-xs font-bold uppercase text-[var(--muted)]">
+                  Admin
+                </p>
+                <form action="/api/auth/logout" method="post">
+                  <button
+                    className="rounded-full border border-[var(--line)] px-2.5 py-1 text-xs font-bold text-[var(--muted)] transition hover:bg-[var(--paper)] hover:text-[var(--ink)]"
+                    type="submit"
+                  >
+                    Sign out
+                  </button>
+                </form>
+              </div>
               <nav className="grid gap-1" aria-label="Admin navigation">
                 {adminLinks.map((item) => (
                   <Link
@@ -473,10 +487,14 @@ export function AdminShell({
   );
 }
 
-export function AdminStatGrid() {
+export function AdminStatGrid({
+  stats = adminStats,
+}: {
+  stats?: { label: string; value: string; note: string }[];
+}) {
   return (
     <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-      {adminStats.map((stat) => (
+      {stats.map((stat) => (
         <div
           key={stat.label}
           className="rounded-lg border border-[var(--line)] bg-white p-5"

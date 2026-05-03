@@ -1,55 +1,24 @@
 import type { Metadata } from "next";
-import {
-  AdminShell,
-  ButtonLink,
-  DataTable,
-} from "@/app/components/portal-ui";
-import { courses, formatUsd } from "@/app/lib/content";
+import { CourseList } from "@/app/admin/cursos/course-list";
+import { AdminShell } from "@/app/components/portal-ui";
+import { CourseStorage } from "@/services/courses-storage";
 
 export const metadata: Metadata = {
   title: "Admin Courses",
   description: "Manage InterJudaica courses and classes.",
 };
 
-export default function AdminCoursesPage() {
+export const runtime = "nodejs";
+
+export default async function AdminCoursesPage() {
+  const courses = await CourseStorage.list();
+
   return (
     <AdminShell
       title="Courses"
-      description="Create and edit courses, prices, community discounts, images, editions, classes, and downloadable materials."
+      description="Search, review, edit, and publish the live course catalog."
     >
-      <div className="grid gap-5">
-        <div className="flex flex-col gap-3 rounded-lg border border-[var(--line)] bg-white p-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h2 className="font-display text-2xl font-semibold">
-              Course catalog
-            </h2>
-            <p className="mt-1 text-sm text-[var(--muted)]">
-              {courses.length} courses configured
-            </p>
-          </div>
-          <ButtonLink href="#" tone="primary">
-            New course
-          </ButtonLink>
-        </div>
-        <DataTable
-          columns={[
-            "Course",
-            "Level",
-            "Price",
-            "Community price",
-            "Start",
-            "Stripe link",
-          ]}
-          rows={courses.map((course) => [
-            course.title,
-            course.level,
-            formatUsd(course.price),
-            formatUsd(course.communityPrice),
-            course.startDate,
-            "Manual link",
-          ])}
-        />
-      </div>
+      <CourseList courses={courses} />
     </AdminShell>
   );
 }

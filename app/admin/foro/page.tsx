@@ -1,28 +1,24 @@
 import type { Metadata } from "next";
-import { AdminShell, DataTable } from "@/app/components/portal-ui";
-import { forumThreads } from "@/app/lib/content";
+import { AdminCollectionManager } from "@/app/admin/components/admin-collection-manager";
+import { AdminShell } from "@/app/components/portal-ui";
+import { ForumStorage } from "@/services/forums-storage";
 
 export const metadata: Metadata = {
   title: "Admin Forum",
   description: "Moderate InterJudaica course and community forums.",
 };
 
-export default function AdminForumPage() {
+export const runtime = "nodejs";
+
+export default async function AdminForumPage() {
+  const forums = await ForumStorage.list();
+
   return (
     <AdminShell
       title="Forum moderation"
       description="Review course and community threads, hide posts, delete spam, and mark conversations as featured."
     >
-      <DataTable
-        columns={["Thread", "Area", "Replies", "Unread", "Moderation"]}
-        rows={forumThreads.map((thread) => [
-          thread.title,
-          thread.area,
-          String(thread.replies),
-          String(thread.unread),
-          "Visible",
-        ])}
-      />
+      <AdminCollectionManager kind="forums" initialItems={forums} />
     </AdminShell>
   );
 }

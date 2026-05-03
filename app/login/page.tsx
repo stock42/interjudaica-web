@@ -1,45 +1,40 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { AuthPanel, ButtonLink, Field } from "@/app/components/portal-ui";
+import { redirect } from "next/navigation";
+import { AuthPanel } from "@/app/components/portal-ui";
+import { LoginForm } from "@/app/login/login-form";
+import { getCurrentOperator } from "@/services/auth";
 
 export const metadata: Metadata = {
   title: "Sign in",
   description: "Sign in to your InterJudaica student account.",
 };
 
-export default function LoginPage() {
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ next?: string }>;
+}) {
+  const operator = await getCurrentOperator();
+  const { next } = await searchParams;
+
+  if (operator) {
+    redirect(next?.startsWith("/") ? next : "/admin");
+  }
+
   return (
     <AuthPanel
-      title="Sign in to continue learning"
-      text="Access purchased courses, class recordings, certificates, subscription status, and private forum threads."
+      eyebrow="Backoffice"
+      title="Admin access"
+      text="Enter with an operator account to manage courses, papers, forum threads, students, and platform operations."
     >
-      <form className="grid gap-5">
-        <Field
-          label="Email"
-          name="email"
-          type="email"
-          placeholder="you@example.com"
-        />
-        <Field label="Password" name="password" type="password" />
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <ButtonLink href="/dashboard">Sign in</ButtonLink>
-          <Link
-            href="/forgot-password"
-            className="text-sm font-semibold text-[var(--sapphire)] underline underline-offset-4"
-          >
-            Forgot password?
-          </Link>
-        </div>
-        <p className="text-sm leading-6 text-[var(--muted)]">
-          New to InterJudaica?{" "}
-          <Link
-            href="/register"
-            className="font-semibold text-[var(--sapphire)] underline underline-offset-4"
-          >
-            Create an account
-          </Link>
-        </p>
-      </form>
+      <LoginForm nextPath={next} />
+      <Link
+        href="/"
+        className="mt-5 inline-flex text-sm font-semibold text-[var(--sapphire)] underline underline-offset-4"
+      >
+        Back to site
+      </Link>
     </AuthPanel>
   );
 }

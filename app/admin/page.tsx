@@ -4,27 +4,68 @@ import {
   AdminStatGrid,
   DataTable,
 } from "@/app/components/portal-ui";
+import { CourseStorage } from "@/services/courses-storage";
+import { ForumStorage } from "@/services/forums-storage";
+import { PaperStorage } from "@/services/papers-storage";
+import { UserStorage } from "@/services/users-storage";
 
 export const metadata: Metadata = {
   title: "Admin",
   description: "InterJudaica admin dashboard.",
 };
 
-export default function AdminPage() {
+export const runtime = "nodejs";
+
+export default async function AdminPage() {
+  const [courses, papers, forums, users] = await Promise.all([
+    CourseStorage.list(),
+    PaperStorage.list(),
+    ForumStorage.list(),
+    UserStorage.list(),
+  ]);
+
+  const publishedCourses = courses.filter((course) => course.status === "published");
+  const publishedPapers = papers.filter((paper) => paper.status === "published");
+  const openThreads = forums.filter((thread) => thread.status === "open");
+  const activeUsers = users.filter((user) => user.status === "active");
+
   return (
     <AdminShell
       title="Admin overview"
-      description="Monitor users, community subscriptions, course sales, Stripe revenue, and live learning activity."
+      description="Monitor catalog content, community writing, forum moderation, and student records."
     >
       <div className="grid gap-6">
-        <AdminStatGrid />
+        <AdminStatGrid
+          stats={[
+            {
+              label: "Courses",
+              value: String(courses.length),
+              note: `${publishedCourses.length} published`,
+            },
+            {
+              label: "Papers",
+              value: String(papers.length),
+              note: `${publishedPapers.length} published`,
+            },
+            {
+              label: "Forum threads",
+              value: String(forums.length),
+              note: `${openThreads.length} open`,
+            },
+            {
+              label: "Users",
+              value: String(users.length),
+              note: `${activeUsers.length} active`,
+            },
+          ]}
+        />
         <DataTable
-          columns={["Area", "Status", "Owner", "Next step"]}
+          columns={["Area", "Records", "Published/Open", "Admin path"]}
           rows={[
-            ["Courses", "3 active cohorts", "Education", "Confirm Zoom links"],
-            ["Community", "396 active members", "Membership", "Publish April paper"],
-            ["Forum", "56 open threads", "Moderation", "Review flagged posts"],
-            ["Payments", "$28.4k gross", "Finance", "Reconcile refunds"],
+            ["Courses", String(courses.length), String(publishedCourses.length), "/admin/cursos"],
+            ["Papers", String(papers.length), String(publishedPapers.length), "/admin/papers"],
+            ["Forum", String(forums.length), String(openThreads.length), "/admin/foro"],
+            ["Users", String(users.length), String(activeUsers.length), "/admin/usuarios"],
           ]}
         />
       </div>
