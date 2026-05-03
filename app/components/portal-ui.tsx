@@ -8,6 +8,7 @@ import {
   formatUsd,
   navItems,
 } from "@/app/lib/content";
+import { OperatorHeaderActions } from "@/app/components/operator-header-actions";
 
 type ButtonTone = "primary" | "secondary" | "quiet" | "dark";
 
@@ -84,12 +85,7 @@ export function SiteHeader() {
         </nav>
 
         <div className="flex shrink-0 items-center gap-2">
-          <ButtonLink href="/login" tone="quiet" className="hidden sm:inline-flex">
-            Sign in
-          </ButtonLink>
-          <ButtonLink href="/register" tone="primary">
-            Join
-          </ButtonLink>
+          <OperatorHeaderActions />
         </div>
       </div>
     </header>
@@ -427,12 +423,14 @@ export function AdminShell({
   const adminLinks = [
     { href: "/admin", label: "Overview" },
     { href: "/admin/usuarios", label: "Users" },
+    { href: "/admin/operators", label: "Operators" },
     { href: "/admin/cursos", label: "Courses" },
     { href: "/admin/course-categories", label: "Course categories" },
     { href: "/admin/instructors", label: "Instructors" },
     { href: "/admin/suscripciones", label: "Subscriptions" },
     { href: "/admin/pagos", label: "Payments" },
     { href: "/admin/papers", label: "Papers" },
+    { href: "/admin/paper-categories", label: "Paper categories" },
     { href: "/admin/foro", label: "Forum" },
     { href: "/admin/analytics", label: "Analytics" },
   ];

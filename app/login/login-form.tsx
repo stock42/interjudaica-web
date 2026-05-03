@@ -2,11 +2,11 @@
 
 import { useMemo, useState, type FormEvent } from "react";
 
-export function LoginForm({ nextPath = "/admin" }: { nextPath?: string }) {
+export function LoginForm({ nextPath = "/dashboard" }: { nextPath?: string }) {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const safeNextPath = useMemo(
-    () => (nextPath.startsWith("/") ? nextPath : "/admin"),
+    () => (nextPath.startsWith("/") ? nextPath : "/dashboard"),
     [nextPath],
   );
 
@@ -16,7 +16,7 @@ export function LoginForm({ nextPath = "/admin" }: { nextPath?: string }) {
     setLoading(true);
 
     const formData = new FormData(event.currentTarget);
-    const response = await fetch("/api/auth/login", {
+    const response = await fetch("/api/user-auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -28,7 +28,7 @@ export function LoginForm({ nextPath = "/admin" }: { nextPath?: string }) {
     setLoading(false);
 
     if (!response.ok) {
-      setError("Email o password incorrectos.");
+      setError("Email or password is incorrect.");
       return;
     }
 
@@ -43,7 +43,7 @@ export function LoginForm({ nextPath = "/admin" }: { nextPath?: string }) {
           className="min-h-12 rounded-md border border-[var(--line)] bg-[var(--paper)] px-4 text-base font-normal outline-none transition focus:border-[var(--sapphire)] focus:ring-4 focus:ring-[rgba(19,70,160,0.14)]"
           name="email"
           type="email"
-          placeholder="admin@interjudaica.com"
+          placeholder="you@example.com"
           autoComplete="email"
           required
         />
@@ -73,4 +73,3 @@ export function LoginForm({ nextPath = "/admin" }: { nextPath?: string }) {
     </form>
   );
 }
-

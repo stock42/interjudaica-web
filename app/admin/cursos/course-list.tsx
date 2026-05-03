@@ -50,7 +50,7 @@ export function CourseList({ courses }: { courses: TypeCourse[] }) {
     setDeletingUuid("");
 
     if (response.status === 401) {
-      window.location.assign("/login?next=/admin/cursos");
+      window.location.assign("/operator-login?next=/admin/cursos");
       return;
     }
 

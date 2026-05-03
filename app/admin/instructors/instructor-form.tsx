@@ -70,7 +70,7 @@ export function InstructorForm({ instructor }: { instructor?: TypeInstructor }) 
     event.target.value = "";
 
     if (response.status === 401) {
-      window.location.assign("/login?next=/admin/instructors");
+      window.location.assign("/operator-login?next=/admin/instructors");
       return;
     }
 
@@ -103,7 +103,7 @@ export function InstructorForm({ instructor }: { instructor?: TypeInstructor }) 
     setLoading(false);
 
     if (response.status === 401) {
-      window.location.assign("/login?next=/admin/instructors");
+      window.location.assign("/operator-login?next=/admin/instructors");
       return;
     }
 

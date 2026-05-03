@@ -45,7 +45,7 @@ export function ForumList({ threads }: { threads: TypeForumThread[] }) {
     setDeletingUuid("");
 
     if (response.status === 401) {
-      window.location.assign("/login?next=/admin/foro");
+      window.location.assign("/operator-login?next=/admin/foro");
       return;
     }
 

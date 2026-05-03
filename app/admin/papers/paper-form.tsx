@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useState, type FormEvent } from "react";
+import { useMemo, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import type { TypePaperCategory } from "@/models/paper-categories";
 import type { TypePaper } from "@/models/papers";
 
 const controlClass =
@@ -13,7 +14,7 @@ const textareaClass =
 
 type PaperFormState = {
   title: string;
-  category: string;
+  categoryUuid: string;
   date: string;
   author: string;
   status: string;
@@ -32,10 +33,22 @@ function slugPreview(value: string) {
     .replace(/^-+|-+$/g, "");
 }
 
-function createFormState(paper?: TypePaper): PaperFormState {
+function createFormState(
+  paper?: TypePaper,
+  categories: TypePaperCategory[] = [],
+): PaperFormState {
+  const matchingCategory =
+    paper && !paper.categoryUuid
+      ? categories.find(
+          (category) =>
+            category.slug === paper.categorySlug ||
+            category.name.toLowerCase() === paper.category.toLowerCase(),
+        )
+      : undefined;
+
   return {
     title: paper?.title ?? "",
-    category: paper?.category ?? "",
+    categoryUuid: paper?.categoryUuid ?? matchingCategory?.uuid ?? "",
     date: paper?.date ?? "",
     author: paper?.author ?? "Rabbi Yattah",
     status: paper?.status ?? "draft",
@@ -45,12 +58,30 @@ function createFormState(paper?: TypePaper): PaperFormState {
   };
 }
 
-export function PaperForm({ paper }: { paper?: TypePaper }) {
+export function PaperForm({
+  categories,
+  paper,
+}: {
+  categories: TypePaperCategory[];
+  paper?: TypePaper;
+}) {
   const router = useRouter();
-  const [form, setForm] = useState(() => createFormState(paper));
+  const [form, setForm] = useState(() => createFormState(paper, categories));
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const isEditing = Boolean(paper?.uuid);
+  const selectedCategory = useMemo(
+    () => categories.find((category) => category.uuid === form.categoryUuid),
+    [categories, form.categoryUuid],
+  );
+  const availableCategories = useMemo(
+    () =>
+      categories.filter(
+        (category) => category.enabled || category.uuid === form.categoryUuid,
+      ),
+    [categories, form.categoryUuid],
+  );
+  const generatedSlug = slugPreview(form.title);
 
   function setField(name: keyof PaperFormState, value: string) {
     setForm((current) => ({ ...current, [name]: value }));
@@ -66,14 +97,25 @@ export function PaperForm({ paper }: { paper?: TypePaper }) {
       {
         method: isEditing ? "PATCH" : "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({
+          title: form.title,
+          categoryUuid: selectedCategory?.uuid ?? "",
+          category: selectedCategory?.name ?? "",
+          categorySlug: selectedCategory?.slug ?? "",
+          date: form.date,
+          author: form.author,
+          status: form.status,
+          visibility: form.visibility,
+          summary: form.summary,
+          content: form.content,
+        }),
       },
     );
 
     setLoading(false);
 
     if (response.status === 401) {
-      window.location.assign("/login?next=/admin/papers");
+      window.location.assign("/operator-login?next=/admin/papers");
       return;
     }
 
@@ -114,14 +156,35 @@ export function PaperForm({ paper }: { paper?: TypePaper }) {
             onChange={(value) => setField("title", value)}
           />
           <p className="text-xs font-semibold text-[var(--muted)]">
-            Generated slug: {slugPreview(form.title) || "paper-title"}
+            Generated slug: {generatedSlug || "paper-title"}
           </p>
         </div>
-        <TextField
-          label="Category"
-          value={form.category}
-          onChange={(value) => setField("category", value)}
-        />
+        <label className="grid gap-2 text-sm font-semibold text-[var(--ink)]">
+          Category
+          <select
+            className={controlClass}
+            required
+            value={form.categoryUuid}
+            onChange={(event) => setField("categoryUuid", event.target.value)}
+          >
+            <option value="">
+              {availableCategories.length
+                ? "Select a category"
+                : "Create a category first"}
+            </option>
+            {availableCategories.map((category) => (
+              <option key={category.uuid} value={category.uuid}>
+                {category.name}
+              </option>
+            ))}
+          </select>
+          <Link
+            href="/admin/paper-categories"
+            className="text-xs font-bold text-[var(--sapphire)] underline underline-offset-4"
+          >
+            Manage categories
+          </Link>
+        </label>
         <TextField
           label="Author"
           value={form.author}
@@ -239,4 +302,3 @@ function TextareaField({
     </label>
   );
 }
-

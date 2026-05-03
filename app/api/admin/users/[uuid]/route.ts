@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { schemaUser } from "@/models/users";
+import { schemaAdminUser } from "@/models/users";
 import { UserStorage } from "@/services/users-storage";
 import { readJson, requireAdminApi, routeError } from "@/app/api/_lib/admin-api";
 
@@ -37,7 +37,7 @@ export async function PATCH(
 
   try {
     const { uuid } = await params;
-    const payload = schemaUser.partial().parse(await readJson(request));
+    const payload = schemaAdminUser.partial().parse(await readJson(request));
     const item = await UserStorage.update(uuid, payload);
 
     if (!item) {
@@ -69,4 +69,3 @@ export async function DELETE(
 
   return NextResponse.json({ deleted: true });
 }
-

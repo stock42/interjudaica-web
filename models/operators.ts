@@ -6,7 +6,10 @@ import {
 } from "@/models/passwords";
 
 export const schemaOperator = z.object({
-  email: z.string().email("insert a valid email").transform((email) => email.toLowerCase()),
+  email: z
+    .string()
+    .email("insert a valid email")
+    .transform((email) => email.toLowerCase()),
   firstName: z.string().nullable().optional(),
   lastName: z.string().nullable().optional(),
   enabled: z.boolean().default(true),
@@ -16,10 +19,33 @@ export const schemaOperator = z.object({
   level: z.number().int().min(1).max(50).default(50),
 });
 
+export const schemaOperatorCreate = z.object({
+  email: z
+    .string()
+    .email("insert a valid email")
+    .transform((email) => email.toLowerCase()),
+  firstName: z.string().trim().nullable().optional(),
+  lastName: z.string().trim().nullable().optional(),
+  enabled: z.coerce.boolean().default(true),
+  password: z.string().min(8),
+  level: z.coerce.number().int().min(1).max(50).default(50),
+});
+
+export const schemaOperatorUpdate = schemaOperatorCreate
+  .partial()
+  .extend({
+    password: z.string().min(8).optional().or(z.literal("")),
+  });
+
 export type TypeOperator = z.infer<typeof schemaOperator>;
-export type TypeSafeOperator = Omit<TypeOperator, "password" | "verifyCode" | "uuid"> & {
+export type TypeSafeOperator = Omit<
+  TypeOperator,
+  "password" | "verifyCode" | "uuid"
+> & {
   uuid: string;
 };
+export type TypeOperatorCreate = z.infer<typeof schemaOperatorCreate>;
+export type TypeOperatorUpdate = z.infer<typeof schemaOperatorUpdate>;
 
 export class OperatorModel {
   private uuid: string;

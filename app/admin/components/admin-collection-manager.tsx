@@ -187,6 +187,9 @@ const configs: Record<AdminKind, EntityConfig> = {
       { name: "firstName", label: "First name" },
       { name: "lastName", label: "Last name" },
       { name: "email", label: "Email" },
+      { name: "country", label: "Country" },
+      { name: "state", label: "State" },
+      { name: "city", label: "City" },
       { name: "role", label: "Role" },
       {
         name: "status",
@@ -208,6 +211,11 @@ const configs: Record<AdminKind, EntityConfig> = {
           `${String(item.firstName ?? "")} ${String(item.lastName ?? "")}`.trim(),
       },
       { label: "Email", value: (item) => String(item.email ?? "") },
+      {
+        label: "Location",
+        value: (item) =>
+          [item.city, item.state, item.country].filter(Boolean).join(", "),
+      },
       { label: "Role", value: (item) => String(item.role ?? "") },
       { label: "Status", value: (item) => String(item.status ?? "") },
       { label: "Community", value: (item) => String(item.communityStatus ?? "") },
@@ -283,7 +291,7 @@ export function AdminCollectionManager({
     const response = await fetch(config.api);
 
     if (response.status === 401) {
-      window.location.assign("/login?next=/admin");
+      window.location.assign("/operator-login?next=/admin");
       return;
     }
 

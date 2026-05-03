@@ -45,7 +45,7 @@ export function PaperList({ papers }: { papers: TypePaper[] }) {
     setDeletingUuid("");
 
     if (response.status === 401) {
-      window.location.assign("/login?next=/admin/papers");
+      window.location.assign("/operator-login?next=/admin/papers");
       return;
     }
 

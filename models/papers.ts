@@ -8,7 +8,9 @@ export const schemaPaper = z.object({
   uuid: z.string().uuid().optional(),
   slug: z.string().trim().optional(),
   title: z.string().trim().min(2),
+  categoryUuid: z.string().uuid().optional().or(z.literal("")),
   category: z.string().trim().min(2),
+  categorySlug: z.string().trim().default(""),
   date: z.string().trim().default(""),
   summary: z.string().trim().default(""),
   content: z.string().trim().default(""),
@@ -30,6 +32,7 @@ export class PaperModel {
       ...parsedData,
       uuid: this.uuid,
       slug: slugify(parsedData.title),
+      categorySlug: parsedData.categorySlug || slugify(parsedData.category),
     };
   }
 

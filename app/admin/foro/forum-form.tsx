@@ -9,15 +9,20 @@ import type { TypeForumThread } from "@/models/forums";
 const controlClass =
   "min-h-11 rounded-md border border-[var(--line)] bg-[var(--paper)] px-3 text-sm font-normal outline-none transition focus:border-[var(--sapphire)] focus:ring-4 focus:ring-[rgba(19,70,160,0.14)]";
 
+const communityAreas = [
+  "Community Forum",
+  "Community Papers",
+  "General Questions",
+  "Announcements",
+  "Technical Support",
+];
+
 type ForumFormState = {
   title: string;
   area: string;
   courseSlug: string;
   status: string;
   featured: boolean;
-  repliesCount: string;
-  unreadCount: string;
-  lastActivityAt: string;
 };
 
 function slugPreview(value: string) {
@@ -33,13 +38,10 @@ function slugPreview(value: string) {
 function createFormState(thread?: TypeForumThread): ForumFormState {
   return {
     title: thread?.title ?? "",
-    area: thread?.area ?? "",
+    area: thread?.area ?? "Community Forum",
     courseSlug: thread?.courseSlug ?? "",
     status: thread?.status ?? "open",
     featured: thread?.featured ?? false,
-    repliesCount: String(thread?.repliesCount ?? 0),
-    unreadCount: String(thread?.unreadCount ?? 0),
-    lastActivityAt: thread?.lastActivityAt ?? "",
   };
 }
 
@@ -55,6 +57,10 @@ export function ForumForm({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const isEditing = Boolean(thread?.uuid);
+  const areaOptions = [
+    ...communityAreas,
+    ...courses.map((course) => course.title),
+  ].filter((area, index, all) => all.indexOf(area) === index);
 
   function setField<K extends keyof ForumFormState>(
     name: K,
@@ -79,9 +85,6 @@ export function ForumForm({
           courseSlug: form.courseSlug,
           status: form.status,
           featured: form.featured,
-          repliesCount: Number(form.repliesCount || 0),
-          unreadCount: Number(form.unreadCount || 0),
-          lastActivityAt: form.lastActivityAt,
         }),
       },
     );
@@ -89,7 +92,7 @@ export function ForumForm({
     setLoading(false);
 
     if (response.status === 401) {
-      window.location.assign("/login?next=/admin/foro");
+      window.location.assign("/operator-login?next=/admin/foro");
       return;
     }
 
@@ -133,11 +136,23 @@ export function ForumForm({
             Generated slug: {slugPreview(form.title) || "thread-title"}
           </p>
         </div>
-        <TextField
-          label="Area"
-          value={form.area}
-          onChange={(value) => setField("area", value)}
-        />
+        <label className="grid gap-2 text-sm font-semibold text-[var(--ink)]">
+          Area
+          <select
+            className={controlClass}
+            value={form.area}
+            onChange={(event) => setField("area", event.target.value)}
+          >
+            {areaOptions.map((area) => (
+              <option key={area} value={area}>
+                {area}
+              </option>
+            ))}
+          </select>
+          <span className="text-xs font-semibold text-[var(--muted)]">
+            Area groups the thread in the forum and moderation views.
+          </span>
+        </label>
         <label className="grid gap-2 text-sm font-semibold text-[var(--ink)]">
           Related course
           <select
@@ -164,27 +179,6 @@ export function ForumForm({
             <option value="closed">Closed</option>
             <option value="hidden">Hidden</option>
           </select>
-        </label>
-        <TextField
-          label="Replies"
-          type="number"
-          value={form.repliesCount}
-          onChange={(value) => setField("repliesCount", value)}
-        />
-        <TextField
-          label="Unread"
-          type="number"
-          value={form.unreadCount}
-          onChange={(value) => setField("unreadCount", value)}
-        />
-        <label className="grid gap-2 text-sm font-semibold text-[var(--ink)]">
-          Last activity
-          <input
-            className={controlClass}
-            type="date"
-            value={form.lastActivityAt}
-            onChange={(event) => setField("lastActivityAt", event.target.value)}
-          />
         </label>
         <label className="flex items-center gap-3 self-end rounded-md border border-[var(--line)] bg-[var(--paper)] px-3 py-3 text-sm font-semibold text-[var(--ink)]">
           <input
@@ -231,14 +225,13 @@ function TextField({
   label: string;
   value: string;
   onChange: (value: string) => void;
-  type?: "number" | "text";
+  type?: "text";
 }) {
   return (
     <label className="grid gap-2 text-sm font-semibold text-[var(--ink)]">
       {label}
       <input
         className={controlClass}
-        min={type === "number" ? 0 : undefined}
         type={type}
         value={value}
         onChange={(event) => onChange(event.target.value)}
@@ -246,4 +239,3 @@ function TextField({
     </label>
   );
 }
-

@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { schemaUser } from "@/models/users";
+import { schemaAdminUser } from "@/models/users";
 import { UserStorage } from "@/services/users-storage";
 import { readJson, requireAdminApi, routeError } from "@/app/api/_lib/admin-api";
 
@@ -24,11 +24,10 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const payload = schemaUser.parse(await readJson(request));
+    const payload = schemaAdminUser.parse(await readJson(request));
     const item = await UserStorage.create(payload);
     return NextResponse.json({ item }, { status: 201 });
   } catch (error) {
     return routeError(error);
   }
 }
-

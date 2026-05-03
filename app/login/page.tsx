@@ -3,7 +3,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { AuthPanel } from "@/app/components/portal-ui";
 import { LoginForm } from "@/app/login/login-form";
-import { getCurrentOperator } from "@/services/auth";
+import { getCurrentUser } from "@/services/user-auth";
 
 export const metadata: Metadata = {
   title: "Sign in",
@@ -15,25 +15,25 @@ export default async function LoginPage({
 }: {
   searchParams: Promise<{ next?: string }>;
 }) {
-  const operator = await getCurrentOperator();
+  const user = await getCurrentUser();
   const { next } = await searchParams;
 
-  if (operator) {
-    redirect(next?.startsWith("/") ? next : "/admin");
+  if (user) {
+    redirect(next?.startsWith("/") ? next : "/dashboard");
   }
 
   return (
     <AuthPanel
-      eyebrow="Backoffice"
-      title="Admin access"
-      text="Enter with an operator account to manage courses, papers, forum threads, students, and platform operations."
+      eyebrow="Student access"
+      title="Sign in to InterJudaica"
+      text="Use your student account to access courses, community membership, papers, and forum discussions."
     >
       <LoginForm nextPath={next} />
       <Link
-        href="/"
+        href="/register"
         className="mt-5 inline-flex text-sm font-semibold text-[var(--sapphire)] underline underline-offset-4"
       >
-        Back to site
+        Create student account
       </Link>
     </AuthPanel>
   );

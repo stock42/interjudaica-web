@@ -47,7 +47,7 @@ export function CourseCategoryList({
     setDeletingUuid("");
 
     if (response.status === 401) {
-      window.location.assign("/login?next=/admin/course-categories");
+      window.location.assign("/operator-login?next=/admin/course-categories");
       return;
     }
 

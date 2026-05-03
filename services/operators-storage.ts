@@ -1,6 +1,12 @@
 import "server-only";
 
-import { type TypeOperator, type TypeSafeOperator, OperatorModel } from "@/models/operators";
+import {
+  OperatorModel,
+  type TypeOperator,
+  type TypeOperatorCreate,
+  type TypeOperatorUpdate,
+  type TypeSafeOperator,
+} from "@/models/operators";
 import { MongoDBStorage, type TypeDocument } from "@/services/MongoDBStorage";
 
 export class OperatorStorage extends MongoDBStorage<TypeOperator> {
@@ -61,7 +67,88 @@ export class OperatorStorage extends MongoDBStorage<TypeOperator> {
     });
 
     await operator.setPassword("1NterJuda1c4");
-    await MongoDBStorage._insert<TypeOperator>(OperatorStorage.COLLECTION, operator);
+    await MongoDBStorage._insert<TypeOperator>(
+      OperatorStorage.COLLECTION,
+      operator,
+    );
+  }
+
+  static async list() {
+    await OperatorStorage.ensureDefaultOperator();
+    const docs = await MongoDBStorage._find<TypeOperator>(
+      OperatorStorage.COLLECTION,
+      {},
+      undefined,
+      { "data.email": 1 },
+    );
+
+    return docs.map((doc) => OperatorStorage.toSafeOperator(doc));
+  }
+
+  static async get(uuid: string) {
+    await OperatorStorage.ensureDefaultOperator();
+    const doc = await MongoDBStorage._getByUUID<TypeOperator>(
+      OperatorStorage.COLLECTION,
+      uuid,
+    );
+
+    return doc ? OperatorStorage.toSafeOperator(doc) : null;
+  }
+
+  static async create(input: TypeOperatorCreate) {
+    await OperatorStorage.ensureIndexes();
+    const operator = new OperatorModel({
+      email: input.email,
+      firstName: input.firstName ?? null,
+      lastName: input.lastName ?? null,
+      enabled: input.enabled,
+      level: input.level,
+      password: "",
+    });
+
+    await operator.setPassword(input.password);
+    await MongoDBStorage._insert<TypeOperator>(
+      OperatorStorage.COLLECTION,
+      operator,
+    );
+
+    return operator.toSafeData();
+  }
+
+  static async update(uuid: string, input: TypeOperatorUpdate) {
+    await OperatorStorage.ensureIndexes();
+    const existing = await MongoDBStorage._getByUUID<TypeOperator>(
+      OperatorStorage.COLLECTION,
+      uuid,
+    );
+
+    if (!existing) {
+      return null;
+    }
+
+    const operator = new OperatorModel({
+      ...existing.data,
+      ...input,
+      uuid,
+      password: existing.data.password,
+    });
+
+    if (input.password?.trim()) {
+      await operator.setPassword(input.password);
+    }
+
+    await MongoDBStorage._replaceData<TypeOperator>(
+      OperatorStorage.COLLECTION,
+      uuid,
+      operator.getData(),
+    );
+
+    return operator.toSafeData();
+  }
+
+  static async delete(uuid: string) {
+    await OperatorStorage.ensureIndexes();
+    return MongoDBStorage._delete(OperatorStorage.COLLECTION, uuid);
   }
 
   static async findByEmail(email: string) {
@@ -74,7 +161,10 @@ export class OperatorStorage extends MongoDBStorage<TypeOperator> {
 
   static async findByUUID(uuid: string) {
     await OperatorStorage.ensureIndexes();
-    return MongoDBStorage._getByUUID<TypeOperator>(OperatorStorage.COLLECTION, uuid);
+    return MongoDBStorage._getByUUID<TypeOperator>(
+      OperatorStorage.COLLECTION,
+      uuid,
+    );
   }
 
   static async authenticate(email: string, password: string) {

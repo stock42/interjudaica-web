@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { PaperForm } from "@/app/admin/papers/paper-form";
 import { AdminShell } from "@/app/components/portal-ui";
+import { PaperCategoryStorage } from "@/services/paper-categories-storage";
 import { PaperStorage } from "@/services/papers-storage";
 
 export const metadata: Metadata = {
@@ -17,7 +18,10 @@ export default async function EditPaperPage({
   params: Promise<{ uuid: string }>;
 }) {
   const { uuid } = await params;
-  const paper = await PaperStorage.get(uuid);
+  const [paper, categories] = await Promise.all([
+    PaperStorage.get(uuid),
+    PaperCategoryStorage.list(),
+  ]);
 
   if (!paper) {
     notFound();
@@ -28,8 +32,7 @@ export default async function EditPaperPage({
       title="Edit paper"
       description="Update article metadata, visibility, and content."
     >
-      <PaperForm paper={paper} />
+      <PaperForm categories={categories} paper={paper} />
     </AdminShell>
   );
 }
-

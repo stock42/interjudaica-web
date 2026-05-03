@@ -106,7 +106,7 @@ export async function requireOperator() {
   const operator = await getCurrentOperator();
 
   if (!operator) {
-    redirect("/login?next=/admin");
+    redirect("/operator-login?next=/admin");
   }
 
   return operator;
@@ -115,4 +115,3 @@ export async function requireOperator() {
 export async function authenticateApiRequest(request: NextRequest) {
   return getOperatorFromToken(request.cookies.get(SESSION_COOKIE_NAME)?.value);
 }
-

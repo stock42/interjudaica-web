@@ -57,7 +57,7 @@ export function InstructorList({
     setDeletingUuid("");
 
     if (response.status === 401) {
-      window.location.assign("/login?next=/admin/instructors");
+      window.location.assign("/operator-login?next=/admin/instructors");
       return;
     }
 

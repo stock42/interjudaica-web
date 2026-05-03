@@ -132,7 +132,7 @@ export function CourseForm({
     event.target.value = "";
 
     if (response.status === 401) {
-      window.location.assign("/login?next=/admin/cursos");
+      window.location.assign("/operator-login?next=/admin/cursos");
       return;
     }
 
@@ -186,7 +186,7 @@ export function CourseForm({
     setLoading(false);
 
     if (response.status === 401) {
-      window.location.assign("/login?next=/admin/cursos");
+      window.location.assign("/operator-login?next=/admin/cursos");
       return;
     }
 

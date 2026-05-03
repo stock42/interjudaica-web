@@ -7,9 +7,12 @@ import {
 export const runtime = "nodejs";
 
 export async function POST(request: NextRequest) {
-  const response = NextResponse.redirect(new URL("/login", request.url), {
-    status: 303,
-  });
+  const response = NextResponse.redirect(
+    new URL("/operator-login", request.url),
+    {
+      status: 303,
+    },
+  );
 
   response.cookies.set(SESSION_COOKIE_NAME, "", {
     ...sessionCookieOptions(),
@@ -18,4 +21,3 @@ export async function POST(request: NextRequest) {
 
   return response;
 }
-

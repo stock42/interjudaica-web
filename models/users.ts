@@ -1,5 +1,9 @@
 import { z } from "zod";
 import { createUuid } from "@/models/model-utils";
+import {
+  hashPassword,
+  verifyPassword as verifyStoredPassword,
+} from "@/models/passwords";
 
 export const userStatuses = ["active", "disabled", "pending"] as const;
 export const communityStatuses = ["none", "active", "cancelled", "manual"] as const;
@@ -9,12 +13,38 @@ export const schemaUser = z.object({
   email: z.string().email().transform((email) => email.toLowerCase()),
   firstName: z.string().trim().default(""),
   lastName: z.string().trim().default(""),
+  country: z.string().trim().default(""),
+  state: z.string().trim().default(""),
+  city: z.string().trim().default(""),
+  password: z.string().default(""),
   role: z.string().trim().default("student"),
   status: z.enum(userStatuses).default("active"),
   communityStatus: z.enum(communityStatuses).default("none"),
 });
 
+export const schemaUserSignup = z.object({
+  email: z.string().email().transform((email) => email.toLowerCase()),
+  firstName: z.string().trim().min(1),
+  lastName: z.string().trim().min(1),
+  country: z.string().trim().min(1),
+  state: z.string().trim().min(1),
+  city: z.string().trim().min(1),
+  password: z.string().min(8),
+});
+
+export const schemaUserSignin = z.object({
+  email: z.string().email().transform((email) => email.toLowerCase()),
+  password: z.string().min(1),
+});
+
+export const schemaAdminUser = schemaUser.omit({ password: true });
+
 export type TypeUser = z.infer<typeof schemaUser>;
+export type TypeUserSignup = z.infer<typeof schemaUserSignup>;
+export type TypeUserSignin = z.infer<typeof schemaUserSignin>;
+export type TypeSafeUser = Omit<TypeUser, "password" | "uuid"> & {
+  uuid: string;
+};
 
 export class UserModel {
   private uuid: string;
@@ -36,5 +66,27 @@ export class UserModel {
   getUUID(): string {
     return this.uuid;
   }
-}
 
+  async setPassword(password: string) {
+    this.userData.password = await hashPassword(password);
+  }
+
+  async verifyPassword(password: string): Promise<boolean> {
+    return verifyStoredPassword(password, this.userData.password);
+  }
+
+  toSafeData(): TypeSafeUser {
+    return {
+      uuid: this.uuid,
+      email: this.userData.email,
+      firstName: this.userData.firstName,
+      lastName: this.userData.lastName,
+      country: this.userData.country,
+      state: this.userData.state,
+      city: this.userData.city,
+      role: this.userData.role,
+      status: this.userData.status,
+      communityStatus: this.userData.communityStatus,
+    };
+  }
+}

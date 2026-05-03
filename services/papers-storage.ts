@@ -23,6 +23,7 @@ export class PaperStorage extends MongoDBStorage<TypePaper> {
     await Promise.all([
       collection.createIndex({ uuid: 1 }, { unique: true }),
       collection.createIndex({ "data.slug": 1 }, { unique: true }),
+      collection.createIndex({ "data.categoryUuid": 1 }),
       collection.createIndex({ "data.status": 1, "data.visibility": 1 }),
       collection.createIndex({ "data.title": "text", "data.category": "text" }),
     ]);
@@ -90,4 +91,3 @@ export class PaperStorage extends MongoDBStorage<TypePaper> {
     return MongoDBStorage._delete(PaperStorage.COLLECTION, uuid);
   }
 }
-
