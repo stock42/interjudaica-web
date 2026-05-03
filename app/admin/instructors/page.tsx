@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import { AdminCollectionManager } from "@/app/admin/components/admin-collection-manager";
 import { AdminShell } from "@/app/components/portal-ui";
+import { InstructorList } from "@/app/admin/instructors/instructor-list";
 import { InstructorStorage } from "@/services/instructors-storage";
 
 export const metadata: Metadata = {
@@ -18,7 +18,7 @@ export default async function InstructorsPage() {
       title="Instructors"
       description="Manage instructors assigned to courses and public catalog records."
     >
-      <AdminCollectionManager kind="instructors" initialItems={instructors} />
+      <InstructorList instructors={instructors} />
     </AdminShell>
   );
 }

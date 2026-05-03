@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { AdminCollectionManager } from "@/app/admin/components/admin-collection-manager";
+import { CourseCategoryList } from "@/app/admin/course-categories/category-list";
 import { AdminShell } from "@/app/components/portal-ui";
 import { CourseCategoryStorage } from "@/services/course-categories-storage";
 
@@ -18,10 +18,7 @@ export default async function CourseCategoriesPage() {
       title="Course categories"
       description="Manage the categories used to organize the course catalog."
     >
-      <AdminCollectionManager
-        kind="course-categories"
-        initialItems={categories}
-      />
+      <CourseCategoryList categories={categories} />
     </AdminShell>
   );
 }

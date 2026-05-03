@@ -28,7 +28,7 @@ export class ForumThreadModel {
     this.threadData = {
       ...parsedData,
       uuid: this.uuid,
-      slug: parsedData.slug?.trim() || slugify(parsedData.title),
+      slug: slugify(parsedData.title),
     };
   }
 
@@ -40,4 +40,3 @@ export class ForumThreadModel {
     return this.uuid;
   }
 }
-

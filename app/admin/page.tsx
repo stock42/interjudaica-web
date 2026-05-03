@@ -4,8 +4,10 @@ import {
   AdminStatGrid,
   DataTable,
 } from "@/app/components/portal-ui";
+import { CourseCategoryStorage } from "@/services/course-categories-storage";
 import { CourseStorage } from "@/services/courses-storage";
 import { ForumStorage } from "@/services/forums-storage";
+import { InstructorStorage } from "@/services/instructors-storage";
 import { PaperStorage } from "@/services/papers-storage";
 import { UserStorage } from "@/services/users-storage";
 
@@ -17,12 +19,15 @@ export const metadata: Metadata = {
 export const runtime = "nodejs";
 
 export default async function AdminPage() {
-  const [courses, papers, forums, users] = await Promise.all([
+  const [categories, courses, forums, instructors, papers, users] =
+    await Promise.all([
+      CourseCategoryStorage.list(),
     CourseStorage.list(),
-    PaperStorage.list(),
     ForumStorage.list(),
-    UserStorage.list(),
-  ]);
+      InstructorStorage.list(),
+      PaperStorage.list(),
+      UserStorage.list(),
+    ]);
 
   const publishedCourses = courses.filter((course) => course.status === "published");
   const publishedPapers = papers.filter((paper) => paper.status === "published");
@@ -62,7 +67,24 @@ export default async function AdminPage() {
         <DataTable
           columns={["Area", "Records", "Published/Open", "Admin path"]}
           rows={[
-            ["Courses", String(courses.length), String(publishedCourses.length), "/admin/cursos"],
+            [
+              "Courses",
+              String(courses.length),
+              String(publishedCourses.length),
+              "/admin/cursos",
+            ],
+            [
+              "Course categories",
+              String(categories.length),
+              String(categories.filter((category) => category.enabled).length),
+              "/admin/course-categories",
+            ],
+            [
+              "Instructors",
+              String(instructors.length),
+              String(instructors.filter((instructor) => instructor.enabled).length),
+              "/admin/instructors",
+            ],
             ["Papers", String(papers.length), String(publishedPapers.length), "/admin/papers"],
             ["Forum", String(forums.length), String(openThreads.length), "/admin/foro"],
             ["Users", String(users.length), String(activeUsers.length), "/admin/usuarios"],

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import { AdminCollectionManager } from "@/app/admin/components/admin-collection-manager";
 import { AdminShell } from "@/app/components/portal-ui";
+import { PaperList } from "@/app/admin/papers/paper-list";
 import { PaperStorage } from "@/services/papers-storage";
 
 export const metadata: Metadata = {
@@ -18,7 +18,7 @@ export default async function AdminPapersPage() {
       title="Papers"
       description="Create, edit, and publish member-only papers and articles from Rabbi Yattah."
     >
-      <AdminCollectionManager kind="papers" initialItems={papers} />
+      <PaperList papers={papers} />
     </AdminShell>
   );
 }

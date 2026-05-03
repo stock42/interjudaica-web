@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { AdminCollectionManager } from "@/app/admin/components/admin-collection-manager";
+import { ForumList } from "@/app/admin/foro/forum-list";
 import { AdminShell } from "@/app/components/portal-ui";
 import { ForumStorage } from "@/services/forums-storage";
 
@@ -18,7 +18,7 @@ export default async function AdminForumPage() {
       title="Forum moderation"
       description="Review course and community threads, hide posts, delete spam, and mark conversations as featured."
     >
-      <AdminCollectionManager kind="forums" initialItems={forums} />
+      <ForumList threads={forums} />
     </AdminShell>
   );
 }

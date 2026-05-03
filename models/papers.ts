@@ -29,7 +29,7 @@ export class PaperModel {
     this.paperData = {
       ...parsedData,
       uuid: this.uuid,
-      slug: parsedData.slug?.trim() || slugify(parsedData.title),
+      slug: slugify(parsedData.title),
     };
   }
 
@@ -41,4 +41,3 @@ export class PaperModel {
     return this.uuid;
   }
 }
-
