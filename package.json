@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
+    "start": "PORT=3025 next start",
     "lint": "eslint"
   },
   "dependencies": {
