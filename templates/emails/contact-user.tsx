@@ -2,6 +2,12 @@ import * as React from "react";
 
 import { base, card, h1, palette, small } from "@/templates/emails/_styles";
 
+const LOGO_URL =
+  "https://interjudaica.com/_next/image?url=%2Flogo-interjudaica-transparente.png&w=1920&q=75";
+
+const RABBI_URL =
+  "https://interjudaica.com/_next/image?url=%2Ffoto-ernesto-yattah-bg-transparent.png&w=1920&q=75";
+
 export default function ContactUserEmail({
   firstName,
   lastName,
@@ -16,11 +22,14 @@ export default function ContactUserEmail({
       <div style={card}>
         <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
           <img
-            src="https://interjudaica.com/_next/image?url=%2Flogo-interjudaica-transparente.png&w=1920&q=75"
+            src={LOGO_URL}
             width={56}
             height={56}
             alt="InterJudaica"
-            style={{ borderRadius: 9999, border: `1px solid ${palette.line}` }}
+            style={{
+              borderRadius: 9999,
+              border: `1px solid ${palette.line}`,
+            }}
           />
           <div>
             <p
@@ -41,13 +50,74 @@ export default function ContactUserEmail({
           </div>
         </div>
 
-        <div style={{ marginTop: 18, color: palette.muted, fontSize: 14, lineHeight: "22px" }}>
+        <div
+          style={{
+            marginTop: 18,
+            color: palette.muted,
+            fontSize: 14,
+            lineHeight: "22px",
+          }}
+        >
           <p style={{ margin: 0 }}>
             Hi {firstName} {lastName},
           </p>
           <p style={{ margin: "10px 0 0" }}>
-            We received your message and will get back to you as soon as possible.
+            We received your message and will get back to you as soon as
+            possible.
           </p>
+        </div>
+
+        <div
+          style={{
+            marginTop: 18,
+            display: "flex",
+            gap: 14,
+            alignItems: "center",
+            border: `1px solid ${palette.line}`,
+            borderRadius: 12,
+            padding: 14,
+            backgroundColor: "rgba(0,0,0,0.28)",
+          }}
+        >
+          <img
+            src={RABBI_URL}
+            width={96}
+            height={96}
+            alt="Rabbi Ernesto Yattah"
+            style={{
+              borderRadius: 14,
+              border: `1px solid ${palette.line}`,
+              backgroundColor: "rgba(0,0,0,0.18)",
+            }}
+          />
+          <div style={{ color: palette.text }}>
+            <p style={{ margin: 0, color: palette.gold, fontWeight: 800 }}>
+              Rabbi Ernesto Yattah
+            </p>
+            <p
+              style={{
+                margin: "6px 0 0",
+                color: palette.muted,
+                fontSize: 14,
+                lineHeight: "22px",
+              }}
+            >
+              Teacher, guide, and passionate advocate for serious Jewish
+              learning. Rabbi Yattah brings years of study and teaching
+              experience into a clear, warm, and rigorous learning environment.
+            </p>
+            <p
+              style={{
+                margin: "10px 0 0",
+                color: palette.muted,
+                fontSize: 13,
+                lineHeight: "20px",
+              }}
+            >
+              Rabbi Yattah and his team will respond to your message as soon as
+              possible.
+            </p>
+          </div>
         </div>
 
         <div

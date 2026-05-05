@@ -44,3 +44,6 @@
 
 ## Unreleased
 - Improve contact email templates styling to match the dark/gold website theme and include the brand logo.
+
+## Unreleased
+- Add Rabbi Ernesto Yattah block to contact emails (photo + bio + response promise).
