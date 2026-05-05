@@ -96,3 +96,6 @@
 
 ## Unreleased
 - Use components/ui Select for admin forum form (area, related course, status).
+
+## Unreleased
+- Use components/ui Select for admin operator form (level).

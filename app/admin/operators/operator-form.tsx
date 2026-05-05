@@ -6,6 +6,7 @@ import { useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useRouter } from "next/navigation";
 import type { TypeSafeOperator } from "@/models/operators";
 
@@ -126,18 +127,19 @@ export function OperatorForm({
           value={form.email}
           onChange={(value) => setField("email", value)}
         />
-        <label className="grid gap-2 text-sm font-semibold text-[var(--ink)]">
-          Level
-          <select
-            className="h-11 w-full"
-            value={form.level}
-            onChange={(event) => setField("level", event.target.value)}
-          >
-            <option value="50">50 - Administrator</option>
-            <option value="30">30 - Manager</option>
-            <option value="10">10 - Support</option>
-          </select>
-        </label>
+        <div className="grid gap-2 text-sm font-semibold text-[var(--ink)]">
+          <Label>Level</Label>
+          <Select value={form.level} onValueChange={(value) => setField("level", value)}>
+            <SelectTrigger className="h-11 w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="50">50 - Administrator</SelectItem>
+              <SelectItem value="30">30 - Manager</SelectItem>
+              <SelectItem value="10">10 - Support</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
         <TextField
           label={isEditing ? "New password" : "Password"}
           type="password"
