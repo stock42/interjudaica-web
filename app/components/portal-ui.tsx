@@ -65,8 +65,8 @@ export function ButtonLink({
 
 export function SiteHeader() {
   return (
-    <header className="sticky top-0 z-50 border-b border-[var(--line)] bg-[rgba(5,6,8,0.94)] shadow-[0_12px_40px_rgba(0,0,0,0.28)] backdrop-blur-xl">
-      <div className="mx-auto flex w-full max-w-[1320px] flex-wrap items-center justify-between gap-4 px-5 py-4 sm:px-8 lg:px-10">
+    <header className="sticky top-0 z-50 border-b border-[var(--line)] bg-[rgba(5,6,8,0.96)] shadow-[0_12px_40px_rgba(0,0,0,0.28)] backdrop-blur-xl">
+      <div className="mx-auto flex w-full flex-wrap items-center justify-between gap-5 px-6 py-4 sm:px-10 lg:px-16 xl:px-20 2xl:px-24">
         <Link
           href="/"
           className="flex min-w-0 items-center gap-3"
@@ -77,11 +77,11 @@ export function SiteHeader() {
             alt="InterJudaica logo"
             width={1500}
             height={1500}
-            className="h-16 w-16 shrink-0 rounded-full"
+            className="h-[4.5rem] w-[4.5rem] shrink-0 rounded-full"
             priority
           />
           <span className="grid min-w-0 leading-none">
-            <span className="font-display text-2xl font-semibold uppercase tracking-[0.18em] text-[var(--gold)]">
+            <span className="font-display text-3xl font-semibold uppercase tracking-[0.18em] text-[var(--gold)]">
               InterJudaica
             </span>
             <span className="mt-1 hidden text-[0.62rem] font-bold uppercase tracking-[0.28em] text-[var(--gold)] sm:block">
@@ -92,13 +92,13 @@ export function SiteHeader() {
 
         <nav
           aria-label="Primary navigation"
-          className="order-3 -mx-4 flex w-[calc(100%+2rem)] gap-1 overflow-x-auto px-4 pb-1 sm:order-none sm:mx-0 sm:w-auto sm:overflow-visible sm:px-0"
+          className="order-3 -mx-4 flex w-[calc(100%+2rem)] gap-4 overflow-x-auto px-4 pb-1 sm:order-none sm:mx-0 sm:w-auto sm:overflow-visible sm:px-0 lg:gap-8"
         >
           {navItems.map((item) => (
             <Link
               key={item.href}
               href={item.href}
-              className="shrink-0 rounded-md border border-transparent px-3 py-2 text-sm font-medium text-[rgba(248,242,232,0.84)] transition hover:border-[var(--line)] hover:bg-[rgba(244,189,51,0.1)] hover:text-[var(--gold)]"
+              className="shrink-0 border-b-2 border-transparent px-1 py-2 text-base font-medium text-[rgba(248,242,232,0.9)] transition hover:border-[var(--gold)] hover:text-[var(--gold)]"
             >
               {item.label}
             </Link>
@@ -106,7 +106,9 @@ export function SiteHeader() {
         </nav>
 
         <div className="flex shrink-0 items-center gap-2">
-          <ButtonLink href="/register">Enroll</ButtonLink>
+          <ButtonLink href="/register" className="min-w-36">
+            Enroll
+          </ButtonLink>
         </div>
       </div>
     </header>
@@ -126,7 +128,7 @@ export function SiteFooter() {
         height={1024}
         className="pointer-events-none absolute -right-32 -top-28 h-80 w-80 opacity-[0.08]"
       />
-      <div className="relative mx-auto grid w-full max-w-[1320px] gap-10 px-5 py-12 sm:px-8 lg:grid-cols-[1fr_2.2fr] lg:px-10">
+      <div className="relative mx-auto grid w-full gap-10 px-6 py-12 sm:px-10 lg:grid-cols-[1.15fr_0.65fr_1.35fr_0.7fr] lg:px-16 xl:px-20 2xl:px-24">
         <div>
           <div className="flex items-center gap-3">
             <Image
@@ -152,64 +154,74 @@ export function SiteFooter() {
           </p>
         </div>
 
-        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-[0.9fr_0.9fr_1.4fr]">
-          <FooterColumn
-            title="Navigation"
-            links={[
-              { href: "/", label: "Home" },
-              { href: "/cursos", label: "All courses" },
-              { href: "/comunidad", label: "Community" },
-              { href: "/comunidad/papers", label: "Papers" },
-              { href: "/#about-rabbi", label: "About Rabbi" },
-            ]}
-          />
-          <FooterColumn
-            title="Student"
-            links={[
-              { href: "/dashboard", label: "Dashboard" },
-              { href: "/login", label: "Sign in" },
-              { href: "/register", label: "Create account" },
-            ]}
-          />
-          <div>
-            <h2 className="text-sm font-semibold uppercase tracking-[0.16em] text-[var(--gold)]">
-              Contact
-            </h2>
-            <div className="mt-4 grid gap-3 text-sm leading-6 text-white/70">
-              <Link
-                href={contactInfo.whatsappHref}
-                className="transition hover:text-[var(--gold)]"
-                target="_blank"
-                rel="noreferrer"
-              >
-                WhatsApp: {contactInfo.whatsapp}
-              </Link>
-              <Link
-                href={`mailto:${contactInfo.email}`}
-                className="transition hover:text-[var(--gold)]"
-              >
-                Email: {contactInfo.email}
-              </Link>
-              <div>
-                <p className="font-semibold text-[var(--ink)]">Office Hours</p>
-                <div className="mt-1 grid gap-1">
-                  {contactInfo.officeHours.map((line) => (
-                    <p key={line}>{line}</p>
-                  ))}
-                </div>
+        <FooterColumn
+          title="Navigation"
+          links={[
+            { href: "/", label: "Home" },
+            { href: "/cursos", label: "Courses" },
+            { href: "/#about-rabbi", label: "About Rabbi" },
+            { href: "/#contact", label: "Contact" },
+          ]}
+        />
+
+        <div>
+          <h2 className="text-sm font-semibold uppercase tracking-[0.16em] text-[var(--gold)]">
+            Contact
+          </h2>
+          <div className="mt-4 grid gap-3 text-sm leading-6 text-white/70">
+            <Link
+              href={contactInfo.whatsappHref}
+              className="transition hover:text-[var(--gold)]"
+              target="_blank"
+              rel="noreferrer"
+            >
+              WhatsApp: {contactInfo.whatsapp}
+            </Link>
+            <Link
+              href={`mailto:${contactInfo.email}`}
+              className="transition hover:text-[var(--gold)]"
+            >
+              Email: {contactInfo.email}
+            </Link>
+            <div>
+              <p className="font-semibold text-[var(--ink)]">Office Hours</p>
+              <div className="mt-1 grid gap-1">
+                {contactInfo.officeHours.map((line) => (
+                  <p key={line}>{line}</p>
+                ))}
               </div>
             </div>
           </div>
         </div>
+
+        <div>
+          <h2 className="text-sm font-semibold uppercase tracking-[0.16em] text-[var(--gold)]">
+            Follow us
+          </h2>
+          <div className="mt-5 flex flex-wrap gap-3">
+            {["F", "I", "Y", "W"].map((label) => (
+              <Link
+                key={label}
+                href={label === "W" ? contactInfo.whatsappHref : "#"}
+                target={label === "W" ? "_blank" : undefined}
+                rel={label === "W" ? "noreferrer" : undefined}
+                aria-label={label === "W" ? "WhatsApp" : `Social link ${label}`}
+                className="flex h-10 w-10 items-center justify-center rounded-full border border-[var(--gold)] text-sm font-bold text-[var(--gold)] transition hover:bg-[var(--gold)] hover:text-[#07090c]"
+              >
+                {label}
+              </Link>
+            ))}
+          </div>
+        </div>
       </div>
-      <div className="relative mx-auto flex w-full max-w-[1320px] flex-col gap-3 border-t border-[var(--line)] px-5 py-5 text-xs text-white/55 sm:flex-row sm:items-center sm:justify-between sm:px-8 lg:px-10">
+      <div className="relative mx-auto flex w-full flex-col gap-3 border-t border-[var(--line)] px-6 py-5 text-xs text-white/55 sm:flex-row sm:items-center sm:justify-between sm:px-10 lg:px-16 xl:px-20 2xl:px-24">
         <p>Copyright 2026 InterJudaica. All rights reserved.</p>
         <div className="flex flex-wrap gap-4">
-          <Link href="/operator-login" className="transition hover:text-[var(--gold)]">
-            Operator access
+          <Link href="#" className="transition hover:text-[var(--gold)]">
+            Terms and conditions
           </Link>
-          <Link href="/admin" className="transition hover:text-[var(--gold)]">
-            Backoffice
+          <Link href="#" className="transition hover:text-[var(--gold)]">
+            Privacy
           </Link>
         </div>
       </div>
