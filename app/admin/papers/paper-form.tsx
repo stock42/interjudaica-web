@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useRouter } from "next/navigation";
 import type { TypePaperCategory } from "@/models/paper-categories";
 import type { TypePaper } from "@/models/papers";
@@ -159,32 +160,38 @@ export function PaperForm({
             Generated slug: {generatedSlug || "paper-title"}
           </p>
         </div>
-        <label className="grid gap-2 text-sm font-semibold text-[var(--ink)]">
-          Category
-          <select
-            className="h-11 w-full"
-            required
-            value={form.categoryUuid}
-            onChange={(event) => setField("categoryUuid", event.target.value)}
+        <div className="grid gap-2 text-sm font-semibold text-[var(--ink)]">
+          <Label>Category</Label>
+          <Select
+            value={form.categoryUuid || ""}
+            onValueChange={(value) => setField("categoryUuid", value)}
           >
-            <option value="">
-              {availableCategories.length
-                ? "Select a category"
-                : "Create a category first"}
-            </option>
-            {availableCategories.map((category) => (
-              <option key={category.uuid} value={category.uuid}>
-                {category.name}
-              </option>
-            ))}
-          </select>
+            <SelectTrigger className="h-11 w-full">
+              <SelectValue
+                placeholder={
+                  availableCategories.length
+                    ? "Select a category"
+                    : "Create a category first"
+                }
+              />
+            </SelectTrigger>
+            <SelectContent>
+              {availableCategories
+                .filter((category) => Boolean(category.uuid))
+                .map((category) => (
+                  <SelectItem key={category.uuid} value={category.uuid ?? ""}>
+                    {category.name}
+                  </SelectItem>
+                ))}
+            </SelectContent>
+          </Select>
           <Link
             href="/admin/paper-categories"
             className="text-xs font-bold text-[var(--sapphire)] underline underline-offset-4"
           >
             Manage categories
           </Link>
-        </label>
+        </div>
         <TextField
           label="Author"
           value={form.author}
@@ -199,30 +206,32 @@ export function PaperForm({
             onChange={(event) => setField("date", event.target.value)}
           />
         </label>
-        <label className="grid gap-2 text-sm font-semibold text-[var(--ink)]">
-          Status
-          <select
-            className="h-11 w-full"
-            value={form.status}
-            onChange={(event) => setField("status", event.target.value)}
-          >
-            <option value="draft">Draft</option>
-            <option value="published">Published</option>
-            <option value="archived">Archived</option>
-          </select>
-        </label>
-        <label className="grid gap-2 text-sm font-semibold text-[var(--ink)]">
-          Visibility
-          <select
-            className="h-11 w-full"
-            value={form.visibility}
-            onChange={(event) => setField("visibility", event.target.value)}
-          >
-            <option value="public">Public</option>
-            <option value="community">Community</option>
-            <option value="private">Private</option>
-          </select>
-        </label>
+        <div className="grid gap-2 text-sm font-semibold text-[var(--ink)]">
+          <Label>Status</Label>
+          <Select value={form.status} onValueChange={(value) => setField("status", value)}>
+            <SelectTrigger className="h-11 w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="draft">Draft</SelectItem>
+              <SelectItem value="published">Published</SelectItem>
+              <SelectItem value="archived">Archived</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="grid gap-2 text-sm font-semibold text-[var(--ink)]">
+          <Label>Visibility</Label>
+          <Select value={form.visibility} onValueChange={(value) => setField("visibility", value)}>
+            <SelectTrigger className="h-11 w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="public">Public</SelectItem>
+              <SelectItem value="community">Community</SelectItem>
+              <SelectItem value="private">Private</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
         <TextareaField
           label="Summary"
           value={form.summary}

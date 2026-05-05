@@ -90,3 +90,6 @@
 
 ## Unreleased
 - Use components/ui Select for admin course form (category, instructor, level, status).
+
+## Unreleased
+- Use components/ui Select for admin paper form (category, status, visibility).
