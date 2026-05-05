@@ -26,3 +26,6 @@
 
 ## Unreleased
 - Remove debug logging from public course loader.
+
+## Unreleased
+- Add student Login button to header navigation.

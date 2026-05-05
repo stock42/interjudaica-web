@@ -105,6 +105,9 @@ export function SiteHeader() {
         </nav>
 
         <div className="flex shrink-0 items-center gap-2">
+          <ButtonLink href="/login" tone="secondary" className="min-w-28">
+            Login
+          </ButtonLink>
           <ButtonLink href="/register" className="min-w-36">
             Enroll
           </ButtonLink>
