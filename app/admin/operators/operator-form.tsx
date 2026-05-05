@@ -6,6 +6,7 @@ import { useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useRouter } from "next/navigation";
 import type { TypeSafeOperator } from "@/models/operators";
@@ -147,15 +148,13 @@ export function OperatorForm({
           required={!isEditing}
           onChange={(value) => setField("password", value)}
         />
-        <label className="flex items-center gap-3 self-end rounded-md border border-[var(--line)] bg-[var(--paper)] px-3 py-3 text-sm font-semibold text-[var(--ink)]">
-          <input
-            className="h-5 w-5 accent-[var(--sapphire)]"
-            type="checkbox"
+        <div className="flex items-center justify-between gap-4 self-end rounded-md border border-[var(--line)] bg-[var(--paper)] px-3 py-3 text-sm font-semibold text-[var(--ink)]">
+          <span>Enabled</span>
+          <Switch
             checked={form.enabled}
-            onChange={(event) => setField("enabled", event.target.checked)}
+            onCheckedChange={(checked) => setField("enabled", Boolean(checked))}
           />
-          Enabled
-        </label>
+        </div>
 
         {error ? (
           <p className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700 md:col-span-2">

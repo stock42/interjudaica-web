@@ -123,3 +123,6 @@
 
 ## Unreleased
 - Use components/ui Select for admin collection manager select fields.
+
+## Unreleased
+- Use components/ui Switch for admin enabled/featured toggles.

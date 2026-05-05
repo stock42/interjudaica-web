@@ -6,6 +6,7 @@ import { useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useRouter } from "next/navigation";
 import type { TypeCourse } from "@/models/courses";
@@ -186,15 +187,13 @@ export function ForumForm({
             </SelectContent>
           </Select>
         </div>
-        <label className="flex items-center gap-3 self-end rounded-md border border-[var(--line)] bg-[var(--paper)] px-3 py-3 text-sm font-semibold text-[var(--ink)]">
-          <input
-            className="h-5 w-5 accent-[var(--sapphire)]"
-            type="checkbox"
+        <div className="flex items-center justify-between gap-4 self-end rounded-md border border-[var(--line)] bg-[var(--paper)] px-3 py-3 text-sm font-semibold text-[var(--ink)]">
+          <span>Featured</span>
+          <Switch
             checked={form.featured}
-            onChange={(event) => setField("featured", event.target.checked)}
+            onCheckedChange={(checked) => setField("featured", Boolean(checked))}
           />
-          Featured
-        </label>
+        </div>
 
         {error ? (
           <p className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700 md:col-span-2">

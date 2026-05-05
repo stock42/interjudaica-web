@@ -7,6 +7,7 @@ import { useState, type ChangeEvent, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { useRouter } from "next/navigation";
 import type { TypeInstructor } from "@/models/instructors";
@@ -172,15 +173,13 @@ export function InstructorForm({ instructor }: { instructor?: TypeInstructor }) 
             </span>
           ) : null}
         </div>
-        <label className="flex items-center gap-3 self-end rounded-md border border-[var(--line)] bg-[var(--paper)] px-3 py-3 text-sm font-semibold text-[var(--ink)]">
-          <input
-            className="h-5 w-5 accent-[var(--sapphire)]"
-            type="checkbox"
+        <div className="flex items-center justify-between gap-4 self-end rounded-md border border-[var(--line)] bg-[var(--paper)] px-3 py-3 text-sm font-semibold text-[var(--ink)]">
+          <span>Enabled</span>
+          <Switch
             checked={form.enabled}
-            onChange={(event) => setField("enabled", event.target.checked)}
+            onCheckedChange={(checked) => setField("enabled", Boolean(checked))}
           />
-          Enabled
-        </label>
+        </div>
         {form.photoUrl ? (
           <div className="md:col-span-2">
             <div className="relative h-36 w-36 overflow-hidden rounded-lg border border-[var(--line)] bg-[var(--paper)]">

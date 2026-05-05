@@ -6,6 +6,7 @@ import { useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { useRouter } from "next/navigation";
 import type { TypePaperCategory } from "@/models/paper-categories";
@@ -116,20 +117,18 @@ export function PaperCategoryForm({
           </p>
         </div>
 
-        <label className="flex items-center gap-3 self-end rounded-md border border-[var(--line)] bg-[var(--paper)] px-3 py-3 text-sm font-semibold text-[var(--ink)]">
-          <input
-            className="h-5 w-5 accent-[var(--sapphire)]"
-            type="checkbox"
+        <div className="flex items-center justify-between gap-4 self-end rounded-md border border-[var(--line)] bg-[var(--paper)] px-3 py-3 text-sm font-semibold text-[var(--ink)]">
+          <span>Enabled</span>
+          <Switch
             checked={form.enabled}
-            onChange={(event) =>
+            onCheckedChange={(checked) =>
               setForm((current) => ({
                 ...current,
-                enabled: event.target.checked,
+                enabled: Boolean(checked),
               }))
             }
           />
-          Enabled
-        </label>
+        </div>
 
         <div className="grid gap-2 text-sm font-semibold text-[var(--ink)] md:col-span-2">
           <Label>Description</Label>
