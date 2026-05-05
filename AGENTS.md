@@ -158,6 +158,12 @@ Operator/auth endpoints:
 | `POST` | `/api/auth/logout` | Clears `interjudaica_operator_session` and redirects to `/operator-login`. |
 | `GET` | `/api/auth/me` | Returns current operator or `401` with `{ operator: null }`. |
 
+Public content endpoints:
+
+| Method | Path | Notes |
+| --- | --- | --- |
+| `GET` | `/api/courses` | Lists published public courses as `{ items }`. |
+
 Admin utility endpoints:
 
 | Method | Path | Notes |

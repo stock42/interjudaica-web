@@ -10,6 +10,20 @@ import {
 } from "@/app/lib/content";
 import { OperatorHeaderActions } from "@/app/components/operator-header-actions";
 
+type CourseCardItem = Pick<
+  Course,
+  | "slug"
+  | "title"
+  | "category"
+  | "level"
+  | "price"
+  | "communityPrice"
+  | "duration"
+  | "imageLabel"
+  | "accent"
+  | "summary"
+>;
+
 type ButtonTone = "primary" | "secondary" | "quiet" | "dark";
 
 const buttonTones: Record<ButtonTone, string> = {
@@ -238,7 +252,7 @@ export function SectionIntro({
   );
 }
 
-export function CourseCard({ course }: { course: Course }) {
+export function CourseCard({ course }: { course: CourseCardItem }) {
   return (
     <article className="group flex h-full flex-col overflow-hidden rounded-lg border border-[var(--line)] bg-white shadow-[0_18px_50px_rgba(17,19,21,0.07)] transition hover:-translate-y-1 hover:shadow-[0_24px_70px_rgba(17,19,21,0.12)]">
       <CourseArtwork course={course} compact />
@@ -277,7 +291,7 @@ export function CourseArtwork({
   course,
   compact = false,
 }: {
-  course: Course;
+  course: CourseCardItem;
   compact?: boolean;
 }) {
   const style = {
@@ -327,7 +341,15 @@ export function MetricsBand() {
   );
 }
 
-export function CourseGrid({ items = courses }: { items?: Course[] }) {
+export function CourseGrid({ items = courses }: { items?: CourseCardItem[] }) {
+  if (!items.length) {
+    return (
+      <div className="rounded-lg border border-[var(--line)] bg-white p-6 text-sm leading-6 text-[var(--muted)]">
+        New public courses will appear here soon.
+      </div>
+    );
+  }
+
   return (
     <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
       {items.map((course) => (

@@ -8,9 +8,23 @@ import {
   Section,
   SectionIntro,
 } from "@/app/components/portal-ui";
-import { communityBenefits, courses, testimonials } from "@/app/lib/content";
+import { communityBenefits, testimonials } from "@/app/lib/content";
+import { listPublicCourses } from "@/app/lib/public-courses";
 
-export default function Home() {
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
+async function getHomeCourses() {
+  try {
+    return (await listPublicCourses()).slice(0, 3);
+  } catch {
+    return [];
+  }
+}
+
+export default async function Home() {
+  const homeCourses = await getHomeCourses();
+
   return (
     <PageShell>
       <section className="relative isolate overflow-hidden border-b border-[var(--line)] bg-[var(--ink)] text-white">
@@ -76,7 +90,7 @@ export default function Home() {
             </ButtonLink>
           }
         />
-        <CourseGrid items={courses} />
+        <CourseGrid items={homeCourses} />
       </Section>
 
       <Section tone="white">

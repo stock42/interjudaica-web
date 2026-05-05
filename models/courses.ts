@@ -40,6 +40,78 @@ export const schemaCourse = z.object({
 
 export type TypeCourse = z.infer<typeof schemaCourse>;
 
+export const schemaPublicCourse = z.object({
+  slug: z.string().trim(),
+  title: z.string().trim(),
+  category: z.string().trim(),
+  categorySlug: z.string().trim(),
+  level: z.enum(courseLevels),
+  price: z.number().nonnegative(),
+  communityPrice: z.number().nonnegative(),
+  duration: z.string().trim(),
+  durationHours: z.number().nonnegative(),
+  startDate: z.string().trim(),
+  endDate: z.string().trim(),
+  imageLabel: z.string().trim(),
+  thumbnailImageUrl: z.string().trim(),
+  coverImageUrl: z.string().trim(),
+  accent: z.string().trim(),
+  description: z.string().trim(),
+  summary: z.string().trim(),
+  instructor: z.string().trim(),
+  instructorSlug: z.string().trim(),
+  video: z.string().trim(),
+  certificate: z.string().trim(),
+  zoomLink: z.string().trim(),
+  stripePaymentLink: z.string().trim(),
+  maxStudents: z.number().int().nonnegative(),
+  includes: z.array(z.string()),
+  outcomes: z.array(z.string()),
+});
+
+export type TypePublicCourse = z.infer<typeof schemaPublicCourse>;
+
+function formatDuration(hours: number) {
+  if (hours <= 0) {
+    return "Self-paced";
+  }
+
+  return hours === 1 ? "1 hour" : `${hours} hours`;
+}
+
+export function toPublicCourse(course: TypeCourse): TypePublicCourse {
+  const parsedCourse = schemaCourse.parse(course);
+
+  return schemaPublicCourse.parse({
+    slug: parsedCourse.slug || slugify(parsedCourse.title),
+    title: parsedCourse.title,
+    category: parsedCourse.category,
+    categorySlug: parsedCourse.categorySlug || slugify(parsedCourse.category),
+    level: parsedCourse.level,
+    price: parsedCourse.price,
+    communityPrice: parsedCourse.communityPrice,
+    duration: formatDuration(parsedCourse.durationHours),
+    durationHours: parsedCourse.durationHours,
+    startDate: parsedCourse.startDate,
+    endDate: parsedCourse.endDate,
+    imageLabel: parsedCourse.imageLabel,
+    thumbnailImageUrl: parsedCourse.thumbnailImageUrl,
+    coverImageUrl: parsedCourse.coverImageUrl,
+    accent: parsedCourse.accent,
+    description: parsedCourse.description,
+    summary: parsedCourse.summary,
+    instructor: parsedCourse.instructor,
+    instructorSlug: parsedCourse.instructorSlug || slugify(parsedCourse.instructor),
+    video: parsedCourse.video,
+    certificate: parsedCourse.certificate,
+    zoomLink: parsedCourse.zoomLink,
+    stripePaymentLink: parsedCourse.stripePaymentLink,
+    maxStudents: parsedCourse.maxStudents,
+    includes: parsedCourse.includes,
+    outcomes: parsedCourse.outcomes,
+  });
+}
+
 export class CourseModel {
   private uuid: string;
   private courseData: TypeCourse;

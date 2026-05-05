@@ -44,6 +44,18 @@ export class CourseStorage extends MongoDBStorage<TypeCourse> {
     return docs.map((doc) => doc.data);
   }
 
+  static async listPublished() {
+    await CourseStorage.ensureIndexes();
+    const docs = await MongoDBStorage._find<TypeCourse>(
+      CourseStorage.COLLECTION,
+      { "data.status": "published" },
+      undefined,
+      { "data.startDate": 1, _added: -1 },
+    );
+
+    return docs.map((doc) => doc.data);
+  }
+
   static async get(uuid: string) {
     await CourseStorage.ensureIndexes();
     const doc = await MongoDBStorage._getByUUID<TypeCourse>(
