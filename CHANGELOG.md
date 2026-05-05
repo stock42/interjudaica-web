@@ -63,3 +63,6 @@
 
 ## Unreleased
 - Start migrating admin list filters to components/ui Input.
+
+## Unreleased
+- Refactor admin course form inputs/textareas/buttons to components/ui primitives.
