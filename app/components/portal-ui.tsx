@@ -9,7 +9,6 @@ import {
   formatUsd,
   navItems,
 } from "@/app/lib/content";
-import { OperatorHeaderActions } from "@/app/components/operator-header-actions";
 
 type CourseCardItem = Pick<
   Course,
@@ -66,8 +65,8 @@ export function ButtonLink({
 
 export function SiteHeader() {
   return (
-    <header className="sticky top-0 z-50 border-b border-[var(--line)] bg-[rgba(5,6,8,0.88)] shadow-[0_12px_40px_rgba(0,0,0,0.28)] backdrop-blur-xl">
-      <div className="mx-auto flex w-full max-w-7xl flex-wrap items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
+    <header className="sticky top-0 z-50 border-b border-[var(--line)] bg-[rgba(5,6,8,0.94)] shadow-[0_12px_40px_rgba(0,0,0,0.28)] backdrop-blur-xl">
+      <div className="mx-auto flex w-full max-w-[1320px] flex-wrap items-center justify-between gap-4 px-5 py-4 sm:px-8 lg:px-10">
         <Link
           href="/"
           className="flex min-w-0 items-center gap-3"
@@ -78,14 +77,14 @@ export function SiteHeader() {
             alt="InterJudaica logo"
             width={1500}
             height={1500}
-            className="h-12 w-12 shrink-0 rounded-full"
+            className="h-16 w-16 shrink-0 rounded-full"
             priority
           />
           <span className="grid min-w-0 leading-none">
-            <span className="font-display text-lg font-semibold uppercase tracking-[0.18em] text-[var(--gold)] sm:text-xl">
+            <span className="font-display text-2xl font-semibold uppercase tracking-[0.18em] text-[var(--gold)]">
               InterJudaica
             </span>
-            <span className="mt-1 hidden text-[0.6rem] font-bold uppercase tracking-[0.28em] text-[var(--muted)] sm:block">
+            <span className="mt-1 hidden text-[0.62rem] font-bold uppercase tracking-[0.28em] text-[var(--gold)] sm:block">
               Jewish Learning Institute
             </span>
           </span>
@@ -107,7 +106,7 @@ export function SiteHeader() {
         </nav>
 
         <div className="flex shrink-0 items-center gap-2">
-          <OperatorHeaderActions />
+          <ButtonLink href="/register">Enroll</ButtonLink>
         </div>
       </div>
     </header>
@@ -127,7 +126,7 @@ export function SiteFooter() {
         height={1024}
         className="pointer-events-none absolute -right-32 -top-28 h-80 w-80 opacity-[0.08]"
       />
-      <div className="relative mx-auto grid w-full max-w-7xl gap-10 px-4 py-12 sm:px-6 lg:grid-cols-[1fr_2.2fr] lg:px-8">
+      <div className="relative mx-auto grid w-full max-w-[1320px] gap-10 px-5 py-12 sm:px-8 lg:grid-cols-[1fr_2.2fr] lg:px-10">
         <div>
           <div className="flex items-center gap-3">
             <Image
@@ -203,7 +202,7 @@ export function SiteFooter() {
           </div>
         </div>
       </div>
-      <div className="relative mx-auto flex w-full max-w-7xl flex-col gap-3 border-t border-[var(--line)] px-4 py-5 text-xs text-white/55 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
+      <div className="relative mx-auto flex w-full max-w-[1320px] flex-col gap-3 border-t border-[var(--line)] px-5 py-5 text-xs text-white/55 sm:flex-row sm:items-center sm:justify-between sm:px-8 lg:px-10">
         <p>Copyright 2026 InterJudaica. All rights reserved.</p>
         <div className="flex flex-wrap gap-4">
           <Link href="/operator-login" className="transition hover:text-[var(--gold)]">
@@ -269,7 +268,7 @@ export function Section({
 
   return (
     <section id={id} className={`relative ${tones[tone]} ${className}`}>
-      <div className="mx-auto w-full max-w-7xl px-4 py-14 sm:px-6 sm:py-16 lg:px-8 lg:py-20">
+      <div className="mx-auto w-full max-w-[1320px] px-5 py-14 sm:px-8 sm:py-16 lg:px-10 lg:py-20">
         {children}
       </div>
     </section>
