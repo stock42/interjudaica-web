@@ -126,3 +126,6 @@
 
 ## Unreleased
 - Use components/ui Switch for admin enabled/featured toggles.
+
+## Unreleased
+- Use components/ui Switch for admin collection manager checkbox fields.

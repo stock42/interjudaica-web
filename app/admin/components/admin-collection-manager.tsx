@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 type AdminKind =
@@ -405,20 +406,21 @@ export function AdminCollectionManager({
                     ))}
                   </SelectContent>
                 </Select>
-              ) : field.type === "checkbox" ? (
-
-                <input
-                  className="h-5 w-5 rounded border border-[var(--line)] accent-[var(--sapphire)]"
-                  type="checkbox"
-                  checked={Boolean(form[field.name])}
-                  onChange={(event) =>
-                    setForm((current) => ({
-                      ...current,
-                      [field.name]: event.target.checked,
-                    }))
-                  }
-                />
+               ) : field.type === "checkbox" ? (
+                <div className="flex items-center justify-between gap-4 rounded-md border border-[var(--line)] bg-[var(--paper)] px-3 py-3">
+                  <span className="text-sm font-semibold text-[var(--ink)]">{field.label}</span>
+                  <Switch
+                    checked={Boolean(form[field.name])}
+                    onCheckedChange={(checked) =>
+                      setForm((current) => ({
+                        ...current,
+                        [field.name]: Boolean(checked),
+                      }))
+                    }
+                  />
+                </div>
               ) : (
+
                 <Input
                   className="h-11"
                   type={field.type === "number" ? "number" : "text"}
