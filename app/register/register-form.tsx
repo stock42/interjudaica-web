@@ -3,8 +3,9 @@
 import Link from "next/link";
 import { useState, type FormEvent } from "react";
 
-const controlClass =
-  "min-h-12 rounded-md border border-[var(--line)] bg-[var(--paper)] px-4 text-base font-normal outline-none transition focus:border-[var(--sapphire)] focus:ring-4 focus:ring-[rgba(19,70,160,0.14)]";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 export function RegisterForm() {
   const [error, setError] = useState("");
@@ -53,30 +54,33 @@ export function RegisterForm() {
   return (
     <form className="grid gap-5" onSubmit={handleSubmit}>
       <div className="grid gap-5 sm:grid-cols-2">
-        <Field label="First name" name="firstName" autoComplete="given-name" />
-        <Field label="Last name" name="lastName" autoComplete="family-name" />
+        <FormField label="First name" name="firstName" autoComplete="given-name" />
+        <FormField label="Last name" name="lastName" autoComplete="family-name" />
       </div>
-      <Field
+
+      <FormField
         label="Email"
         name="email"
         type="email"
         placeholder="you@example.com"
         autoComplete="email"
       />
+
       <div className="grid gap-5 sm:grid-cols-3">
-        <Field label="Country" name="country" autoComplete="country-name" />
-        <Field label="State" name="state" autoComplete="address-level1" />
-        <Field label="City" name="city" autoComplete="address-level2" />
+        <FormField label="Country" name="country" autoComplete="country-name" />
+        <FormField label="State" name="state" autoComplete="address-level1" />
+        <FormField label="City" name="city" autoComplete="address-level2" />
       </div>
+
       <div className="grid gap-5 sm:grid-cols-2">
-        <Field
+        <FormField
           label="Password"
           name="password"
           type="password"
           autoComplete="new-password"
           minLength={8}
         />
-        <Field
+        <FormField
           label="Confirm password"
           name="confirmPassword"
           type="password"
@@ -84,18 +88,17 @@ export function RegisterForm() {
           minLength={8}
         />
       </div>
+
       {error ? (
         <p className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
           {error}
         </p>
       ) : null}
-      <button
-        className="inline-flex min-h-11 items-center justify-center rounded-md border border-[var(--gold)] bg-[var(--gold)] px-5 py-2.5 text-sm font-semibold text-[#07090c] transition hover:bg-[#ffd66b] disabled:cursor-not-allowed disabled:opacity-60"
-        type="submit"
-        disabled={loading}
-      >
+
+      <Button type="submit" disabled={loading}>
         {loading ? "Creating..." : "Create account"}
-      </button>
+      </Button>
+
       <p className="text-sm leading-6 text-[var(--muted)]">
         Already have an account?{" "}
         <Link
@@ -109,7 +112,7 @@ export function RegisterForm() {
   );
 }
 
-function Field({
+function FormField({
   label,
   name,
   autoComplete,
@@ -125,17 +128,17 @@ function Field({
   type?: string;
 }) {
   return (
-    <label className="grid gap-2 text-sm font-semibold text-[var(--ink)]">
-      {label}
-      <input
-        autoComplete={autoComplete}
-        className={controlClass}
-        minLength={minLength}
+    <div className="grid gap-2">
+      <Label htmlFor={name}>{label}</Label>
+      <Input
+        id={name}
         name={name}
+        autoComplete={autoComplete}
+        minLength={minLength}
         placeholder={placeholder}
         required
         type={type}
       />
-    </label>
+    </div>
   );
 }
