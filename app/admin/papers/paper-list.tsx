@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { TypePaper } from "@/models/papers";
+import { Input } from "@/components/ui/input";
 
 export function PaperList({ papers }: { papers: TypePaper[] }) {
   const router = useRouter();
@@ -64,7 +65,7 @@ export function PaperList({ papers }: { papers: TypePaper[] }) {
           <form className="grid flex-1 gap-3 md:grid-cols-[minmax(16rem,1fr)_12rem_12rem]">
             <label className="grid gap-2 text-sm font-semibold text-[var(--ink)]">
               Search papers
-              <input
+              <Input
                 className="min-h-11 rounded-md border border-[var(--line)] bg-[var(--paper)] px-3 text-sm font-normal outline-none transition focus:border-[var(--sapphire)] focus:ring-4 focus:ring-[rgba(19,70,160,0.14)]"
                 type="search"
                 placeholder="Title, category, author"
