@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { adminTextControlClass } from "@/app/admin/components/admin-controls";
+import { AdminStatPill } from "@/app/admin/components/admin-stat-pill";
 
 import type { TypePaperCategory } from "@/models/paper-categories";
 import { Input } from "@/components/ui/input";
@@ -100,12 +101,12 @@ export function PaperCategoryList({
         </div>
 
         <div className="mt-4 flex flex-wrap gap-2 text-xs font-bold uppercase text-[var(--muted)]">
-          <span className="rounded-full bg-[var(--paper)] px-3 py-1">
+          <AdminStatPill>
             {filteredCategories.length} visible
-          </span>
-          <span className="rounded-full bg-[var(--paper)] px-3 py-1">
+          </AdminStatPill>
+          <AdminStatPill>
             {categories.length} total
-          </span>
+          </AdminStatPill>
         </div>
       </section>
 

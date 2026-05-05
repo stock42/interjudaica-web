@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { adminTextControlClass } from "@/app/admin/components/admin-controls";
+import { AdminStatPill } from "@/app/admin/components/admin-stat-pill";
 
 import type { TypeCourse } from "@/models/courses";
 import { Input } from "@/components/ui/input";
@@ -118,12 +119,12 @@ export function CourseList({ courses }: { courses: TypeCourse[] }) {
         </div>
 
         <div className="mt-4 flex flex-wrap gap-2 text-xs font-bold uppercase text-[var(--muted)]">
-          <span className="rounded-full bg-[var(--paper)] px-3 py-1">
+          <AdminStatPill>
             {filteredCourses.length} visible
-          </span>
-          <span className="rounded-full bg-[var(--paper)] px-3 py-1">
+          </AdminStatPill>
+          <AdminStatPill>
             {courses.length} total
-          </span>
+          </AdminStatPill>
         </div>
       </section>
 

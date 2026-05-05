@@ -138,3 +138,6 @@
 
 ## Unreleased
 - Centralize admin filter text input classes via app/admin/components/admin-controls.
+
+## Unreleased
+- Extract admin list stat pills into AdminStatPill component.
