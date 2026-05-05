@@ -1,26 +1,26 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+
 import {
   ButtonLink,
   PageShell,
   Section,
   SectionIntro,
 } from "@/app/components/portal-ui";
-import { courses, getCourse } from "@/app/lib/content";
+import { getPublicCourseBySlug } from "@/app/lib/public-courses";
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 type CourseForumPageProps = {
   params: Promise<{ slug: string }>;
 };
 
-export function generateStaticParams() {
-  return courses.map((course) => ({ slug: course.slug }));
-}
-
 export async function generateMetadata({
   params,
 }: CourseForumPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const course = getCourse(slug);
+  const course = await getPublicCourseBySlug(slug);
 
   return {
     title: course ? `${course.title} Forum` : "Course forum",
@@ -29,7 +29,7 @@ export async function generateMetadata({
 
 export default async function CourseForumPage({ params }: CourseForumPageProps) {
   const { slug } = await params;
-  const course = getCourse(slug);
+  const course = await getPublicCourseBySlug(slug);
 
   if (!course) {
     notFound();

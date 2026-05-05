@@ -14,3 +14,6 @@
 
 ## Unreleased
 - Read MONGODB_URI/MONGODB_DATABASE env vars as fallbacks for MongoDB connection.
+
+## Unreleased
+- Remove hardcoded course catalog from app/lib/content and load course pages from the database/public endpoint instead.

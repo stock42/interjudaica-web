@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+
 import {
   ButtonLink,
   CourseArtwork,
@@ -8,26 +9,24 @@ import {
   Section,
   SectionIntro,
 } from "@/app/components/portal-ui";
-import { courses, formatUsd, getCourse } from "@/app/lib/content";
+import { getPublicCourseBySlug } from "@/app/lib/public-courses";
+import { formatUsd } from "@/app/lib/content";
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 type CoursePageProps = {
   params: Promise<{ slug: string }>;
 };
 
-export function generateStaticParams() {
-  return courses.map((course) => ({ slug: course.slug }));
-}
-
 export async function generateMetadata({
   params,
 }: CoursePageProps): Promise<Metadata> {
   const { slug } = await params;
-  const course = getCourse(slug);
+  const course = await getPublicCourseBySlug(slug);
 
   if (!course) {
-    return {
-      title: "Course not found",
-    };
+    return { title: "Course not found" };
   }
 
   return {
@@ -38,7 +37,7 @@ export async function generateMetadata({
 
 export default async function CoursePage({ params }: CoursePageProps) {
   const { slug } = await params;
-  const course = getCourse(slug);
+  const course = await getPublicCourseBySlug(slug);
 
   if (!course) {
     notFound();
@@ -111,55 +110,6 @@ export default async function CoursePage({ params }: CoursePageProps) {
               title="What students will be able to do"
             />
             <InfoList items={course.outcomes} />
-          </div>
-        </div>
-      </Section>
-
-      <Section tone="paper">
-        <div className="grid gap-10 lg:grid-cols-[1fr_0.8fr]">
-          <div>
-            <SectionIntro
-              eyebrow="Available editions"
-              title="Choose a cohort or self-paced path"
-            />
-            <div className="grid gap-4">
-              {course.editions.map((edition) => (
-                <article
-                  key={edition.name}
-                  className="rounded-lg border border-[var(--line)] bg-white p-5"
-                >
-                  <h2 className="font-display text-2xl font-semibold">
-                    {edition.name}
-                  </h2>
-                  <p className="mt-2 text-sm text-[var(--muted)]">
-                    {edition.schedule}
-                  </p>
-                  <p className="mt-4 text-sm font-semibold text-[var(--sapphire)]">
-                    {edition.seats}
-                  </p>
-                </article>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <SectionIntro
-              eyebrow="Sample materials"
-              title="Preview the learning style"
-            />
-            <div className="grid gap-4">
-              {course.sampleMaterials.map((sample) => (
-                <div
-                  key={sample.title}
-                  className="rounded-lg border border-[var(--line)] bg-white p-5"
-                >
-                  <p className="text-xs font-bold uppercase text-[var(--muted)]">
-                    {sample.kind}
-                  </p>
-                  <p className="mt-2 font-semibold">{sample.title}</p>
-                </div>
-              ))}
-            </div>
           </div>
         </div>
       </Section>

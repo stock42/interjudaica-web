@@ -5,7 +5,6 @@ import {
   type Course,
   adminStats,
   contactInfo,
-  courses,
   formatUsd,
   navItems,
 } from "@/app/lib/content";
@@ -435,7 +434,7 @@ export function MetricsBand() {
   );
 }
 
-export function CourseGrid({ items = courses }: { items?: CourseCardItem[] }) {
+export function CourseGrid({ items }: { items: CourseCardItem[] }) {
   if (!items.length) {
     return (
       <div className="rounded-lg border border-[var(--line)] bg-[var(--surface)] p-6 text-sm leading-6 text-[var(--muted)]">

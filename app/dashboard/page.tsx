@@ -1,25 +1,33 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+
 import {
   ButtonLink,
   PageShell,
   Section,
   SectionIntro,
 } from "@/app/components/portal-ui";
-import { dashboardCourses, forumThreads } from "@/app/lib/content";
+import { forumThreads } from "@/app/lib/content";
+import { listPublicCourses } from "@/app/lib/public-courses";
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Dashboard",
   description: "InterJudaica student dashboard for courses and community.",
 };
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  const courses = await listPublicCourses();
+  const dashboardCourses = courses.slice(0, 2);
+
   return (
     <PageShell>
       <Section tone="transparent">
         <SectionIntro
           eyebrow="Student dashboard"
-          title="Welcome back, Miriam"
+          title="Welcome back"
           text="Continue purchased courses, manage the community membership, review live sessions, and jump back into forum threads."
         />
 
@@ -33,42 +41,46 @@ export default function DashboardPage() {
                 Find a course
               </ButtonLink>
             </div>
-            <div className="grid gap-4">
-              {dashboardCourses.map((course) => (
-                <article
-                  key={course.slug}
-                  className="rounded-lg border border-[var(--line)] bg-[var(--paper)] p-4"
-                >
-                  <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                    <div>
-                      <p className="text-xs font-bold uppercase text-[var(--sapphire)]">
-                        {course.category}
-                      </p>
-                      <h3 className="mt-2 font-display text-2xl font-semibold">
-                        {course.title}
-                      </h3>
-                      <p className="mt-2 text-sm text-[var(--muted)]">
-                        Next live class: {course.startDate}
-                      </p>
+
+            {dashboardCourses.length === 0 ? (
+              <div className="rounded-lg border border-[var(--line)] bg-[var(--paper)] p-4 text-sm text-[var(--muted)]">
+                No courses yet.
+              </div>
+            ) : (
+              <div className="grid gap-4">
+                {dashboardCourses.map((course) => (
+                  <article
+                    key={course.slug}
+                    className="rounded-lg border border-[var(--line)] bg-[var(--paper)] p-4"
+                  >
+                    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                      <div>
+                        <p className="text-xs font-bold uppercase text-[var(--sapphire)]">
+                          {course.category}
+                        </p>
+                        <h3 className="mt-2 font-display text-2xl font-semibold">
+                          {course.title}
+                        </h3>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        <ButtonLink
+                          href={`/curso/${course.slug}/clases`}
+                          tone="primary"
+                        >
+                          Classes
+                        </ButtonLink>
+                        <ButtonLink
+                          href={`/curso/${course.slug}/foro`}
+                          tone="secondary"
+                        >
+                          Forum
+                        </ButtonLink>
+                      </div>
                     </div>
-                    <div className="flex flex-wrap gap-2">
-                      <ButtonLink
-                        href={`/curso/${course.slug}/clases`}
-                        tone="primary"
-                      >
-                        Classes
-                      </ButtonLink>
-                      <ButtonLink
-                        href={`/curso/${course.slug}/foro`}
-                        tone="secondary"
-                      >
-                        Forum
-                      </ButtonLink>
-                    </div>
-                  </div>
-                </article>
-              ))}
-            </div>
+                  </article>
+                ))}
+              </div>
+            )}
           </section>
 
           <aside className="grid gap-5">
@@ -80,7 +92,7 @@ export default function DashboardPage() {
                 Active
               </h2>
               <p className="mt-3 text-sm leading-6 text-white/70">
-                Renews on May 23, 2026 at $19 USD/month.
+                Renews at $19 USD/month.
               </p>
               <div className="mt-5 flex flex-col gap-2 sm:flex-row lg:flex-col">
                 <ButtonLink href="/comunidad/foro" tone="dark">

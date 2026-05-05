@@ -1,11 +1,15 @@
 import type { Metadata } from "next";
+
 import {
   CourseGrid,
   PageShell,
   Section,
   SectionIntro,
 } from "@/app/components/portal-ui";
-import { courses, formatUsd } from "@/app/lib/content";
+import { listPublicCourses } from "@/app/lib/public-courses";
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Courses",
@@ -13,7 +17,9 @@ export const metadata: Metadata = {
     "Browse InterJudaica courses in Jewish thought, Talmud, Hebrew text, and community learning.",
 };
 
-export default function CoursesPage() {
+export default async function CoursesPage() {
+  const courses = await listPublicCourses();
+
   return (
     <PageShell>
       <Section tone="transparent">
@@ -44,10 +50,7 @@ export default function CoursesPage() {
           <label className="grid gap-2 text-sm font-semibold">
             Start date
             <select className="min-h-11 rounded-md border border-[var(--line)] bg-[var(--paper)] px-3">
-              <option>All 2026 cohorts</option>
-              <option>Spring 2026</option>
-              <option>Summer 2026</option>
-              <option>Fall 2026</option>
+              <option>All cohorts</option>
             </select>
           </label>
           <label className="grid gap-2 text-sm font-semibold">
@@ -60,18 +63,7 @@ export default function CoursesPage() {
           </label>
         </form>
 
-        <div className="mb-6 flex flex-wrap gap-3">
-          {courses.map((course) => (
-            <div
-              key={course.slug}
-              className="rounded-full border border-[var(--line)] bg-white px-4 py-2 text-sm text-[var(--muted)]"
-            >
-              {course.title}: {formatUsd(course.price)}
-            </div>
-          ))}
-        </div>
-
-        <CourseGrid />
+        <CourseGrid items={courses} />
       </Section>
     </PageShell>
   );
