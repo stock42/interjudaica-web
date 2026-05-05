@@ -65,7 +65,7 @@ export function ButtonLink({
 
 export function SiteHeader() {
   return (
-    <header className="sticky top-0 z-50 border-b border-[var(--line)] bg-[rgba(5,6,8,0.96)] shadow-[0_12px_40px_rgba(0,0,0,0.28)] backdrop-blur-xl">
+    <header className="sticky top-0 z-50 border-b border-[var(--gold)] bg-black shadow-[0_12px_40px_rgba(0,0,0,0.28)] backdrop-blur-xl">
       <div className="mx-auto flex w-full flex-wrap items-center justify-between gap-5 px-6 py-4 sm:px-10 lg:px-16 xl:px-20 2xl:px-24">
         <Link
           href="/"
@@ -184,7 +184,7 @@ export function SiteFooter() {
               Email: {contactInfo.email}
             </Link>
             <div>
-              <p className="font-semibold text-[var(--ink)]">Office Hours</p>
+              <p className="font-semibold text-[var(--gold)]">Office Hours</p>
               <div className="mt-1 grid gap-1">
                 {contactInfo.officeHours.map((line) => (
                   <p key={line}>{line}</p>

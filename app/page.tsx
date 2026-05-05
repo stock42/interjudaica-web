@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { ButtonLink, PageShell } from "@/app/components/portal-ui";
-import { courses, testimonials } from "@/app/lib/content";
+import { testimonials } from "@/app/lib/content";
 import { listPublicCourses } from "@/app/lib/public-courses";
 
 export const runtime = "nodejs";
@@ -23,9 +23,9 @@ async function getHomeCourses(): Promise<HomeCourse[]> {
       .filter((course) => course.summary.trim())
       .slice(0, 2);
 
-    return publicCourses.length >= 2 ? publicCourses : courses.slice(0, 2);
+    return publicCourses;
   } catch {
-    return courses.slice(0, 2);
+    return [];
   }
 }
 
@@ -168,14 +168,22 @@ function CourseFeatureCard({
   );
 }
 
-function SectionTitle({ children }: { children: string }) {
+function SectionTitle({
+  children,
+  lineTone = "line",
+}: {
+  children: string;
+  lineTone?: "line" | "gold";
+}) {
+  const lineClass = lineTone === "gold" ? "bg-[var(--gold)]" : "bg-[var(--line)]";
+
   return (
     <div className="mb-7 flex items-center justify-center gap-6">
-      <span className="hidden h-px max-w-[18rem] flex-1 bg-[var(--line)] sm:block" />
+      <span className={`hidden h-px max-w-[18rem] flex-1 sm:block ${lineClass}`} />
       <h2 className="text-center font-display text-2xl font-semibold uppercase tracking-[0.32em] text-[var(--gold)]">
         {children}
       </h2>
-      <span className="hidden h-px max-w-[18rem] flex-1 bg-[var(--line)] sm:block" />
+      <span className={`hidden h-px max-w-[18rem] flex-1 sm:block ${lineClass}`} />
     </div>
   );
 }
@@ -208,24 +216,24 @@ export default async function Home() {
 
   return (
     <PageShell>
-      <section className="relative isolate overflow-hidden border-b border-[var(--line)] bg-[#050608] text-[#f8f2e8]">
+      <section className="relative isolate overflow-hidden border-b border-[var(--gold)] bg-[#050608] text-[#f8f2e8]">
         <Image
           src="/hero-image.png"
           alt=""
           fill
           sizes="100vw"
-          className="absolute right-0 top-0 h-full w-full object-cover object-[62%_center]"
+          className="absolute right-0 top-0 h-full w-full object-cover object-[78%_center]"
           priority
         />
         <div className="absolute inset-0 bg-[linear-gradient(90deg,#050608_0%,#050608_32%,rgba(5,6,8,0.78)_52%,rgba(5,6,8,0.28)_72%,rgba(5,6,8,0.74)_100%)]" />
-        <div className="absolute inset-y-0 left-[43%] hidden w-[46rem] rounded-full border border-[rgba(244,189,51,0.65)] opacity-75 lg:block" />
-        <div className="absolute inset-y-[-4rem] left-[39%] hidden w-[58rem] rounded-full border border-[rgba(244,189,51,0.35)] opacity-70 lg:block" />
+        <div className="absolute right-[-10rem] top-1/2 hidden h-[32rem] w-[32rem] -translate-y-1/2 rounded-full border border-[rgba(244,189,51,0.65)] opacity-75 lg:block" />
+        <div className="absolute right-[-16rem] top-1/2 hidden h-[44rem] w-[44rem] -translate-y-1/2 rounded-full border border-[rgba(244,189,51,0.35)] opacity-70 lg:block" />
         <Image
-          src="/interjudaica-silueta-candel.png"
+          src="/logo-interjudaica-transparente.png"
           alt=""
-          width={1024}
-          height={1024}
-          className="pointer-events-none absolute -right-28 top-20 hidden h-[33rem] w-[33rem] opacity-48 lg:block"
+          width={1500}
+          height={1500}
+          className="pointer-events-none absolute right-[-4rem] top-1/2 hidden h-[26rem] w-[26rem] -translate-y-1/2 opacity-40 lg:block"
           priority
         />
 
@@ -285,7 +293,7 @@ export default async function Home() {
           <div className="relative mx-auto aspect-square w-full max-w-[26rem] lg:mx-0 lg:ml-auto">
             <div className="absolute inset-0 rounded-full border border-[rgba(244,189,51,0.82)]" />
             <div className="absolute inset-4 rounded-full border border-[rgba(244,189,51,0.42)]" />
-            <div className="absolute inset-9 overflow-hidden rounded-full bg-[radial-gradient(circle_at_center,rgba(244,189,51,0.16),rgba(5,6,8,0.92))]">
+            <div className="absolute inset-9 overflow-hidden rounded-full bg-[radial-gradient(circle_at_center,rgba(244,189,51,0.22),rgba(244,189,51,0.06)_52%,rgba(5,6,8,0.92))]">
               <Image
                 src="/foto-ernesto-yattah-bg-transparent.png"
                 alt="Rabbi Ernesto Yattah"
@@ -330,12 +338,12 @@ export default async function Home() {
 
       <section className="bg-[#080b0d] py-7 text-[#f8f2e8]">
         <div className={homeFrame}>
-          <SectionTitle>Why Choose InterJudaica?</SectionTitle>
+          <SectionTitle lineTone="gold">Why Choose InterJudaica?</SectionTitle>
           <div className="grid gap-8 md:grid-cols-4">
             {whyChoose.map((item) => (
               <article
                 key={item.title}
-                className="px-6 text-center md:border-r md:border-[var(--line)] md:last:border-r-0"
+                className="px-6 text-center md:border-r md:border-[rgba(244,189,51,0.55)] md:last:border-r-0"
               >
                 <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full border border-[var(--gold)] text-[var(--gold)]">
                   <HomeIcon kind={item.icon} className="h-10 w-10" />
@@ -367,12 +375,10 @@ export default async function Home() {
                 <blockquote className="mt-1 text-base italic leading-7 text-white/86">
                   {testimonial.quote}
                 </blockquote>
-                <figcaption className="mt-5 text-sm text-white/78">
-                  - {testimonial.name}
+                <figcaption className="mt-5 flex items-center justify-between gap-4 text-sm text-white/78">
+                  <span>- {testimonial.name}</span>
+                  <span className="text-base tracking-[0.18em] text-[var(--gold)]">*****</span>
                 </figcaption>
-                <p className="mt-2 text-base tracking-[0.18em] text-[var(--gold)]">
-                  *****
-                </p>
               </figure>
             ))}
           </div>
