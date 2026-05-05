@@ -26,6 +26,28 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-body);
   --font-display: var(--font-heading);
+
+  /*
+    Shadcn/ui (Tailwind tokens)
+    We map the shadcn design tokens to InterJudaica's existing theme variables.
+    This keeps components like Select/Popover/Dialog from rendering with
+    transparent backgrounds or mismatched (white) borders.
+  */
+  --color-border: var(--line-soft);
+  --color-input: var(--surface-soft);
+  --color-ring: var(--gold);
+
+  --color-popover: var(--surface);
+  --color-popover-foreground: var(--foreground);
+
+  --color-muted: var(--paper);
+  --color-muted-foreground: var(--muted);
+
+  --color-accent: rgba(244, 189, 51, 0.12);
+  --color-accent-foreground: var(--foreground);
+
+  --color-primary: var(--gold);
+  --color-primary-foreground: #07090c;
 }
 
 * {
