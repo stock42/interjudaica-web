@@ -8,9 +8,7 @@ import { CourseStorage } from "@/services/courses-storage";
 
 export async function listPublicCourses(): Promise<TypePublicCourse[]> {
   const courses = await CourseStorage.listPublished();
-	console.info('courses', courses)
-  // return courses.map(toPublicCourse);
-	return courses.map(toPublicCourse);
+  return courses.map(toPublicCourse);
 }
 
 export async function getPublicCourseBySlug(

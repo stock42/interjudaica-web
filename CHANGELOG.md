@@ -23,3 +23,6 @@
 
 ## Unreleased
 - Home no longer filters out courses missing summaries; show all published courses.
+
+## Unreleased
+- Remove debug logging from public course loader.
