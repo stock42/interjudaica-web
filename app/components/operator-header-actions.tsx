@@ -3,6 +3,9 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
+import OperatorUserMenu from "@/components/share/operator-user-menu";
+import StudentUserMenu from "@/components/share/student-user-menu";
+
 type HeaderOperator = {
   uuid: string;
   email: string;
@@ -17,11 +20,6 @@ type HeaderUser = {
   firstName?: string | null;
   lastName?: string | null;
 };
-
-function personName(person: HeaderOperator | HeaderUser) {
-  const name = [person.firstName, person.lastName].filter(Boolean).join(" ");
-  return name || person.email;
-}
 
 export function OperatorHeaderActions() {
   const [operator, setOperator] = useState<HeaderOperator | null>(null);
@@ -63,43 +61,21 @@ export function OperatorHeaderActions() {
 
   if (operator) {
     return (
-      <>
-        <div className="hidden min-w-0 max-w-48 text-right sm:block">
-          <p className="truncate text-xs font-bold uppercase text-[var(--muted)]">
-            Operator
-          </p>
-          <p className="truncate text-sm font-semibold text-[var(--ink)]">
-            {personName(operator)}
-          </p>
-        </div>
-        <Link
-          href="/admin"
-          className="inline-flex min-h-11 items-center justify-center rounded-md border border-[var(--gold)] bg-[var(--gold)] px-5 py-2.5 text-sm font-semibold text-[#07090c] transition hover:bg-[#ffd66b]"
-        >
-          Backoffice
-        </Link>
-      </>
+      <OperatorUserMenu
+        firstName={operator.firstName ?? ""}
+        lastName={operator.lastName ?? ""}
+        email={operator.email}
+      />
     );
   }
 
   if (user) {
     return (
-      <>
-        <div className="hidden min-w-0 max-w-48 text-right sm:block">
-          <p className="truncate text-xs font-bold uppercase text-[var(--muted)]">
-            Student
-          </p>
-          <p className="truncate text-sm font-semibold text-[var(--ink)]">
-            {personName(user)}
-          </p>
-        </div>
-        <Link
-          href="/dashboard"
-          className="inline-flex min-h-11 items-center justify-center rounded-md border border-[var(--gold)] bg-[var(--gold)] px-5 py-2.5 text-sm font-semibold text-[#07090c] transition hover:bg-[#ffd66b]"
-        >
-          Dashboard
-        </Link>
-      </>
+      <StudentUserMenu
+        firstName={user.firstName ?? ""}
+        lastName={user.lastName ?? ""}
+        email={user.email}
+      />
     );
   }
 
