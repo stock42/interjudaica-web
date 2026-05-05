@@ -38,3 +38,6 @@
 
 ## Unreleased
 - Fix header Contact link and redesign /contact page as a two-column layout.
+
+## Unreleased
+- Hide contact form after successful submit and show a confirmation message.

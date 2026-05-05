@@ -39,6 +39,29 @@ export default function ContactForm() {
     }
   }
 
+  if (status === "sent") {
+    return (
+      <div className="rounded-lg border border-[rgba(34,197,94,0.3)] bg-[rgba(34,197,94,0.06)] p-6">
+        <p className="text-xs font-bold uppercase tracking-[0.18em] text-[var(--jade)]">
+          Message sent
+        </p>
+        <h2 className="mt-3 font-display text-3xl font-semibold">
+          Thank you for reaching out.
+        </h2>
+        <p className="mt-3 text-sm leading-6 text-[var(--muted)]">
+          We received your message and will reply as soon as possible.
+        </p>
+        <button
+          type="button"
+          className="mt-5 inline-flex min-h-11 items-center justify-center rounded-md border border-[var(--line)] bg-white px-5 py-2.5 text-sm font-semibold text-[var(--ink)] transition hover:bg-[var(--paper)]"
+          onClick={() => setStatus("idle")}
+        >
+          Send another message
+        </button>
+      </div>
+    );
+  }
+
   return (
     <form
       className="grid gap-4"
@@ -96,11 +119,6 @@ export default function ContactForm() {
         >
           {status === "sending" ? "Sending…" : "Send"}
         </button>
-        {status === "sent" ? (
-          <span className="text-sm font-semibold text-[var(--jade)]">
-            Message sent.
-          </span>
-        ) : null}
         {status === "error" ? (
           <span className="text-sm font-semibold text-[var(--sumac)]">
             Unable to send. Please try again.
