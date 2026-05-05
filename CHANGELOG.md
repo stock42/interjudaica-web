@@ -84,3 +84,6 @@
 
 ## Unreleased
 - Refactor admin forum form inputs/buttons to components/ui primitives.
+
+## Unreleased
+- Refactor admin collection manager form controls to components/ui primitives (Input, Textarea, Label, Button).

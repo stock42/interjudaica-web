@@ -2,6 +2,11 @@
 
 import { useMemo, useState, type FormEvent } from "react";
 
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+
 type AdminKind =
   | "course-categories"
   | "courses"
@@ -35,11 +40,6 @@ type EntityConfig = {
   columns: ColumnConfig[];
 };
 
-const controlClass =
-  "min-h-11 rounded-md border border-[var(--line)] bg-[var(--paper)] px-3 text-sm font-normal outline-none transition focus:border-[var(--sapphire)] focus:ring-4 focus:ring-[rgba(19,70,160,0.14)]";
-
-const textareaClass =
-  "min-h-28 rounded-md border border-[var(--line)] bg-[var(--paper)] px-3 py-3 text-sm font-normal outline-none transition focus:border-[var(--sapphire)] focus:ring-4 focus:ring-[rgba(19,70,160,0.14)]";
 
 const configs: Record<AdminKind, EntityConfig> = {
   "course-categories": {
@@ -357,28 +357,22 @@ export function AdminCollectionManager({
             </p>
           </div>
           {editingUuid ? (
-            <button
-              className="inline-flex min-h-10 items-center justify-center rounded-full border border-[var(--line)] px-4 text-sm font-semibold transition hover:bg-[var(--paper)]"
-              type="button"
-              onClick={resetForm}
-            >
-              Cancel
-            </button>
+            <Button type="button" variant="outline" onClick={resetForm}>Cancel</Button>
           ) : null}
         </div>
 
         <form className="grid gap-4 md:grid-cols-2" onSubmit={handleSubmit}>
           {config.fields.map((field) => (
-            <label
+            <div
               key={field.name}
               className={`grid gap-2 text-sm font-semibold text-[var(--ink)] ${
                 field.span === "full" ? "md:col-span-2" : ""
               }`}
             >
-              {field.label}
+              <Label>{field.label}</Label>
               {field.type === "textarea" || field.type === "textarea-list" ? (
-                <textarea
-                  className={textareaClass}
+                <Textarea
+                  className="min-h-28"
                   value={String(form[field.name] ?? "")}
                   placeholder={field.placeholder}
                   onChange={(event) =>
@@ -390,7 +384,7 @@ export function AdminCollectionManager({
                 />
               ) : field.type === "select" ? (
                 <select
-                  className={controlClass}
+                  className="h-11 w-full"
                   value={String(form[field.name] ?? "")}
                   onChange={(event) =>
                     setForm((current) => ({
@@ -419,8 +413,8 @@ export function AdminCollectionManager({
                   }
                 />
               ) : (
-                <input
-                  className={controlClass}
+                <Input
+                  className="h-11"
                   type={field.type === "number" ? "number" : "text"}
                   value={String(form[field.name] ?? "")}
                   placeholder={field.placeholder}
@@ -432,7 +426,7 @@ export function AdminCollectionManager({
                   }
                 />
               )}
-            </label>
+            </div>
           ))}
 
           {error ? (
@@ -442,20 +436,12 @@ export function AdminCollectionManager({
           ) : null}
 
           <div className="flex flex-wrap gap-3 md:col-span-2">
-            <button
-              className="inline-flex min-h-11 items-center justify-center rounded-md border border-[var(--gold)] bg-[var(--gold)] px-5 py-2.5 text-sm font-semibold text-[#07090c] transition hover:bg-[#ffd66b] disabled:cursor-not-allowed disabled:opacity-60"
-              type="submit"
-              disabled={loading}
-            >
+            <Button type="submit" disabled={loading}>
               {loading ? "Saving..." : "Save"}
-            </button>
-            <button
-              className="inline-flex min-h-11 items-center justify-center rounded-full border border-[var(--line)] px-5 py-2.5 text-sm font-semibold transition hover:bg-[var(--paper)]"
-              type="button"
-              onClick={resetForm}
-            >
+            </Button>
+            <Button type="button" variant="outline" onClick={resetForm}>
               Clear
-            </button>
+            </Button>
           </div>
         </form>
       </section>
