@@ -87,3 +87,6 @@
 
 ## Unreleased
 - Refactor admin collection manager form controls to components/ui primitives (Input, Textarea, Label, Button).
+
+## Unreleased
+- Use components/ui Select for admin course form (category, instructor, level, status).

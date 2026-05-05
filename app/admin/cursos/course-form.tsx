@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useRouter } from "next/navigation";
 import type { TypeCourseCategory } from "@/models/course-categories";
 import type { TypeCourse } from "@/models/courses";
@@ -231,67 +232,68 @@ export function CourseForm({
           </p>
         </div>
 
-        <label className="grid gap-2 text-sm font-semibold text-[var(--ink)]">
-          Category
-          <select
-            className="h-11 w-full"
-            required
-            value={form.categoryUuid}
-            onChange={(event) => setField("categoryUuid", event.target.value)}
-          >
-            <option value="">Select a category</option>
-            {categories
-              .filter((category) => category.enabled)
-              .map((category) => (
-                <option key={category.uuid} value={category.uuid}>
-                  {category.name}
-                </option>
-              ))}
-          </select>
+        <div className="grid gap-2 text-sm font-semibold text-[var(--ink)]">
+          <Label>Category</Label>
+          <Select value={form.categoryUuid || ""} onValueChange={(value) => setField("categoryUuid", value)}>
+            <SelectTrigger className="h-11 w-full">
+              <SelectValue placeholder="Select a category" />
+            </SelectTrigger>
+            <SelectContent>
+              {categories
+                .filter((category) => category.enabled && Boolean(category.uuid))
+                .map((category) => (
+                  <SelectItem key={category.uuid} value={category.uuid ?? ""}>
+                    {category.name}
+                  </SelectItem>
+                ))}
+            </SelectContent>
+          </Select>
           <Link
             href="/admin/course-categories"
             className="text-xs font-bold text-[var(--sapphire)] underline underline-offset-4"
           >
             Manage categories
           </Link>
-        </label>
+        </div>
 
-        <label className="grid gap-2 text-sm font-semibold text-[var(--ink)]">
-          Instructor
-          <select
-            className="h-11 w-full"
-            value={form.instructorUuid}
-            onChange={(event) => setField("instructorUuid", event.target.value)}
-          >
-            <option value="">Select an instructor</option>
-            {instructors
-              .filter((instructor) => instructor.enabled)
-              .map((instructor) => (
-                <option key={instructor.uuid} value={instructor.uuid}>
-                  {instructor.displayName}
-                </option>
-              ))}
-          </select>
+        <div className="grid gap-2 text-sm font-semibold text-[var(--ink)]">
+          <Label>Instructor</Label>
+          <Select value={form.instructorUuid || ""} onValueChange={(value) => setField("instructorUuid", value)}>
+            <SelectTrigger className="h-11 w-full">
+              <SelectValue placeholder="Select an instructor" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="">Select an instructor</SelectItem>
+              {instructors
+                .filter((instructor) => instructor.enabled && Boolean(instructor.uuid))
+                .map((instructor) => (
+                  <SelectItem key={instructor.uuid} value={instructor.uuid ?? ""}>
+                    {instructor.displayName}
+                  </SelectItem>
+                ))}
+            </SelectContent>
+          </Select>
           <Link
             href="/admin/instructors"
             className="text-xs font-bold text-[var(--sapphire)] underline underline-offset-4"
           >
             Manage instructors
           </Link>
-        </label>
+        </div>
 
-        <label className="grid gap-2 text-sm font-semibold text-[var(--ink)]">
-          Level
-          <select
-            className="h-11 w-full"
-            value={form.level}
-            onChange={(event) => setField("level", event.target.value)}
-          >
-            <option value="Beginner">Beginner</option>
-            <option value="Intermediate">Intermediate</option>
-            <option value="Advanced">Advanced</option>
-          </select>
-        </label>
+        <div className="grid gap-2 text-sm font-semibold text-[var(--ink)]">
+          <Label>Level</Label>
+          <Select value={form.level} onValueChange={(value) => setField("level", value)}>
+            <SelectTrigger className="h-11 w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Beginner">Beginner</SelectItem>
+              <SelectItem value="Intermediate">Intermediate</SelectItem>
+              <SelectItem value="Advanced">Advanced</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
         <TextField
           label="Max students"
           type="number"
@@ -326,18 +328,19 @@ export function CourseForm({
           value={form.endDate}
           onChange={(value) => setField("endDate", value)}
         />
-        <label className="grid gap-2 text-sm font-semibold text-[var(--ink)]">
-          Status
-          <select
-            className="h-11 w-full"
-            value={form.status}
-            onChange={(event) => setField("status", event.target.value)}
-          >
-            <option value="draft">Draft</option>
-            <option value="published">Published</option>
-            <option value="archived">Archived</option>
-          </select>
-        </label>
+        <div className="grid gap-2 text-sm font-semibold text-[var(--ink)]">
+          <Label>Status</Label>
+          <Select value={form.status} onValueChange={(value) => setField("status", value)}>
+            <SelectTrigger className="h-11 w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="draft">Draft</SelectItem>
+              <SelectItem value="published">Published</SelectItem>
+              <SelectItem value="archived">Archived</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
         <TextField
           label="Stripe link"
           value={form.stripePaymentLink}
