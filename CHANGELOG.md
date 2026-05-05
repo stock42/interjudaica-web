@@ -81,3 +81,6 @@
 
 ## Unreleased
 - Refactor admin paper category form inputs/textareas/buttons to components/ui primitives.
+
+## Unreleased
+- Refactor admin forum form inputs/buttons to components/ui primitives.
