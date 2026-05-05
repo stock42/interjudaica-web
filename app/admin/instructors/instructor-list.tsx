@@ -4,6 +4,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { adminTextControlClass } from "@/app/admin/components/admin-controls";
+
 import type { TypeInstructor } from "@/models/instructors";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -80,7 +82,7 @@ export function InstructorList({
             <label className="grid gap-2 text-sm font-semibold text-[var(--ink)]">
               Search instructors
               <Input
-                className="min-h-11 rounded-md border border-[var(--line)] bg-[var(--paper)] px-3 text-sm font-normal outline-none transition focus:border-[var(--sapphire)] focus:ring-4 focus:ring-[rgba(19,70,160,0.14)]"
+                className={adminTextControlClass}
                 type="search"
                 placeholder="Name, email, slug"
                 value={query}

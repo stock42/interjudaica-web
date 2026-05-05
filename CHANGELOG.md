@@ -135,3 +135,6 @@
 
 ## Unreleased
 - Use components/ui Button for admin list primary CTAs (New ...).
+
+## Unreleased
+- Centralize admin filter text input classes via app/admin/components/admin-controls.
