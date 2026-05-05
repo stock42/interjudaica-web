@@ -11,3 +11,6 @@
 
 - Documented all current API endpoints in `AGENTS.md`.
 - Added mandatory project workflow rules requiring changelog updates and descriptive commits after changes.
+
+## Unreleased
+- Read MONGODB_URI/MONGODB_DATABASE env vars as fallbacks for MongoDB connection.

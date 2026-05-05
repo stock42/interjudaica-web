@@ -34,11 +34,10 @@ No `.env*` file is committed, and `.env*` is ignored.
 
 The code currently reads:
 
-- `MONGODB_URL`, falling back to `MONGO_URI`, then `mongodb://localhost:27017`
-- `MONGODB_NAME`, falling back to `MONGO_DB`, then `interjudaica`
+- `MONGODB_URL`, falling back to `MONGODB_URI`, then `MONGO_URI`, then `mongodb://localhost:27017`
+- `MONGODB_NAME`, falling back to `MONGODB_DATABASE`, then `MONGO_DB`, then `interjudaica`
 - `AUTH_SECRET`, falling back to `NEXTAUTH_SECRET`, then a local development secret
 
-`promptings/INITIAL.md` mentions `MONGODB_URI` and `MONGODB_DATABASE`, but the implemented code does not currently read those names. If env naming changes, update code and docs together.
 
 ## Product Rules
 

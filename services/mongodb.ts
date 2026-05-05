@@ -4,11 +4,15 @@ import { MongoClient, type Db } from "mongodb";
 
 const MONGODB_URL =
   process.env.MONGODB_URL ??
+  process.env.MONGODB_URI ??
   process.env.MONGO_URI ??
   "mongodb://localhost:27017";
 
 const MONGODB_NAME =
-  process.env.MONGODB_NAME ?? process.env.MONGO_DB ?? "interjudaica";
+  process.env.MONGODB_NAME ??
+  process.env.MONGODB_DATABASE ??
+  process.env.MONGO_DB ??
+  "interjudaica";
 
 type MongoGlobal = typeof globalThis & {
   __interjudaicaMongoClientPromise?: Promise<MongoClient>;
