@@ -2,7 +2,9 @@ import type { CSSProperties, ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { getCurrentUser } from "@/services/user-auth";
+import { getCurrentOperator } from "@/services/auth";
 import StudentUserMenu from "@/components/share/student-user-menu";
+import OperatorUserMenu from "@/components/share/operator-user-menu";
 import {
   type Course,
   adminStats,
@@ -65,7 +67,10 @@ export function ButtonLink({
 }
 
 export async function SiteHeader() {
-  const user = await getCurrentUser();
+  const [operator, user] = await Promise.all([
+    getCurrentOperator(),
+    getCurrentUser(),
+  ]);
   return (
     <header className="sticky top-0 z-50 border-b border-[var(--gold)] bg-black shadow-[0_12px_40px_rgba(0,0,0,0.28)] backdrop-blur-xl">
       <div className="mx-auto flex w-full flex-wrap items-center justify-between gap-5 px-6 py-4 sm:px-10 lg:px-16 xl:px-20 2xl:px-24">
@@ -108,7 +113,13 @@ export async function SiteHeader() {
         </nav>
 
         <div className="flex shrink-0 items-center gap-2">
-          {user ? (
+          {operator ? (
+            <OperatorUserMenu
+              firstName={operator.firstName ?? ""}
+              lastName={operator.lastName ?? ""}
+              email={operator.email}
+            />
+          ) : user ? (
             <StudentUserMenu
               firstName={user.firstName}
               lastName={user.lastName}
