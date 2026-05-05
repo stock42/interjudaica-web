@@ -6,6 +6,7 @@ import { useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useRouter } from "next/navigation";
 import type { TypeCourse } from "@/models/courses";
 import type { TypeForumThread } from "@/models/forums";
@@ -138,50 +139,53 @@ export function ForumForm({
             Generated slug: {slugPreview(form.title) || "thread-title"}
           </p>
         </div>
-        <label className="grid gap-2 text-sm font-semibold text-[var(--ink)]">
-          Area
-          <select
-            className="h-11 w-full"
-            value={form.area}
-            onChange={(event) => setField("area", event.target.value)}
-          >
-            {areaOptions.map((area) => (
-              <option key={area} value={area}>
-                {area}
-              </option>
-            ))}
-          </select>
+        <div className="grid gap-2 text-sm font-semibold text-[var(--ink)]">
+          <Label>Area</Label>
+          <Select value={form.area} onValueChange={(value) => setField("area", value)}>
+            <SelectTrigger className="h-11 w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {areaOptions.map((area) => (
+                <SelectItem key={area} value={area}>
+                  {area}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           <span className="text-xs font-semibold text-[var(--muted)]">
             Area groups the thread in the forum and moderation views.
           </span>
-        </label>
-        <label className="grid gap-2 text-sm font-semibold text-[var(--ink)]">
-          Related course
-          <select
-            className="h-11 w-full"
-            value={form.courseSlug}
-            onChange={(event) => setField("courseSlug", event.target.value)}
-          >
-            <option value="">Community forum</option>
-            {courses.map((course) => (
-              <option key={course.uuid} value={course.slug}>
-                {course.title}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="grid gap-2 text-sm font-semibold text-[var(--ink)]">
-          Status
-          <select
-            className="h-11 w-full"
-            value={form.status}
-            onChange={(event) => setField("status", event.target.value)}
-          >
-            <option value="open">Open</option>
-            <option value="closed">Closed</option>
-            <option value="hidden">Hidden</option>
-          </select>
-        </label>
+        </div>
+        <div className="grid gap-2 text-sm font-semibold text-[var(--ink)]">
+          <Label>Related course</Label>
+          <Select value={form.courseSlug || ""} onValueChange={(value) => setField("courseSlug", value)}>
+            <SelectTrigger className="h-11 w-full">
+              <SelectValue placeholder="Community forum" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="">Community forum</SelectItem>
+              {courses.filter((course) => Boolean(course.uuid) && Boolean(course.slug)).map((course) => (
+                <SelectItem key={course.uuid} value={course.slug ?? ""}>
+                  {course.title}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="grid gap-2 text-sm font-semibold text-[var(--ink)]">
+          <Label>Status</Label>
+          <Select value={form.status} onValueChange={(value) => setField("status", value)}>
+            <SelectTrigger className="h-11 w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="open">Open</SelectItem>
+              <SelectItem value="closed">Closed</SelectItem>
+              <SelectItem value="hidden">Hidden</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
         <label className="flex items-center gap-3 self-end rounded-md border border-[var(--line)] bg-[var(--paper)] px-3 py-3 text-sm font-semibold text-[var(--ink)]">
           <input
             className="h-5 w-5 accent-[var(--sapphire)]"

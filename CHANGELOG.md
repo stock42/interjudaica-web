@@ -93,3 +93,6 @@
 
 ## Unreleased
 - Use components/ui Select for admin paper form (category, status, visibility).
+
+## Unreleased
+- Use components/ui Select for admin forum form (area, related course, status).
