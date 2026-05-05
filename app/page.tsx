@@ -143,7 +143,7 @@ function CourseFeatureCard({
         </h3>
         <span className="mt-3 h-px w-20 bg-[var(--gold)]" />
         <p className="mt-4 line-clamp-3 max-w-md text-sm leading-6 text-white/78">
-          {course.summary}
+          {course.summary || "Course details coming soon."}
         </p>
         <div className="mt-5">
           <ButtonLink href={`/curso/${course.slug}`} tone="secondary">
@@ -176,7 +176,7 @@ function SectionTitle({
 }
 
 export default async function Home() {
-  const homeCourses = (await listPublicCourses()).filter((course) => course.summary.trim());
+  const homeCourses = await listPublicCourses();
   const whyChoose = [
     {
       icon: "screen" as const,

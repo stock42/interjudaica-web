@@ -20,3 +20,6 @@
 
 ## Unreleased
 - Home now lists all public courses and renders them in a horizontal carousel when there are many.
+
+## Unreleased
+- Home no longer filters out courses missing summaries; show all published courses.
