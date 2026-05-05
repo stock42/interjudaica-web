@@ -662,13 +662,13 @@ export function DataTable({
             </tr>
           </thead>
           <tbody>
-            {rows.map((row) => (
+            {rows.map((row, rowIndex) => (
               <tr
-                key={row.join("-")}
+                key={`${rowIndex}-${row.join("-")}`}
                 className="border-t border-[var(--line)] hover:bg-[rgba(244,189,51,0.05)]"
               >
-                {row.map((cell) => (
-                  <td key={cell} className="px-4 py-4 text-[var(--muted)]">
+                {row.map((cell, index) => (
+                  <td key={`${index}-${cell}`} className="px-4 py-4 text-[var(--muted)]">
                     {cell}
                   </td>
                 ))}
