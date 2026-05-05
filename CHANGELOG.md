@@ -29,3 +29,6 @@
 
 ## Unreleased
 - Add student Login button to header navigation.
+
+## Unreleased
+- Header now shows the logged-in student profile shortcut (and hides Login/Enroll when signed in).

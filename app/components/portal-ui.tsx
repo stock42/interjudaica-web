@@ -1,6 +1,7 @@
 import type { CSSProperties, ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { getCurrentUser } from "@/services/user-auth";
 import {
   type Course,
   adminStats,
@@ -62,7 +63,8 @@ export function ButtonLink({
   );
 }
 
-export function SiteHeader() {
+export async function SiteHeader() {
+  const user = await getCurrentUser();
   return (
     <header className="sticky top-0 z-50 border-b border-[var(--gold)] bg-black shadow-[0_12px_40px_rgba(0,0,0,0.28)] backdrop-blur-xl">
       <div className="mx-auto flex w-full flex-wrap items-center justify-between gap-5 px-6 py-4 sm:px-10 lg:px-16 xl:px-20 2xl:px-24">
@@ -105,12 +107,28 @@ export function SiteHeader() {
         </nav>
 
         <div className="flex shrink-0 items-center gap-2">
-          <ButtonLink href="/login" tone="secondary" className="min-w-28">
-            Login
-          </ButtonLink>
-          <ButtonLink href="/register" className="min-w-36">
-            Enroll
-          </ButtonLink>
+          {user ? (
+            <Link
+              href="/dashboard"
+              className="flex items-center gap-3 rounded-full border border-[var(--gold)] bg-black/40 px-4 py-2 text-sm font-semibold text-[var(--gold)] transition hover:bg-[rgba(244,189,51,0.12)]"
+            >
+              <span className="flex h-9 w-9 items-center justify-center rounded-full border border-[rgba(244,189,51,0.55)] bg-[#050608] font-bold text-[var(--gold)]">
+                {`${(user.firstName || "U")[0]}${(user.lastName || "")[0]}`.toUpperCase()}
+              </span>
+              <span className="hidden max-w-[12rem] truncate sm:block">
+                {user.firstName || user.email}
+              </span>
+            </Link>
+          ) : (
+            <>
+              <ButtonLink href="/login" tone="secondary" className="min-w-28">
+                Login
+              </ButtonLink>
+              <ButtonLink href="/register" className="min-w-36">
+                Enroll
+              </ButtonLink>
+            </>
+          )}
         </div>
       </div>
     </header>
