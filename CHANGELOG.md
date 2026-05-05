@@ -105,3 +105,6 @@
 
 ## Unreleased
 - Use components/ui Select for admin paper list filters.
+
+## Unreleased
+- Use components/ui Select for admin forum list filters.

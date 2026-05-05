@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { TypeForumThread } from "@/models/forums";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export function ForumList({ threads }: { threads: TypeForumThread[] }) {
   const router = useRouter();
@@ -73,31 +74,33 @@ export function ForumList({ threads }: { threads: TypeForumThread[] }) {
                 onChange={(event) => setQuery(event.target.value)}
               />
             </label>
-            <label className="grid gap-2 text-sm font-semibold text-[var(--ink)]">
-              Status
-              <select
-                className="min-h-11 rounded-md border border-[var(--line)] bg-[var(--paper)] px-3 text-sm font-normal outline-none transition focus:border-[var(--sapphire)] focus:ring-4 focus:ring-[rgba(19,70,160,0.14)]"
-                value={status}
-                onChange={(event) => setStatus(event.target.value)}
-              >
-                <option value="">All</option>
-                <option value="open">Open</option>
-                <option value="closed">Closed</option>
-                <option value="hidden">Hidden</option>
-              </select>
-            </label>
-            <label className="grid gap-2 text-sm font-semibold text-[var(--ink)]">
-              Featured
-              <select
-                className="min-h-11 rounded-md border border-[var(--line)] bg-[var(--paper)] px-3 text-sm font-normal outline-none transition focus:border-[var(--sapphire)] focus:ring-4 focus:ring-[rgba(19,70,160,0.14)]"
-                value={featured}
-                onChange={(event) => setFeatured(event.target.value)}
-              >
-                <option value="">All</option>
-                <option value="true">Featured</option>
-                <option value="false">Not featured</option>
-              </select>
-            </label>
+            <div className="grid gap-2 text-sm font-semibold text-[var(--ink)]">
+              <span>Status</span>
+              <Select value={status} onValueChange={(value) => setStatus(value)}>
+                <SelectTrigger className="h-11 w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                <SelectItem value="">All</SelectItem>
+                <SelectItem value="open">Open</SelectItem>
+                <SelectItem value="closed">Closed</SelectItem>
+                <SelectItem value="hidden">Hidden</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid gap-2 text-sm font-semibold text-[var(--ink)]">
+              <span>Featured</span>
+              <Select value={featured} onValueChange={(value) => setFeatured(value)}>
+                <SelectTrigger className="h-11 w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                <SelectItem value="">All</SelectItem>
+                <SelectItem value="true">Featured</SelectItem>
+                <SelectItem value="false">Not featured</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </form>
           <Link
             href="/admin/foro/new"
