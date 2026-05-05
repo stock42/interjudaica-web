@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { TypeCourseCategory } from "@/models/course-categories";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export function CourseCategoryList({
@@ -155,12 +156,9 @@ export function CourseCategoryList({
                     </td>
                     <td className="px-4 py-4">
                       <div className="flex flex-wrap gap-2">
-                        <Link
-                          href={`/admin/course-categories/${category.uuid}`}
-                          className="rounded-full border border-[var(--line)] px-3 py-1.5 text-xs font-bold transition hover:bg-[var(--paper)]"
-                        >
-                          Edit
-                        </Link>
+                        <Button asChild variant="outline" size="xs" className="rounded-full">
+                          <Link href={`/admin/course-categories/${category.uuid}`}>Edit</Link>
+                        </Button>
                         <button
                           className="rounded-full border border-red-200 px-3 py-1.5 text-xs font-bold text-red-700 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60"
                           type="button"

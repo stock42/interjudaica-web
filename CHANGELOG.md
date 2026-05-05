@@ -129,3 +129,6 @@
 
 ## Unreleased
 - Use components/ui Switch for admin collection manager checkbox fields.
+
+## Unreleased
+- Use components/ui Button for admin list action buttons (Edit/Delete).
