@@ -35,3 +35,6 @@
 
 ## Unreleased
 - Add /contact page and API route using Resend with React email templates (user confirmation + admin notification).
+
+## Unreleased
+- Fix header Contact link and redesign /contact page as a two-column layout.
