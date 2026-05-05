@@ -99,3 +99,6 @@
 
 ## Unreleased
 - Use components/ui Select for admin operator form (level).
+
+## Unreleased
+- Use components/ui Select for admin course list filters.

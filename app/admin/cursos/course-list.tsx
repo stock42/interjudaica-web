@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { TypeCourse } from "@/models/courses";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const formatUsd = new Intl.NumberFormat("en-US", {
   style: "currency",
@@ -78,32 +79,34 @@ export function CourseList({ courses }: { courses: TypeCourse[] }) {
                 onChange={(event) => setQuery(event.target.value)}
               />
             </label>
-            <label className="grid gap-2 text-sm font-semibold text-[var(--ink)]">
-              Status
-              <select
-                className="min-h-11 rounded-md border border-[var(--line)] bg-[var(--paper)] px-3 text-sm font-normal outline-none transition focus:border-[var(--sapphire)] focus:ring-4 focus:ring-[rgba(19,70,160,0.14)]"
-                value={status}
-                onChange={(event) => setStatus(event.target.value)}
-              >
-                <option value="">All</option>
-                <option value="draft">Draft</option>
-                <option value="published">Published</option>
-                <option value="archived">Archived</option>
-              </select>
-            </label>
-            <label className="grid gap-2 text-sm font-semibold text-[var(--ink)]">
-              Level
-              <select
-                className="min-h-11 rounded-md border border-[var(--line)] bg-[var(--paper)] px-3 text-sm font-normal outline-none transition focus:border-[var(--sapphire)] focus:ring-4 focus:ring-[rgba(19,70,160,0.14)]"
-                value={level}
-                onChange={(event) => setLevel(event.target.value)}
-              >
-                <option value="">All</option>
-                <option value="Beginner">Beginner</option>
-                <option value="Intermediate">Intermediate</option>
-                <option value="Advanced">Advanced</option>
-              </select>
-            </label>
+            <div className="grid gap-2 text-sm font-semibold text-[var(--ink)]">
+              <span>Status</span>
+              <Select value={status} onValueChange={(value) => setStatus(value)}>
+                <SelectTrigger className="h-11 w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+              <SelectItem value="">All</SelectItem>
+              <SelectItem value="draft">Draft</SelectItem>
+              <SelectItem value="published">Published</SelectItem>
+              <SelectItem value="archived">Archived</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid gap-2 text-sm font-semibold text-[var(--ink)]">
+              <span>Level</span>
+              <Select value={level} onValueChange={(value) => setLevel(value)}>
+                <SelectTrigger className="h-11 w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+              <SelectItem value="">All</SelectItem>
+              <SelectItem value="Beginner">Beginner</SelectItem>
+              <SelectItem value="Intermediate">Intermediate</SelectItem>
+              <SelectItem value="Advanced">Advanced</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </form>
 
           <Link
