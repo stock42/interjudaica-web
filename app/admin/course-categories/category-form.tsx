@@ -2,14 +2,14 @@
 
 import Link from "next/link";
 import { useState, type FormEvent } from "react";
+
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { useRouter } from "next/navigation";
 import type { TypeCourseCategory } from "@/models/course-categories";
 
-const controlClass =
-  "min-h-11 rounded-md border border-[var(--line)] bg-[var(--paper)] px-3 text-sm font-normal outline-none transition focus:border-[var(--sapphire)] focus:ring-4 focus:ring-[rgba(19,70,160,0.14)]";
-
-const textareaClass =
-  "min-h-28 rounded-md border border-[var(--line)] bg-[var(--paper)] px-3 py-3 text-sm font-normal outline-none transition focus:border-[var(--sapphire)] focus:ring-4 focus:ring-[rgba(19,70,160,0.14)]";
 
 type CategoryFormState = {
   name: string;
@@ -100,17 +100,17 @@ export function CourseCategoryForm({
 
       <form className="grid gap-4 md:grid-cols-2" onSubmit={handleSubmit}>
         <div className="grid gap-2 md:col-span-2">
-          <label className="grid gap-2 text-sm font-semibold text-[var(--ink)]">
-            Name
-            <input
-              className={controlClass}
+          <div className="grid gap-2 text-sm font-semibold text-[var(--ink)]">
+            <Label>Name</Label>
+            <Input
+              className="h-11"
               type="text"
               value={form.name}
               onChange={(event) =>
                 setForm((current) => ({ ...current, name: event.target.value }))
               }
             />
-          </label>
+          </div>
           <p className="text-xs font-semibold text-[var(--muted)]">
             Generated slug: {slugPreview(form.name) || "category-name"}
           </p>
@@ -131,10 +131,10 @@ export function CourseCategoryForm({
           Enabled
         </label>
 
-        <label className="grid gap-2 text-sm font-semibold text-[var(--ink)] md:col-span-2">
-          Description
-          <textarea
-            className={textareaClass}
+        <div className="grid gap-2 text-sm font-semibold text-[var(--ink)] md:col-span-2">
+          <Label>Description</Label>
+          <Textarea
+            className="min-h-28"
             value={form.description}
             onChange={(event) =>
               setForm((current) => ({
@@ -143,7 +143,7 @@ export function CourseCategoryForm({
               }))
             }
           />
-        </label>
+        </div>
 
         {error ? (
           <p className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700 md:col-span-2">
@@ -152,19 +152,12 @@ export function CourseCategoryForm({
         ) : null}
 
         <div className="flex flex-wrap gap-3 md:col-span-2">
-          <button
-            className="inline-flex min-h-11 items-center justify-center rounded-md border border-[var(--gold)] bg-[var(--gold)] px-5 py-2.5 text-sm font-semibold text-[#07090c] transition hover:bg-[#ffd66b] disabled:cursor-not-allowed disabled:opacity-60"
-            type="submit"
-            disabled={loading}
-          >
+          <Button type="submit" disabled={loading}>
             {loading ? "Saving..." : "Save category"}
-          </button>
-          <Link
-            href="/admin/course-categories"
-            className="inline-flex min-h-11 items-center justify-center rounded-full border border-[var(--line)] px-5 py-2.5 text-sm font-semibold transition hover:bg-[var(--paper)]"
-          >
-            Cancel
-          </Link>
+          </Button>
+          <Button asChild variant="outline">
+            <Link href="/admin/course-categories">Cancel</Link>
+          </Button>
         </div>
       </form>
     </section>
