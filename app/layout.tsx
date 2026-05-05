@@ -1,6 +1,11 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { TooltipProvider } from "@/components/ui/tooltip"
 import { SiteFooter, SiteHeader } from "@/app/components/portal-ui";
+import { Geist } from "next/font/google";
+import { cn } from "@/lib/utils";
+
+const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://interjudaica.com"),
@@ -27,12 +32,14 @@ export default function RootLayout({
     <html
       lang="en"
       data-scroll-behavior="smooth"
-      className="h-full antialiased"
+      className={cn("h-full antialiased", "font-sans", geist.variable)}
     >
       <body className="flex min-h-full flex-col">
-        <SiteHeader />
-        {children}
-        <SiteFooter />
+        <TooltipProvider>
+          <SiteHeader />
+          {children}
+          <SiteFooter />
+        </TooltipProvider>
       </body>
     </html>
   );

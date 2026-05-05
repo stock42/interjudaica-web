@@ -33,6 +33,7 @@ export async function POST(request: Request) {
     await sendContactEmails(parsed.data);
     return NextResponse.json({ ok: true });
   } catch (error) {
+    console.info("error: ", error);
     return NextResponse.json(
       {
         ok: false,
