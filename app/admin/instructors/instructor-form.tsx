@@ -3,14 +3,14 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState, type ChangeEvent, type FormEvent } from "react";
+
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { useRouter } from "next/navigation";
 import type { TypeInstructor } from "@/models/instructors";
 
-const controlClass =
-  "min-h-11 rounded-md border border-[var(--line)] bg-[var(--paper)] px-3 text-sm font-normal outline-none transition focus:border-[var(--sapphire)] focus:ring-4 focus:ring-[rgba(19,70,160,0.14)]";
-
-const textareaClass =
-  "min-h-28 rounded-md border border-[var(--line)] bg-[var(--paper)] px-3 py-3 text-sm font-normal outline-none transition focus:border-[var(--sapphire)] focus:ring-4 focus:ring-[rgba(19,70,160,0.14)]";
 
 type InstructorFormState = {
   firstName: string;
@@ -158,11 +158,11 @@ export function InstructorForm({ instructor }: { instructor?: TypeInstructor }) 
           value={form.email}
           onChange={(value) => setField("email", value)}
         />
-        <label className="grid gap-2 text-sm font-semibold text-[var(--ink)]">
-          Photo
-          <input
+        <div className="grid gap-2 text-sm font-semibold text-[var(--ink)]">
+          <Label>Photo</Label>
+          <Input
             accept="image/png,image/jpeg,image/webp,image/gif"
-            className={controlClass}
+            className="h-11"
             type="file"
             onChange={uploadPhoto}
           />
@@ -171,7 +171,7 @@ export function InstructorForm({ instructor }: { instructor?: TypeInstructor }) 
               Uploading...
             </span>
           ) : null}
-        </label>
+        </div>
         <label className="flex items-center gap-3 self-end rounded-md border border-[var(--line)] bg-[var(--paper)] px-3 py-3 text-sm font-semibold text-[var(--ink)]">
           <input
             className="h-5 w-5 accent-[var(--sapphire)]"
@@ -207,19 +207,12 @@ export function InstructorForm({ instructor }: { instructor?: TypeInstructor }) 
         ) : null}
 
         <div className="flex flex-wrap gap-3 md:col-span-2">
-          <button
-            className="inline-flex min-h-11 items-center justify-center rounded-md border border-[var(--gold)] bg-[var(--gold)] px-5 py-2.5 text-sm font-semibold text-[#07090c] transition hover:bg-[#ffd66b] disabled:cursor-not-allowed disabled:opacity-60"
-            type="submit"
-            disabled={loading || uploading}
-          >
+          <Button type="submit" disabled={loading || uploading}>
             {loading ? "Saving..." : "Save instructor"}
-          </button>
-          <Link
-            href="/admin/instructors"
-            className="inline-flex min-h-11 items-center justify-center rounded-full border border-[var(--line)] px-5 py-2.5 text-sm font-semibold transition hover:bg-[var(--paper)]"
-          >
-            Cancel
-          </Link>
+          </Button>
+          <Button asChild variant="outline">
+            <Link href="/admin/instructors">Cancel</Link>
+          </Button>
         </div>
       </form>
     </section>
@@ -238,15 +231,15 @@ function TextField({
   type?: "email" | "text";
 }) {
   return (
-    <label className="grid gap-2 text-sm font-semibold text-[var(--ink)]">
-      {label}
-      <input
-        className={controlClass}
+    <div className="grid gap-2 text-sm font-semibold text-[var(--ink)]">
+      <Label>{label}</Label>
+      <Input
+        className="h-11"
         type={type}
         value={value}
         onChange={(event) => onChange(event.target.value)}
       />
-    </label>
+    </div>
   );
 }
 
@@ -260,14 +253,13 @@ function TextareaField({
   onChange: (value: string) => void;
 }) {
   return (
-    <label className="grid gap-2 text-sm font-semibold text-[var(--ink)] md:col-span-2">
-      {label}
-      <textarea
-        className={textareaClass}
+    <div className="grid gap-2 text-sm font-semibold text-[var(--ink)] md:col-span-2">
+      <Label>{label}</Label>
+      <Textarea
+        className="min-h-28"
         value={value}
         onChange={(event) => onChange(event.target.value)}
       />
-    </label>
+    </div>
   );
 }
-
