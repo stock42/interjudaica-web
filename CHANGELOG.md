@@ -32,3 +32,6 @@
 
 ## Unreleased
 - Header now shows the logged-in student profile shortcut (and hides Login/Enroll when signed in).
+
+## Unreleased
+- Add /contact page and API route using Resend with React email templates (user confirmation + admin notification).
