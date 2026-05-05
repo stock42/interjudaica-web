@@ -132,3 +132,6 @@
 
 ## Unreleased
 - Use components/ui Button for admin list action buttons (Edit/Delete).
+
+## Unreleased
+- Use components/ui Button for admin list primary CTAs (New ...).

@@ -110,12 +110,9 @@ export function CourseList({ courses }: { courses: TypeCourse[] }) {
             </div>
           </form>
 
-          <Link
-            href="/admin/cursos/new"
-            className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-md border border-[var(--gold)] bg-[var(--gold)] px-5 py-2.5 text-sm font-semibold text-[#07090c] transition hover:bg-[#ffd66b]"
-          >
-            New course
-          </Link>
+          <Button asChild size="lg" className="h-11">
+            <Link href="/admin/cursos/new">New course</Link>
+          </Button>
         </div>
 
         <div className="mt-4 flex flex-wrap gap-2 text-xs font-bold uppercase text-[var(--muted)]">

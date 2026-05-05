@@ -103,12 +103,9 @@ export function ForumList({ threads }: { threads: TypeForumThread[] }) {
               </Select>
             </div>
           </form>
-          <Link
-            href="/admin/foro/new"
-            className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-md border border-[var(--gold)] bg-[var(--gold)] px-5 py-2.5 text-sm font-semibold text-[#07090c] transition hover:bg-[#ffd66b]"
-          >
-            New thread
-          </Link>
+          <Button asChild size="lg" className="h-11">
+            <Link href="/admin/foro/new">New thread</Link>
+          </Button>
         </div>
       </section>
 

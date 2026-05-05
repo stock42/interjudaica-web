@@ -92,12 +92,9 @@ export function CourseCategoryList({
             </div>
           </form>
 
-          <Link
-            href="/admin/course-categories/new"
-            className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-md border border-[var(--gold)] bg-[var(--gold)] px-5 py-2.5 text-sm font-semibold text-[#07090c] transition hover:bg-[#ffd66b]"
-          >
-            New category
-          </Link>
+          <Button asChild size="lg" className="h-11">
+            <Link href="/admin/course-categories/new">New category</Link>
+          </Button>
         </div>
 
         <div className="mt-4 flex flex-wrap gap-2 text-xs font-bold uppercase text-[var(--muted)]">
