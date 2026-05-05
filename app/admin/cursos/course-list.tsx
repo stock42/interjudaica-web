@@ -85,12 +85,12 @@ export function CourseList({ courses }: { courses: TypeCourse[] }) {
             </label>
             <div className="grid gap-2 text-sm font-semibold text-[var(--ink)]">
               <span>Status</span>
-              <Select value={status} onValueChange={(value) => setStatus(value)}>
+              <Select value={status} onValueChange={(value) => setStatus(value === "__all__" ? "" : value)}>
                 <SelectTrigger className="h-11 w-full">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-              <SelectItem value="">All</SelectItem>
+              <SelectItem value="__all__">All</SelectItem>
               <SelectItem value="draft">Draft</SelectItem>
               <SelectItem value="published">Published</SelectItem>
               <SelectItem value="archived">Archived</SelectItem>
@@ -99,12 +99,12 @@ export function CourseList({ courses }: { courses: TypeCourse[] }) {
             </div>
             <div className="grid gap-2 text-sm font-semibold text-[var(--ink)]">
               <span>Level</span>
-              <Select value={level} onValueChange={(value) => setLevel(value)}>
+              <Select value={level} onValueChange={(value) => setLevel(value === "__all__" ? "" : value)}>
                 <SelectTrigger className="h-11 w-full">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-              <SelectItem value="">All</SelectItem>
+              <SelectItem value="__all__">All</SelectItem>
               <SelectItem value="Beginner">Beginner</SelectItem>
               <SelectItem value="Intermediate">Intermediate</SelectItem>
               <SelectItem value="Advanced">Advanced</SelectItem>

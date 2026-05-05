@@ -79,12 +79,12 @@ export function ForumList({ threads }: { threads: TypeForumThread[] }) {
             </label>
             <div className="grid gap-2 text-sm font-semibold text-[var(--ink)]">
               <span>Status</span>
-              <Select value={status} onValueChange={(value) => setStatus(value)}>
+              <Select value={status} onValueChange={(value) => setStatus(value === "__all__" ? "" : value)}>
                 <SelectTrigger className="h-11 w-full">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                <SelectItem value="">All</SelectItem>
+                <SelectItem value="__all__">All</SelectItem>
                 <SelectItem value="open">Open</SelectItem>
                 <SelectItem value="closed">Closed</SelectItem>
                 <SelectItem value="hidden">Hidden</SelectItem>
@@ -93,12 +93,12 @@ export function ForumList({ threads }: { threads: TypeForumThread[] }) {
             </div>
             <div className="grid gap-2 text-sm font-semibold text-[var(--ink)]">
               <span>Featured</span>
-              <Select value={featured} onValueChange={(value) => setFeatured(value)}>
+              <Select value={featured} onValueChange={(value) => setFeatured(value === "__all__" ? "" : value)}>
                 <SelectTrigger className="h-11 w-full">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                <SelectItem value="">All</SelectItem>
+                <SelectItem value="__all__">All</SelectItem>
                 <SelectItem value="true">Featured</SelectItem>
                 <SelectItem value="false">Not featured</SelectItem>
                 </SelectContent>

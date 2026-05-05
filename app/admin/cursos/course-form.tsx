@@ -258,12 +258,12 @@ export function CourseForm({
 
         <div className="grid gap-2 text-sm font-semibold text-[var(--ink)]">
           <Label>Instructor</Label>
-          <Select value={form.instructorUuid || ""} onValueChange={(value) => setField("instructorUuid", value)}>
+          <Select value={form.instructorUuid || ""} onValueChange={(value) => setField("instructorUuid", value === "__none__" ? "" : value)}>
             <SelectTrigger className="h-11 w-full">
               <SelectValue placeholder="Select an instructor" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Select an instructor</SelectItem>
+              <SelectItem value="__none__">Select an instructor</SelectItem>
               {instructors
                 .filter((instructor) => instructor.enabled && Boolean(instructor.uuid))
                 .map((instructor) => (

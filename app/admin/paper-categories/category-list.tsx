@@ -82,12 +82,12 @@ export function PaperCategoryList({
             </label>
             <div className="grid gap-2 text-sm font-semibold text-[var(--ink)]">
               <span>Status</span>
-              <Select value={enabled} onValueChange={(value) => setEnabled(value)}>
+              <Select value={enabled} onValueChange={(value) => setEnabled(value === "__all__" ? "" : value)}>
                 <SelectTrigger className="h-11 w-full">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                <SelectItem value="">All</SelectItem>
+                <SelectItem value="__all__">All</SelectItem>
                 <SelectItem value="true">Enabled</SelectItem>
                 <SelectItem value="false">Disabled</SelectItem>
                 </SelectContent>

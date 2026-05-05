@@ -79,12 +79,12 @@ export function PaperList({ papers }: { papers: TypePaper[] }) {
             </label>
             <div className="grid gap-2 text-sm font-semibold text-[var(--ink)]">
               <span>Status</span>
-              <Select value={status} onValueChange={(value) => setStatus(value)}>
+              <Select value={status} onValueChange={(value) => setStatus(value === "__all__" ? "" : value)}>
                 <SelectTrigger className="h-11 w-full">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                <SelectItem value="">All</SelectItem>
+                <SelectItem value="__all__">All</SelectItem>
                 <SelectItem value="draft">Draft</SelectItem>
                 <SelectItem value="published">Published</SelectItem>
                 <SelectItem value="archived">Archived</SelectItem>
@@ -93,12 +93,12 @@ export function PaperList({ papers }: { papers: TypePaper[] }) {
             </div>
             <div className="grid gap-2 text-sm font-semibold text-[var(--ink)]">
               <span>Visibility</span>
-              <Select value={visibility} onValueChange={(value) => setVisibility(value)}>
+              <Select value={visibility} onValueChange={(value) => setVisibility(value === "__all__" ? "" : value)}>
                 <SelectTrigger className="h-11 w-full">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                <SelectItem value="">All</SelectItem>
+                <SelectItem value="__all__">All</SelectItem>
                 <SelectItem value="public">Public</SelectItem>
                 <SelectItem value="community">Community</SelectItem>
                 <SelectItem value="private">Private</SelectItem>

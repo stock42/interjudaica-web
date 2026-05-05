@@ -160,12 +160,12 @@ export function ForumForm({
         </div>
         <div className="grid gap-2 text-sm font-semibold text-[var(--ink)]">
           <Label>Related course</Label>
-          <Select value={form.courseSlug || ""} onValueChange={(value) => setField("courseSlug", value)}>
+          <Select value={form.courseSlug || ""} onValueChange={(value) => setField("courseSlug", value === "__community__" ? "" : value)}>
             <SelectTrigger className="h-11 w-full">
               <SelectValue placeholder="Community forum" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Community forum</SelectItem>
+              <SelectItem value="__community__">Community forum</SelectItem>
               {courses.filter((course) => Boolean(course.uuid) && Boolean(course.slug)).map((course) => (
                 <SelectItem key={course.uuid} value={course.slug ?? ""}>
                   {course.title}

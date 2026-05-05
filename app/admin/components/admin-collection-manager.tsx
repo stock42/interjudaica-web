@@ -390,7 +390,7 @@ export function AdminCollectionManager({
                   onValueChange={(value) =>
                     setForm((current) => ({
                       ...current,
-                      [field.name]: value,
+                      [field.name]: value === "__none__" ? "" : value,
                     }))
                   }
                 >
@@ -398,7 +398,7 @@ export function AdminCollectionManager({
                     <SelectValue placeholder="Select" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Select</SelectItem>
+                    <SelectItem value="__none__">Select</SelectItem>
                     {field.options?.map((option) => (
                       <SelectItem key={option} value={option}>
                         {option}

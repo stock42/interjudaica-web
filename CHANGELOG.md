@@ -141,3 +141,6 @@
 
 ## Unreleased
 - Extract admin list stat pills into AdminStatPill component.
+
+## Unreleased
+- Fix SelectItem empty value usage by mapping All/None options to sentinel values.
