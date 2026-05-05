@@ -17,3 +17,6 @@
 
 ## Unreleased
 - Remove hardcoded course catalog from app/lib/content and load course pages from the database/public endpoint instead.
+
+## Unreleased
+- Home now lists all public courses and renders them in a horizontal carousel when there are many.

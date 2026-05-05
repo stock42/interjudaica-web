@@ -2,32 +2,15 @@ import Image from "next/image";
 import { ButtonLink, PageShell } from "@/app/components/portal-ui";
 import { testimonials } from "@/app/lib/content";
 import { listPublicCourses } from "@/app/lib/public-courses";
+import type { TypePublicCourse } from "@/models/courses";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 const homeFrame =
   "mx-auto w-full px-6 sm:px-10 lg:px-16 xl:px-20 2xl:px-24";
-
-type HomeCourse = {
-  slug: string;
-  title: string;
-  summary: string;
-};
-
 type HomeIconKind = "book" | "pin" | "screen" | "menorah" | "globe";
 
-async function getHomeCourses(): Promise<HomeCourse[]> {
-  try {
-    const publicCourses = (await listPublicCourses())
-      .filter((course) => course.summary.trim())
-      .slice(0, 2);
-
-    return publicCourses;
-  } catch {
-    return [];
-  }
-}
 
 function HomeIcon({ kind, className = "" }: { kind: HomeIconKind; className?: string }) {
   if (kind === "pin") {
@@ -123,15 +106,19 @@ function HomeIcon({ kind, className = "" }: { kind: HomeIconKind; className?: st
   );
 }
 
+type FeaturedCourse = Pick<
+  TypePublicCourse,
+  "slug" | "title" | "summary" | "coverImageUrl" | "thumbnailImageUrl"
+>
+
 function CourseFeatureCard({
   course,
-  image,
   icon,
 }: {
-  course: HomeCourse;
-  image: string;
+  course: FeaturedCourse;
   icon: HomeIconKind;
 }) {
+  const image = course.coverImageUrl || course.thumbnailImageUrl || "/hero-image.png";
   return (
     <article className="grid overflow-hidden rounded-lg border border-[rgba(244,189,51,0.62)] bg-[linear-gradient(120deg,#11161a_0%,#070a0c_58%,#050608_100%)] shadow-[0_30px_90px_rgba(0,0,0,0.42)] md:h-[21rem] md:grid-cols-[47%_53%]">
       <div className="relative min-h-[18rem] overflow-hidden md:min-h-0">
@@ -189,8 +176,7 @@ function SectionTitle({
 }
 
 export default async function Home() {
-  const homeCourses = await getHomeCourses();
-  const courseImages = ["/genesis.jpg", "/hero-image.png"];
+  const homeCourses = (await listPublicCourses()).filter((course) => course.summary.trim());
   const whyChoose = [
     {
       icon: "screen" as const,
@@ -270,16 +256,27 @@ export default async function Home() {
       <section className="bg-[#080b0d] py-8 text-[#f8f2e8]">
         <div className={homeFrame}>
           <SectionTitle>Featured Courses</SectionTitle>
-          <div className="grid gap-8 xl:grid-cols-2">
-            {homeCourses.map((course, index) => (
-              <CourseFeatureCard
-                key={course.slug}
-                course={course}
-                image={courseImages[index] ?? "/hero-image.png"}
-                icon={index === 0 ? "book" : "pin"}
-              />
-            ))}
-          </div>
+          {homeCourses.length === 0 ? (
+            <div className="rounded-lg border border-[rgba(244,189,51,0.4)] bg-[#050608] p-6 text-sm text-white/70">
+              No public courses are available yet.
+            </div>
+          ) : (
+            <div className="-mx-6 overflow-x-auto px-6 pb-2">
+              <div className="flex snap-x snap-mandatory gap-6">
+                {homeCourses.map((course, index) => (
+                  <div
+                    key={course.slug}
+                    className="w-[22rem] snap-start sm:w-[26rem] lg:w-[30rem]"
+                  >
+                    <CourseFeatureCard
+                      course={course}
+                      icon={index % 2 === 0 ? "book" : "pin"}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </section>
 
