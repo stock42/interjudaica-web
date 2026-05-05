@@ -2,6 +2,11 @@
 
 import { useState } from "react";
 
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+
 type Status = "idle" | "sending" | "sent" | "error";
 
 export default function ContactForm() {
@@ -51,74 +56,43 @@ export default function ContactForm() {
         <p className="mt-3 text-sm leading-6 text-[var(--muted)]">
           We received your message and will reply as soon as possible.
         </p>
-        <button
-          type="button"
-          className="mt-5 inline-flex min-h-11 items-center justify-center rounded-md border border-[var(--line)] bg-white px-5 py-2.5 text-sm font-semibold text-[var(--ink)] transition hover:bg-[var(--paper)]"
-          onClick={() => setStatus("idle")}
-        >
+        <Button className="mt-5" variant="outline" onClick={() => setStatus("idle")}>
           Send another message
-        </button>
+        </Button>
       </div>
     );
   }
 
   return (
-    <form
-      className="grid gap-4"
-      onSubmit={handleSubmit}
-      aria-busy={status === "sending"}
-    >
+    <form className="grid gap-4" onSubmit={handleSubmit} aria-busy={status === "sending"}>
       <div className="grid gap-4 sm:grid-cols-2">
-        <label className="grid gap-2 text-sm font-semibold">
-          Email
-          <input
-            className="min-h-12 rounded-md border border-[var(--line)] bg-[var(--paper)] px-4"
-            name="email"
-            type="email"
-            required
-            autoComplete="email"
-          />
-        </label>
+        <div className="grid gap-2">
+          <Label htmlFor="email">Email</Label>
+          <Input id="email" name="email" type="email" required autoComplete="email" />
+        </div>
 
         <div className="hidden sm:block" />
 
-        <label className="grid gap-2 text-sm font-semibold">
-          First name
-          <input
-            className="min-h-12 rounded-md border border-[var(--line)] bg-[var(--paper)] px-4"
-            name="firstName"
-            required
-            autoComplete="given-name"
-          />
-        </label>
-        <label className="grid gap-2 text-sm font-semibold">
-          Last name
-          <input
-            className="min-h-12 rounded-md border border-[var(--line)] bg-[var(--paper)] px-4"
-            name="lastName"
-            required
-            autoComplete="family-name"
-          />
-        </label>
+        <div className="grid gap-2">
+          <Label htmlFor="firstName">First name</Label>
+          <Input id="firstName" name="firstName" required autoComplete="given-name" />
+        </div>
+
+        <div className="grid gap-2">
+          <Label htmlFor="lastName">Last name</Label>
+          <Input id="lastName" name="lastName" required autoComplete="family-name" />
+        </div>
       </div>
 
-      <label className="grid gap-2 text-sm font-semibold">
-        Message
-        <textarea
-          className="min-h-40 rounded-md border border-[var(--line)] bg-[var(--paper)] p-4"
-          name="message"
-          required
-        />
-      </label>
+      <div className="grid gap-2">
+        <Label htmlFor="message">Message</Label>
+        <Textarea id="message" name="message" required className="min-h-40" />
+      </div>
 
       <div className="flex flex-wrap items-center gap-3">
-        <button
-          type="submit"
-          className="inline-flex min-h-11 items-center justify-center rounded-md border border-[var(--gold)] bg-[var(--gold)] px-5 py-2.5 text-sm font-semibold text-[#07090c] transition hover:bg-[#ffd66b] disabled:cursor-not-allowed disabled:opacity-70"
-          disabled={status === "sending"}
-        >
+        <Button type="submit" disabled={status === "sending"}>
           {status === "sending" ? "Sending…" : "Send"}
-        </button>
+        </Button>
         {status === "error" ? (
           <span className="text-sm font-semibold text-[var(--sumac)]">
             Unable to send. Please try again.

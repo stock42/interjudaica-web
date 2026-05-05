@@ -1,79 +1,80 @@
 "use client";
 
-import { useMemo, useState, type FormEvent } from "react";
+import { useState } from "react";
 
-export function OperatorLoginForm({
-  nextPath = "/admin",
-}: {
-  nextPath?: string;
-}) {
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-  const safeNextPath = useMemo(
-    () => (nextPath.startsWith("/") ? nextPath : "/admin"),
-    [nextPath],
-  );
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+type Status = "idle" | "sending" | "error";
+
+export function OperatorLoginForm({ nextPath }: { nextPath?: string }) {
+  const [status, setStatus] = useState<Status>("idle");
+
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setError("");
-    setLoading(true);
+    setStatus("sending");
 
-    const formData = new FormData(event.currentTarget);
-    const response = await fetch("/api/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        email: formData.get("email"),
-        password: formData.get("password"),
-      }),
-    });
+    const form = event.currentTarget;
+    const formData = new FormData(form);
 
-    setLoading(false);
+    const payload = {
+      email: String(formData.get("email") ?? ""),
+      password: String(formData.get("password") ?? ""),
+    };
 
-    if (!response.ok) {
-      setError("Email or password is incorrect.");
-      return;
+    try {
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        throw new Error("Request failed");
+      }
+
+      const next = nextPath && nextPath.startsWith("/") ? nextPath : "/admin";
+      window.location.href = next;
+    } catch {
+      setStatus("error");
+      setStatus("idle");
     }
-
-    window.location.assign(safeNextPath);
   }
 
   return (
-    <form className="grid gap-5" onSubmit={handleSubmit}>
-      <label className="grid gap-2 text-sm font-semibold text-[var(--ink)]">
-        Email
-        <input
-          className="min-h-12 rounded-md border border-[var(--line)] bg-[var(--paper)] px-4 text-base font-normal outline-none transition focus:border-[var(--sapphire)] focus:ring-4 focus:ring-[rgba(19,70,160,0.14)]"
+    <form className="grid gap-4" onSubmit={handleSubmit}>
+      <div className="grid gap-2">
+        <Label htmlFor="email">Email</Label>
+        <Input
+          id="email"
           name="email"
           type="email"
-          placeholder="admin@interjudaica.com"
           autoComplete="email"
           required
         />
-      </label>
-      <label className="grid gap-2 text-sm font-semibold text-[var(--ink)]">
-        Password
-        <input
-          className="min-h-12 rounded-md border border-[var(--line)] bg-[var(--paper)] px-4 text-base font-normal outline-none transition focus:border-[var(--sapphire)] focus:ring-4 focus:ring-[rgba(19,70,160,0.14)]"
+      </div>
+
+      <div className="grid gap-2">
+        <Label htmlFor="password">Password</Label>
+        <Input
+          id="password"
           name="password"
           type="password"
           autoComplete="current-password"
           required
         />
-      </label>
-      {error ? (
-        <p className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
-          {error}
+      </div>
+
+      <Button type="submit" disabled={status === "sending"}>
+        {status === "sending" ? "Signing in…" : "Sign in"}
+      </Button>
+
+      {status === "error" ? (
+        <p className="text-sm font-semibold text-[var(--sumac)]">
+          Unable to sign in.
         </p>
       ) : null}
-      <button
-        className="inline-flex min-h-11 items-center justify-center rounded-md border border-[var(--gold)] bg-[var(--gold)] px-5 py-2.5 text-sm font-semibold text-[#07090c] transition hover:bg-[#ffd66b] disabled:cursor-not-allowed disabled:opacity-60"
-        type="submit"
-        disabled={loading}
-      >
-        {loading ? "Signing in..." : "Sign in"}
-      </button>
     </form>
   );
 }

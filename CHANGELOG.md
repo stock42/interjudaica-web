@@ -50,3 +50,7 @@
 
 ## Unreleased
 - Document installed UI components and add student header popover with dashboard + logout.
+
+## Unreleased
+- Refactor forms to use components/ui primitives (Input, Label, Textarea, Button).
+- Fix eslint warnings for email templates and effect lint rule in ui kit.
