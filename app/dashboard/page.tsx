@@ -72,7 +72,7 @@ export default function DashboardPage() {
           </section>
 
           <aside className="grid gap-5">
-            <section className="rounded-lg border border-[var(--line)] bg-[var(--ink)] p-5 text-white sm:p-6">
+            <section className="rounded-lg border border-[var(--line)] bg-[#050608] p-5 text-white sm:p-6">
               <p className="text-xs font-bold uppercase text-white/60">
                 Community subscription
               </p>

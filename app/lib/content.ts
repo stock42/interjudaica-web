@@ -11,6 +11,8 @@ export type Course = {
   startDate: string;
   endDate: string;
   imageLabel: string;
+  thumbnailImageUrl?: string;
+  coverImageUrl?: string;
   accent: string;
   description: string;
   summary: string;
@@ -41,9 +43,24 @@ export const navItems = [
   { href: "/", label: "Home" },
   { href: "/cursos", label: "Courses" },
   { href: "/comunidad", label: "Community" },
+  { href: "/#about-rabbi", label: "About Rabbi" },
+  { href: "/#contact", label: "Contact" },
   { href: "/dashboard", label: "Dashboard" },
   { href: "/admin", label: "Admin" },
 ];
+
+export const contactInfo = {
+  whatsapp: "+54 9 11 5836 7095",
+  whatsappHref: "https://wa.me/5491158367095",
+  email: "eyattah@hotmail.com",
+  officeHours: [
+    "Monday to Thursday: 9:00 AM - 10:00 PM",
+    "Friday: 9:00 AM - 5:00 PM",
+    "Sunday: 10:00 AM - 8:00 PM",
+    "Office closed on Shabbat and Jewish Holidays.",
+    "Emails and WhatsApp messages will be answered after Shabbat and Holidays.",
+  ],
+};
 
 export const courses: Course[] = [
   {

@@ -14,7 +14,7 @@ export const metadata: Metadata = {
     title: "InterJudaica",
     description:
       "Live Jewish courses, private community study, and student resources in English.",
-    images: ["/logo-interjudaica.png"],
+    images: ["/hero-image.png"],
   },
 };
 

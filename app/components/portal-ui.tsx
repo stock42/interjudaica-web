@@ -4,6 +4,7 @@ import Link from "next/link";
 import {
   type Course,
   adminStats,
+  contactInfo,
   courses,
   formatUsd,
   navItems,
@@ -20,6 +21,8 @@ type CourseCardItem = Pick<
   | "communityPrice"
   | "duration"
   | "imageLabel"
+  | "thumbnailImageUrl"
+  | "coverImageUrl"
   | "accent"
   | "summary"
 >;
@@ -28,12 +31,12 @@ type ButtonTone = "primary" | "secondary" | "quiet" | "dark";
 
 const buttonTones: Record<ButtonTone, string> = {
   primary:
-    "border-[var(--ink)] bg-[var(--ink)] text-white hover:bg-[var(--sapphire)] hover:border-[var(--sapphire)]",
+    "border-[var(--gold)] bg-[var(--gold)] text-[#07090c] shadow-[0_16px_34px_rgba(244,189,51,0.22)] hover:border-[#ffd66b] hover:bg-[#ffd66b]",
   secondary:
-    "border-[var(--line)] bg-white text-[var(--ink)] hover:border-[var(--ink)] hover:bg-[var(--paper)]",
+    "border-[var(--gold)] bg-transparent text-[var(--gold)] hover:bg-[rgba(244,189,51,0.12)] hover:text-[var(--ink)]",
   quiet:
-    "border-transparent bg-transparent text-[var(--ink)] hover:bg-white",
-  dark: "border-white/20 bg-white text-[var(--ink)] hover:bg-[var(--gold)]",
+    "border-transparent bg-transparent text-[var(--ink)] hover:bg-[rgba(244,189,51,0.1)] hover:text-[var(--gold)]",
+  dark: "border-[var(--gold)] bg-[var(--gold)] text-[#07090c] hover:bg-[#ffd66b]",
 };
 
 export function ButtonLink({
@@ -52,7 +55,7 @@ export function ButtonLink({
   return (
     <Link
       href={href}
-      className={`inline-flex min-h-11 items-center justify-center rounded-full border px-5 py-2.5 text-sm font-semibold transition ${buttonTones[tone]} ${className}`}
+      className={`inline-flex min-h-11 items-center justify-center gap-2 rounded-md border px-5 py-2.5 text-sm font-semibold transition ${buttonTones[tone]} ${className}`}
       target={isExternal ? "_blank" : undefined}
       rel={isExternal ? "noreferrer" : undefined}
     >
@@ -63,35 +66,40 @@ export function ButtonLink({
 
 export function SiteHeader() {
   return (
-    <header className="sticky top-0 z-50 border-b border-[var(--line)] bg-[rgba(255,253,247,0.92)] backdrop-blur-xl">
-      <div className="mx-auto flex w-full max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8">
+    <header className="sticky top-0 z-50 border-b border-[var(--line)] bg-[rgba(5,6,8,0.88)] shadow-[0_12px_40px_rgba(0,0,0,0.28)] backdrop-blur-xl">
+      <div className="mx-auto flex w-full max-w-7xl flex-wrap items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
         <Link
           href="/"
           className="flex min-w-0 items-center gap-3"
           aria-label="InterJudaica home"
         >
           <Image
-            src="/logo-interjudaica.png"
+            src="/logo-interjudaica-transparente.png"
             alt="InterJudaica logo"
-            width={500}
-            height={500}
-            className="h-11 w-11 shrink-0 rounded-full"
+            width={1500}
+            height={1500}
+            className="h-12 w-12 shrink-0 rounded-full"
             priority
           />
-          <span className="min-w-0 font-display text-xl font-semibold leading-none text-[var(--ink)]">
-            InterJudaica
+          <span className="grid min-w-0 leading-none">
+            <span className="font-display text-lg font-semibold uppercase tracking-[0.18em] text-[var(--gold)] sm:text-xl">
+              InterJudaica
+            </span>
+            <span className="mt-1 hidden text-[0.6rem] font-bold uppercase tracking-[0.28em] text-[var(--muted)] sm:block">
+              Jewish Learning Institute
+            </span>
           </span>
         </Link>
 
         <nav
           aria-label="Primary navigation"
-          className="order-3 -mx-4 flex w-[calc(100%+2rem)] gap-2 overflow-x-auto px-4 pb-1 sm:order-none sm:mx-0 sm:w-auto sm:overflow-visible sm:px-0"
+          className="order-3 -mx-4 flex w-[calc(100%+2rem)] gap-1 overflow-x-auto px-4 pb-1 sm:order-none sm:mx-0 sm:w-auto sm:overflow-visible sm:px-0"
         >
           {navItems.map((item) => (
             <Link
               key={item.href}
               href={item.href}
-              className="shrink-0 rounded-full px-3 py-2 text-sm font-medium text-[var(--muted)] transition hover:bg-white hover:text-[var(--ink)]"
+              className="shrink-0 rounded-md border border-transparent px-3 py-2 text-sm font-medium text-[rgba(248,242,232,0.84)] transition hover:border-[var(--line)] hover:bg-[rgba(244,189,51,0.1)] hover:text-[var(--gold)]"
             >
               {item.label}
             </Link>
@@ -108,19 +116,34 @@ export function SiteHeader() {
 
 export function SiteFooter() {
   return (
-    <footer className="border-t border-[var(--line)] bg-[var(--ink)] text-white">
-      <div className="mx-auto grid w-full max-w-7xl gap-10 px-4 py-12 sm:px-6 lg:grid-cols-[1.2fr_2fr] lg:px-8">
+    <footer
+      id="contact"
+      className="relative isolate overflow-hidden border-t border-[var(--line)] bg-[#050608] text-[var(--ink)]"
+    >
+      <Image
+        src="/interjudaica-silueta-candel.png"
+        alt=""
+        width={1024}
+        height={1024}
+        className="pointer-events-none absolute -right-32 -top-28 h-80 w-80 opacity-[0.08]"
+      />
+      <div className="relative mx-auto grid w-full max-w-7xl gap-10 px-4 py-12 sm:px-6 lg:grid-cols-[1fr_2.2fr] lg:px-8">
         <div>
           <div className="flex items-center gap-3">
             <Image
-              src="/logo-interjudaica.png"
+              src="/logo-interjudaica-transparente.png"
               alt="InterJudaica logo"
-              width={500}
-              height={500}
-              className="h-12 w-12 rounded-full border border-white/20"
+              width={1500}
+              height={1500}
+              className="h-14 w-14 rounded-full"
             />
-            <span className="font-display text-2xl font-semibold">
-              InterJudaica
+            <span className="grid">
+              <span className="font-display text-2xl font-semibold uppercase tracking-[0.16em] text-[var(--gold)]">
+                InterJudaica
+              </span>
+              <span className="text-[0.62rem] font-bold uppercase tracking-[0.24em] text-[var(--muted)]">
+                Jewish Learning Institute
+              </span>
             </span>
           </div>
           <p className="mt-5 max-w-sm text-sm leading-6 text-white/70">
@@ -130,13 +153,15 @@ export function SiteFooter() {
           </p>
         </div>
 
-        <div className="grid gap-8 sm:grid-cols-3">
+        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-[0.9fr_0.9fr_1.4fr]">
           <FooterColumn
-            title="Learn"
+            title="Navigation"
             links={[
+              { href: "/", label: "Home" },
               { href: "/cursos", label: "All courses" },
               { href: "/comunidad", label: "Community" },
               { href: "/comunidad/papers", label: "Papers" },
+              { href: "/#about-rabbi", label: "About Rabbi" },
             ]}
           />
           <FooterColumn
@@ -147,14 +172,46 @@ export function SiteFooter() {
               { href: "/register", label: "Create account" },
             ]}
           />
-          <FooterColumn
-            title="Office"
-            links={[
-              { href: "/admin", label: "Admin" },
-              { href: "/admin/cursos", label: "Courses" },
-              { href: "/admin/pagos", label: "Payments" },
-            ]}
-          />
+          <div>
+            <h2 className="text-sm font-semibold uppercase tracking-[0.16em] text-[var(--gold)]">
+              Contact
+            </h2>
+            <div className="mt-4 grid gap-3 text-sm leading-6 text-white/70">
+              <Link
+                href={contactInfo.whatsappHref}
+                className="transition hover:text-[var(--gold)]"
+                target="_blank"
+                rel="noreferrer"
+              >
+                WhatsApp: {contactInfo.whatsapp}
+              </Link>
+              <Link
+                href={`mailto:${contactInfo.email}`}
+                className="transition hover:text-[var(--gold)]"
+              >
+                Email: {contactInfo.email}
+              </Link>
+              <div>
+                <p className="font-semibold text-[var(--ink)]">Office Hours</p>
+                <div className="mt-1 grid gap-1">
+                  {contactInfo.officeHours.map((line) => (
+                    <p key={line}>{line}</p>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="relative mx-auto flex w-full max-w-7xl flex-col gap-3 border-t border-[var(--line)] px-4 py-5 text-xs text-white/55 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
+        <p>Copyright 2026 InterJudaica. All rights reserved.</p>
+        <div className="flex flex-wrap gap-4">
+          <Link href="/operator-login" className="transition hover:text-[var(--gold)]">
+            Operator access
+          </Link>
+          <Link href="/admin" className="transition hover:text-[var(--gold)]">
+            Backoffice
+          </Link>
         </div>
       </div>
     </footer>
@@ -170,13 +227,15 @@ function FooterColumn({
 }) {
   return (
     <div>
-      <h2 className="text-sm font-semibold text-white">{title}</h2>
+      <h2 className="text-sm font-semibold uppercase tracking-[0.16em] text-[var(--gold)]">
+        {title}
+      </h2>
       <div className="mt-4 flex flex-col gap-3">
         {links.map((link) => (
           <Link
             key={link.href}
             href={link.href}
-            className="text-sm text-white/65 transition hover:text-white"
+            className="text-sm text-white/65 transition hover:text-[var(--gold)]"
           >
             {link.label}
           </Link>
@@ -192,23 +251,25 @@ export function PageShell({ children }: { children: ReactNode }) {
 
 export function Section({
   children,
+  id,
   tone = "paper",
   className = "",
 }: {
   children: ReactNode;
+  id?: string;
   tone?: "paper" | "white" | "ink" | "transparent";
   className?: string;
 }) {
   const tones = {
     paper: "bg-[var(--paper)] text-[var(--ink)]",
-    white: "bg-white text-[var(--ink)]",
-    ink: "bg-[var(--ink)] text-white",
+    white: "bg-[var(--surface)] text-[var(--ink)]",
+    ink: "bg-[#050608] text-[var(--ink)]",
     transparent: "bg-transparent text-[var(--ink)]",
   };
 
   return (
-    <section className={`${tones[tone]} ${className}`}>
-      <div className="mx-auto w-full max-w-7xl px-4 py-14 sm:px-6 sm:py-16 lg:px-8 lg:py-24">
+    <section id={id} className={`relative ${tones[tone]} ${className}`}>
+      <div className="mx-auto w-full max-w-7xl px-4 py-14 sm:px-6 sm:py-16 lg:px-8 lg:py-20">
         {children}
       </div>
     </section>
@@ -217,7 +278,8 @@ export function Section({
 
 export function Eyebrow({ children }: { children: ReactNode }) {
   return (
-    <p className="mb-4 inline-flex rounded-full border border-[var(--line)] bg-white px-3 py-1 text-xs font-bold uppercase text-[var(--sapphire)]">
+    <p className="mb-4 inline-flex items-center gap-3 text-xs font-bold uppercase tracking-[0.22em] text-[var(--gold)]">
+      <span className="h-px w-10 bg-[var(--gold)]" aria-hidden="true" />
       {children}
     </p>
   );
@@ -238,7 +300,7 @@ export function SectionIntro({
     <div className="mb-9 flex flex-col gap-5 md:mb-12 md:flex-row md:items-end md:justify-between">
       <div className="max-w-2xl">
         {eyebrow ? <Eyebrow>{eyebrow}</Eyebrow> : null}
-        <h2 className="font-display text-3xl font-semibold leading-tight sm:text-4xl">
+        <h2 className="font-display text-3xl font-semibold leading-tight text-[var(--ink)] sm:text-4xl">
           {title}
         </h2>
         {text ? (
@@ -254,15 +316,15 @@ export function SectionIntro({
 
 export function CourseCard({ course }: { course: CourseCardItem }) {
   return (
-    <article className="group flex h-full flex-col overflow-hidden rounded-lg border border-[var(--line)] bg-white shadow-[0_18px_50px_rgba(17,19,21,0.07)] transition hover:-translate-y-1 hover:shadow-[0_24px_70px_rgba(17,19,21,0.12)]">
+    <article className="group flex h-full flex-col overflow-hidden rounded-lg border border-[var(--line)] bg-[linear-gradient(145deg,rgba(23,28,32,0.98),rgba(8,10,12,0.98))] shadow-[var(--shadow)] transition hover:-translate-y-1 hover:border-[rgba(244,189,51,0.62)]">
       <CourseArtwork course={course} compact />
       <div className="flex flex-1 flex-col p-5 sm:p-6">
-        <div className="flex flex-wrap gap-2 text-xs font-semibold uppercase text-[var(--muted)]">
+        <div className="flex flex-wrap gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--gold)]">
           <span>{course.category}</span>
           <span aria-hidden="true">/</span>
           <span>{course.level}</span>
         </div>
-        <h3 className="mt-3 font-display text-2xl font-semibold leading-tight">
+        <h3 className="mt-3 font-display text-2xl font-semibold leading-tight text-[var(--ink)]">
           {course.title}
         </h3>
         <p className="mt-3 flex-1 text-sm leading-6 text-[var(--muted)]">
@@ -273,7 +335,9 @@ export function CourseCard({ course }: { course: CourseCardItem }) {
             <p className="text-xs font-semibold uppercase text-[var(--muted)]">
               From
             </p>
-            <p className="text-2xl font-bold">{formatUsd(course.price)}</p>
+            <p className="text-2xl font-bold text-[var(--ink)]">
+              {formatUsd(course.price)}
+            </p>
             <p className="text-xs text-[var(--muted)]">
               Community: {formatUsd(course.communityPrice)}
             </p>
@@ -297,19 +361,36 @@ export function CourseArtwork({
   const style = {
     "--course-accent": course.accent,
   } as CSSProperties;
+  const imageSrc = course.thumbnailImageUrl || course.coverImageUrl;
 
   return (
     <div
-      className={`relative isolate overflow-hidden bg-[var(--ink)] text-white ${
+      className={`relative isolate overflow-hidden bg-[#050608] text-white ${
         compact ? "min-h-48" : "min-h-[22rem] rounded-lg"
       }`}
       style={style}
     >
-      <div className="absolute inset-0 bg-[linear-gradient(135deg,var(--course-accent),rgba(255,255,255,0)_48%),repeating-linear-gradient(90deg,rgba(255,255,255,0.12)_0_1px,transparent_1px_24px)]" />
-      <div className="absolute left-6 top-6 h-16 w-16 rounded-full border border-white/30" />
-      <div className="absolute bottom-0 right-0 h-36 w-36 translate-x-8 translate-y-8 rounded-full border border-white/20" />
+      {imageSrc ? (
+        <Image
+          src={imageSrc}
+          alt=""
+          fill
+          sizes={compact ? "(min-width: 1024px) 33vw, 100vw" : "100vw"}
+          className="object-cover"
+        />
+      ) : null}
+      <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(0,0,0,0.22),rgba(0,0,0,0.78)_62%),radial-gradient(circle_at_18%_22%,var(--course-accent),transparent_17rem),repeating-linear-gradient(90deg,rgba(244,189,51,0.12)_0_1px,transparent_1px_24px)]" />
+      <Image
+        src="/interjudaica-silueta-candel.png"
+        alt=""
+        width={1024}
+        height={1024}
+        className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 opacity-20"
+      />
+      <div className="absolute left-6 top-6 h-16 w-16 rounded-full border border-[rgba(244,189,51,0.5)] bg-black/45 backdrop-blur" />
+      <div className="absolute bottom-0 right-0 h-36 w-36 translate-x-8 translate-y-8 rounded-full border border-[rgba(244,189,51,0.3)]" />
       <div className="relative flex h-full min-h-inherit flex-col justify-between p-6">
-        <span className="w-fit rounded-full border border-white/25 bg-white/10 px-3 py-1 text-xs font-semibold uppercase">
+        <span className="w-fit rounded-md border border-[rgba(244,189,51,0.45)] bg-black/35 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--gold)]">
           {course.imageLabel}
         </span>
         <div className="mt-20 max-w-sm">
@@ -332,8 +413,10 @@ export function MetricsBand() {
         ["100%", "mobile ready portal"],
         ["1", "forum per course"],
       ].map(([value, label]) => (
-        <div key={label} className="bg-white p-5">
-          <p className="font-display text-3xl font-semibold">{value}</p>
+        <div key={label} className="bg-[var(--surface)] p-5">
+          <p className="font-display text-3xl font-semibold text-[var(--gold)]">
+            {value}
+          </p>
           <p className="mt-1 text-sm text-[var(--muted)]">{label}</p>
         </div>
       ))}
@@ -344,7 +427,7 @@ export function MetricsBand() {
 export function CourseGrid({ items = courses }: { items?: CourseCardItem[] }) {
   if (!items.length) {
     return (
-      <div className="rounded-lg border border-[var(--line)] bg-white p-6 text-sm leading-6 text-[var(--muted)]">
+      <div className="rounded-lg border border-[var(--line)] bg-[var(--surface)] p-6 text-sm leading-6 text-[var(--muted)]">
         New public courses will appear here soon.
       </div>
     );
@@ -365,11 +448,11 @@ export function InfoList({ items }: { items: string[] }) {
       {items.map((item) => (
         <div
           key={item}
-          className="flex gap-3 rounded-lg border border-[var(--line)] bg-white p-4"
+          className="flex gap-3 rounded-lg border border-[var(--line)] bg-[var(--surface)] p-4"
         >
           <span
             aria-hidden="true"
-            className="mt-2 h-2 w-2 shrink-0 rounded-full bg-[var(--sapphire)]"
+            className="mt-2 h-2 w-2 shrink-0 rounded-full bg-[var(--gold)]"
           />
           <p className="text-sm leading-6 text-[var(--muted)]">{item}</p>
         </div>
@@ -394,14 +477,14 @@ export function AuthPanel({
       <div className="mx-auto grid max-w-5xl gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
         <div>
           <Eyebrow>{eyebrow}</Eyebrow>
-          <h1 className="font-display text-4xl font-semibold leading-tight sm:text-5xl">
+          <h1 className="font-display text-4xl font-semibold leading-tight text-[var(--ink)] sm:text-5xl">
             {title}
           </h1>
           <p className="mt-5 max-w-xl text-base leading-7 text-[var(--muted)]">
             {text}
           </p>
         </div>
-        <div className="rounded-lg border border-[var(--line)] bg-white p-5 shadow-[0_18px_60px_rgba(17,19,21,0.08)] sm:p-8">
+        <div className="rounded-lg border border-[var(--line)] bg-[linear-gradient(145deg,rgba(23,28,32,0.96),rgba(9,11,13,0.96))] p-5 shadow-[var(--shadow)] sm:p-8">
           {children}
         </div>
       </div>
@@ -424,7 +507,7 @@ export function Field({
     <label className="grid gap-2 text-sm font-semibold text-[var(--ink)]">
       {label}
       <input
-        className="min-h-12 rounded-md border border-[var(--line)] bg-[var(--paper)] px-4 text-base font-normal outline-none transition focus:border-[var(--sapphire)] focus:ring-4 focus:ring-[rgba(19,70,160,0.14)]"
+        className="min-h-12 rounded-md border border-[var(--line)] bg-[var(--paper)] px-4 text-base font-normal outline-none transition focus:border-[var(--gold)] focus:ring-4 focus:ring-[rgba(244,189,51,0.16)]"
         type={type}
         name={name}
         placeholder={placeholder}
@@ -462,14 +545,14 @@ export function AdminShell({
       <Section tone="transparent">
         <div className="grid gap-8 lg:grid-cols-[16rem_1fr]">
           <aside className="lg:sticky lg:top-28 lg:self-start">
-            <div className="rounded-lg border border-[var(--line)] bg-white p-3">
+            <div className="rounded-lg border border-[var(--line)] bg-[linear-gradient(180deg,rgba(23,28,32,0.98),rgba(8,10,12,0.98))] p-3 shadow-[var(--shadow)]">
               <div className="flex items-center justify-between gap-2 px-3 py-2">
-                <p className="text-xs font-bold uppercase text-[var(--muted)]">
+                <p className="text-xs font-bold uppercase tracking-[0.18em] text-[var(--gold)]">
                   Admin
                 </p>
                 <form action="/api/auth/logout" method="post">
                   <button
-                    className="rounded-full border border-[var(--line)] px-2.5 py-1 text-xs font-bold text-[var(--muted)] transition hover:bg-[var(--paper)] hover:text-[var(--ink)]"
+                    className="rounded-md border border-[var(--line)] px-2.5 py-1 text-xs font-bold text-[var(--muted)] transition hover:bg-[rgba(244,189,51,0.1)] hover:text-[var(--gold)]"
                     type="submit"
                   >
                     Sign out
@@ -481,7 +564,7 @@ export function AdminShell({
                   <Link
                     key={item.href}
                     href={item.href}
-                    className="rounded-md px-3 py-2 text-sm font-semibold text-[var(--muted)] transition hover:bg-[var(--paper)] hover:text-[var(--ink)]"
+                    className="rounded-md px-3 py-2 text-sm font-semibold text-[var(--muted)] transition hover:bg-[rgba(244,189,51,0.1)] hover:text-[var(--gold)]"
                   >
                     {item.label}
                   </Link>
@@ -492,7 +575,7 @@ export function AdminShell({
           <div className="min-w-0">
             <div className="mb-8">
               <Eyebrow>Backoffice</Eyebrow>
-              <h1 className="font-display text-4xl font-semibold leading-tight sm:text-5xl">
+              <h1 className="font-display text-4xl font-semibold leading-tight text-[var(--ink)] sm:text-5xl">
                 {title}
               </h1>
               <p className="mt-4 max-w-3xl text-base leading-7 text-[var(--muted)]">
@@ -517,12 +600,12 @@ export function AdminStatGrid({
       {stats.map((stat) => (
         <div
           key={stat.label}
-          className="rounded-lg border border-[var(--line)] bg-white p-5"
+          className="rounded-lg border border-[var(--line)] bg-[var(--surface)] p-5 shadow-[var(--shadow)]"
         >
           <p className="text-sm font-semibold text-[var(--muted)]">
             {stat.label}
           </p>
-          <p className="mt-3 font-display text-4xl font-semibold">
+          <p className="mt-3 font-display text-4xl font-semibold text-[var(--gold)]">
             {stat.value}
           </p>
           <p className="mt-2 text-sm text-[var(--muted)]">{stat.note}</p>
@@ -540,10 +623,10 @@ export function DataTable({
   rows: string[][];
 }) {
   return (
-    <div className="overflow-hidden rounded-lg border border-[var(--line)] bg-white">
+    <div className="overflow-hidden rounded-lg border border-[var(--line)] bg-[var(--surface)] shadow-[var(--shadow)]">
       <div className="overflow-x-auto">
         <table className="w-full min-w-[42rem] border-collapse text-left text-sm">
-          <thead className="bg-[var(--paper)] text-xs uppercase text-[var(--muted)]">
+          <thead className="bg-[rgba(244,189,51,0.08)] text-xs uppercase tracking-[0.12em] text-[var(--gold)]">
             <tr>
               {columns.map((column) => (
                 <th key={column} className="px-4 py-3 font-bold">
@@ -554,7 +637,10 @@ export function DataTable({
           </thead>
           <tbody>
             {rows.map((row) => (
-              <tr key={row.join("-")} className="border-t border-[var(--line)]">
+              <tr
+                key={row.join("-")}
+                className="border-t border-[var(--line)] hover:bg-[rgba(244,189,51,0.05)]"
+              >
                 {row.map((cell) => (
                   <td key={cell} className="px-4 py-4 text-[var(--muted)]">
                     {cell}

@@ -74,7 +74,7 @@ export function OperatorHeaderActions() {
         </div>
         <Link
           href="/admin"
-          className="inline-flex min-h-11 items-center justify-center rounded-full border border-[var(--ink)] bg-[var(--ink)] px-5 py-2.5 text-sm font-semibold text-white transition hover:border-[var(--sapphire)] hover:bg-[var(--sapphire)]"
+          className="inline-flex min-h-11 items-center justify-center rounded-md border border-[var(--gold)] bg-[var(--gold)] px-5 py-2.5 text-sm font-semibold text-[#07090c] transition hover:bg-[#ffd66b]"
         >
           Backoffice
         </Link>
@@ -95,7 +95,7 @@ export function OperatorHeaderActions() {
         </div>
         <Link
           href="/dashboard"
-          className="inline-flex min-h-11 items-center justify-center rounded-full border border-[var(--ink)] bg-[var(--ink)] px-5 py-2.5 text-sm font-semibold text-white transition hover:border-[var(--sapphire)] hover:bg-[var(--sapphire)]"
+          className="inline-flex min-h-11 items-center justify-center rounded-md border border-[var(--gold)] bg-[var(--gold)] px-5 py-2.5 text-sm font-semibold text-[#07090c] transition hover:bg-[#ffd66b]"
         >
           Dashboard
         </Link>
@@ -107,7 +107,7 @@ export function OperatorHeaderActions() {
     <>
       <Link
         href="/login"
-        className={`hidden min-h-11 items-center justify-center rounded-full border border-transparent bg-transparent px-5 py-2.5 text-sm font-semibold text-[var(--ink)] transition hover:bg-white sm:inline-flex ${
+        className={`hidden min-h-11 items-center justify-center rounded-md border border-transparent bg-transparent px-5 py-2.5 text-sm font-semibold text-[var(--ink)] transition hover:border-[var(--line)] hover:bg-[rgba(244,189,51,0.1)] hover:text-[var(--gold)] sm:inline-flex ${
           loaded ? "" : "opacity-70"
         }`}
       >
@@ -115,7 +115,7 @@ export function OperatorHeaderActions() {
       </Link>
       <Link
         href="/register"
-        className="inline-flex min-h-11 items-center justify-center rounded-full border border-[var(--ink)] bg-[var(--ink)] px-5 py-2.5 text-sm font-semibold text-white transition hover:border-[var(--sapphire)] hover:bg-[var(--sapphire)]"
+        className="inline-flex min-h-11 items-center justify-center rounded-md border border-[var(--gold)] bg-[var(--gold)] px-5 py-2.5 text-sm font-semibold text-[#07090c] transition hover:bg-[#ffd66b]"
       >
         Join
       </Link>

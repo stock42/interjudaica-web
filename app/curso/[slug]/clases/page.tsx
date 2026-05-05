@@ -56,7 +56,7 @@ export default async function CourseClassesPage({ params }: ClassesPageProps) {
               className="rounded-lg border border-[var(--line)] bg-white p-5"
             >
               <div className="grid gap-5 lg:grid-cols-[6rem_1fr_12rem] lg:items-center">
-                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[var(--ink)] font-display text-2xl font-semibold text-white">
+                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[var(--gold)] font-display text-2xl font-semibold text-[#07090c]">
                   {index + 1}
                 </div>
                 <div>

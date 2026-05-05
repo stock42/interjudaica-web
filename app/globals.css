@@ -1,16 +1,21 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f7f6f0;
-  --foreground: #17130d;
-  --paper: #fffdf7;
-  --ink: #17130d;
-  --muted: #625d53;
-  --line: rgba(23, 19, 13, 0.14);
-  --sapphire: #164a9f;
-  --jade: #126c63;
-  --sumac: #9b342c;
-  --gold: #d8a51d;
+  --background: #050608;
+  --foreground: #f8f2e8;
+  --paper: #0d1013;
+  --surface: #11161a;
+  --surface-soft: #171c20;
+  --ink: #f8f2e8;
+  --muted: #c1b8a8;
+  --line: rgba(235, 177, 42, 0.28);
+  --line-soft: rgba(255, 255, 255, 0.1);
+  --sapphire: #f3bc32;
+  --jade: #cf9d22;
+  --sumac: #b26a22;
+  --gold: #f4bd33;
+  --gold-soft: #946a13;
+  --shadow: 0 28px 80px rgba(0, 0, 0, 0.38);
   --font-body: "Avenir Next", "Segoe UI", "Helvetica Neue", sans-serif;
   --font-heading: "Iowan Old Style", "Palatino Linotype", "Book Antiqua",
     Georgia, serif;
@@ -37,9 +42,12 @@ html {
 body {
   min-width: 320px;
   background:
-    linear-gradient(90deg, rgba(22, 74, 159, 0.06), transparent 34%),
-    linear-gradient(180deg, rgba(216, 165, 29, 0.09), transparent 18rem),
+    radial-gradient(circle at 18% 0%, rgba(244, 189, 51, 0.16), transparent 24rem),
+    radial-gradient(circle at 88% 12%, rgba(244, 189, 51, 0.1), transparent 22rem),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px),
     var(--background);
+  background-size: auto, auto, 72px 72px, 72px 72px, auto;
   color: var(--foreground);
   font-family: var(--font-body);
 }
@@ -51,9 +59,20 @@ textarea {
   font: inherit;
 }
 
+input,
+select,
+textarea {
+  color: var(--ink);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: rgba(248, 242, 232, 0.48);
+}
+
 ::selection {
   background: var(--gold);
-  color: var(--ink);
+  color: #07090c;
 }
 
 .font-display {
@@ -62,6 +81,26 @@ textarea {
 
 .min-h-inherit {
   min-height: inherit;
+}
+
+.bg-white {
+  background-color: var(--surface) !important;
+}
+
+.hover\:bg-white:hover {
+  background-color: rgba(244, 189, 51, 0.12) !important;
+}
+
+.bg-red-50 {
+  background-color: rgba(127, 29, 29, 0.22) !important;
+}
+
+.border-red-200 {
+  border-color: rgba(248, 113, 113, 0.38) !important;
+}
+
+.text-red-700 {
+  color: #fecaca !important;
 }
 
 @media (prefers-reduced-motion: reduce) {
