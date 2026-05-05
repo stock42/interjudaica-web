@@ -57,3 +57,6 @@
 
 ## Unreleased
 - Refactor register form to use components/ui primitives (Input, Label, Button).
+
+## Unreleased
+- Refactor forgot/reset password screens to use components/ui primitives.

@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
-import { AuthPanel, ButtonLink, Field } from "@/app/components/portal-ui";
+
+import { AuthPanel } from "@/app/components/portal-ui";
+import ResetPasswordForm from "@/app/reset-password/[token]/reset-password-form";
 
 export const metadata: Metadata = {
   title: "Reset password",
@@ -12,15 +14,7 @@ export default function ResetPasswordPage() {
       title="Choose a new password"
       text="Set a secure password and return to your student dashboard."
     >
-      <form className="grid gap-5">
-        <Field label="New password" name="password" type="password" />
-        <Field
-          label="Confirm new password"
-          name="confirmPassword"
-          type="password"
-        />
-        <ButtonLink href="/login">Save password</ButtonLink>
-      </form>
+      <ResetPasswordForm />
     </AuthPanel>
   );
 }
