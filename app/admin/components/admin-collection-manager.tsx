@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 type AdminKind =
   | "course-categories"
@@ -382,25 +383,30 @@ export function AdminCollectionManager({
                     }))
                   }
                 />
-              ) : field.type === "select" ? (
-                <select
-                  className="h-11 w-full"
+               ) : field.type === "select" ? (
+                <Select
                   value={String(form[field.name] ?? "")}
-                  onChange={(event) =>
+                  onValueChange={(value) =>
                     setForm((current) => ({
                       ...current,
-                      [field.name]: event.target.value,
+                      [field.name]: value,
                     }))
                   }
                 >
-                  <option value="">Select</option>
-                  {field.options?.map((option) => (
-                    <option key={option} value={option}>
-                      {option}
-                    </option>
-                  ))}
-                </select>
+                  <SelectTrigger className="h-11 w-full">
+                    <SelectValue placeholder="Select" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">Select</SelectItem>
+                    {field.options?.map((option) => (
+                      <SelectItem key={option} value={option}>
+                        {option}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               ) : field.type === "checkbox" ? (
+
                 <input
                   className="h-5 w-5 rounded border border-[var(--line)] accent-[var(--sapphire)]"
                   type="checkbox"

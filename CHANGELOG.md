@@ -120,3 +120,6 @@
 
 ## Unreleased
 - Use components/ui Select for admin paper category list filters.
+
+## Unreleased
+- Use components/ui Select for admin collection manager select fields.
