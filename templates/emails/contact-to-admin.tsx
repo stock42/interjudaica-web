@@ -1,5 +1,7 @@
 import * as React from "react";
 
+import { base, card, h1, palette, small } from "@/templates/emails/_styles";
+
 export default function ContactToAdminEmail({
   email,
   firstName,
@@ -12,16 +14,89 @@ export default function ContactToAdminEmail({
   message: string;
 }) {
   return (
-    <div style={{ fontFamily: "Arial, sans-serif", color: "#111827" }}>
-      <h1 style={{ margin: 0 }}>New contact message</h1>
-      <p style={{ marginTop: 16 }}>
-        <strong>From:</strong> {firstName} {lastName}
-        <br />
-        <strong>Email:</strong> {email}
-      </p>
-      <hr style={{ margin: "24px 0", border: 0, borderTop: "1px solid #e5e7eb" }} />
-      <p style={{ margin: 0, fontWeight: 700 }}>Message</p>
-      <p style={{ marginTop: 8, whiteSpace: "pre-wrap" }}>{message}</p>
+    <div style={base}>
+      <div style={card}>
+        <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+          <img
+            src="https://interjudaica.com/_next/image?url=%2Flogo-interjudaica-transparente.png&w=1920&q=75"
+            width={56}
+            height={56}
+            alt="InterJudaica"
+            style={{ borderRadius: 9999, border: `1px solid ${palette.line}` }}
+          />
+          <div>
+            <p
+              style={{
+                margin: 0,
+                color: palette.gold,
+                fontWeight: 800,
+                letterSpacing: "0.14em",
+                textTransform: "uppercase",
+                fontSize: 12,
+              }}
+            >
+              InterJudaica
+            </p>
+            <p style={{ ...h1, margin: "6px 0 0" }}>New contact message</p>
+          </div>
+        </div>
+
+        <div
+          style={{
+            marginTop: 18,
+            border: `1px solid ${palette.line}`,
+            borderRadius: 12,
+            padding: 14,
+            backgroundColor: "rgba(0,0,0,0.28)",
+            color: palette.text,
+            fontSize: 14,
+            lineHeight: "22px",
+          }}
+        >
+          <p style={{ margin: 0 }}>
+            <span style={{ color: palette.gold, fontWeight: 800 }}>From:</span> {firstName} {lastName}
+          </p>
+          <p style={{ margin: "8px 0 0" }}>
+            <span style={{ color: palette.gold, fontWeight: 800 }}>Email:</span> {email}
+          </p>
+        </div>
+
+        <div
+          style={{
+            marginTop: 18,
+            borderTop: `1px solid ${palette.line}`,
+            paddingTop: 16,
+          }}
+        >
+          <p
+            style={{
+              margin: 0,
+              fontWeight: 800,
+              color: palette.gold,
+              letterSpacing: "0.12em",
+              textTransform: "uppercase",
+              fontSize: 12,
+            }}
+          >
+            Message
+          </p>
+          <div
+            style={{
+              marginTop: 10,
+              whiteSpace: "pre-wrap",
+              color: palette.text,
+              fontSize: 14,
+              lineHeight: "22px",
+            }}
+          >
+            {message}
+          </div>
+        </div>
+
+        <p style={{ marginTop: 18, ...small }}>
+          Reply directly to this email to respond to the user.
+        </p>
+      </div>
     </div>
   );
 }
