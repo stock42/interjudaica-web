@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { TypeCourseCategory } from "@/models/course-categories";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export function CourseCategoryList({
   categories,
@@ -75,18 +76,19 @@ export function CourseCategoryList({
                 onChange={(event) => setQuery(event.target.value)}
               />
             </label>
-            <label className="grid gap-2 text-sm font-semibold text-[var(--ink)]">
-              Status
-              <select
-                className="min-h-11 rounded-md border border-[var(--line)] bg-[var(--paper)] px-3 text-sm font-normal outline-none transition focus:border-[var(--sapphire)] focus:ring-4 focus:ring-[rgba(19,70,160,0.14)]"
-                value={enabled}
-                onChange={(event) => setEnabled(event.target.value)}
-              >
-                <option value="">All</option>
-                <option value="true">Enabled</option>
-                <option value="false">Disabled</option>
-              </select>
-            </label>
+            <div className="grid gap-2 text-sm font-semibold text-[var(--ink)]">
+              <span>Status</span>
+              <Select value={enabled} onValueChange={(value) => setEnabled(value)}>
+                <SelectTrigger className="h-11 w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                <SelectItem value="">All</SelectItem>
+                <SelectItem value="true">Enabled</SelectItem>
+                <SelectItem value="false">Disabled</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </form>
 
           <Link

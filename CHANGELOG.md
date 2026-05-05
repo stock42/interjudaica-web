@@ -114,3 +114,6 @@
 
 ## Unreleased
 - Use components/ui Select for admin instructor list filters.
+
+## Unreleased
+- Use components/ui Select for admin course category list filters.
