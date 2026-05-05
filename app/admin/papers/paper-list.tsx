@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { TypePaper } from "@/models/papers";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export function PaperList({ papers }: { papers: TypePaper[] }) {
   const router = useRouter();
@@ -73,32 +74,34 @@ export function PaperList({ papers }: { papers: TypePaper[] }) {
                 onChange={(event) => setQuery(event.target.value)}
               />
             </label>
-            <label className="grid gap-2 text-sm font-semibold text-[var(--ink)]">
-              Status
-              <select
-                className="min-h-11 rounded-md border border-[var(--line)] bg-[var(--paper)] px-3 text-sm font-normal outline-none transition focus:border-[var(--sapphire)] focus:ring-4 focus:ring-[rgba(19,70,160,0.14)]"
-                value={status}
-                onChange={(event) => setStatus(event.target.value)}
-              >
-                <option value="">All</option>
-                <option value="draft">Draft</option>
-                <option value="published">Published</option>
-                <option value="archived">Archived</option>
-              </select>
-            </label>
-            <label className="grid gap-2 text-sm font-semibold text-[var(--ink)]">
-              Visibility
-              <select
-                className="min-h-11 rounded-md border border-[var(--line)] bg-[var(--paper)] px-3 text-sm font-normal outline-none transition focus:border-[var(--sapphire)] focus:ring-4 focus:ring-[rgba(19,70,160,0.14)]"
-                value={visibility}
-                onChange={(event) => setVisibility(event.target.value)}
-              >
-                <option value="">All</option>
-                <option value="public">Public</option>
-                <option value="community">Community</option>
-                <option value="private">Private</option>
-              </select>
-            </label>
+            <div className="grid gap-2 text-sm font-semibold text-[var(--ink)]">
+              <span>Status</span>
+              <Select value={status} onValueChange={(value) => setStatus(value)}>
+                <SelectTrigger className="h-11 w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                <SelectItem value="">All</SelectItem>
+                <SelectItem value="draft">Draft</SelectItem>
+                <SelectItem value="published">Published</SelectItem>
+                <SelectItem value="archived">Archived</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid gap-2 text-sm font-semibold text-[var(--ink)]">
+              <span>Visibility</span>
+              <Select value={visibility} onValueChange={(value) => setVisibility(value)}>
+                <SelectTrigger className="h-11 w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                <SelectItem value="">All</SelectItem>
+                <SelectItem value="public">Public</SelectItem>
+                <SelectItem value="community">Community</SelectItem>
+                <SelectItem value="private">Private</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </form>
           <Link
             href="/admin/papers/new"
