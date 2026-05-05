@@ -72,3 +72,6 @@
 
 ## Unreleased
 - Refactor admin operator form inputs/buttons to components/ui primitives.
+
+## Unreleased
+- Refactor admin paper form inputs/textareas/buttons to components/ui primitives.
