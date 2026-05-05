@@ -47,3 +47,6 @@
 
 ## Unreleased
 - Add Rabbi Ernesto Yattah block to contact emails (photo + bio + response promise).
+
+## Unreleased
+- Document installed UI components and add student header popover with dashboard + logout.

@@ -2,6 +2,7 @@ import type { CSSProperties, ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { getCurrentUser } from "@/services/user-auth";
+import StudentUserMenu from "@/components/share/student-user-menu";
 import {
   type Course,
   adminStats,
@@ -108,17 +109,11 @@ export async function SiteHeader() {
 
         <div className="flex shrink-0 items-center gap-2">
           {user ? (
-            <Link
-              href="/dashboard"
-              className="flex items-center gap-3 rounded-full border border-[var(--gold)] bg-black/40 px-4 py-2 text-sm font-semibold text-[var(--gold)] transition hover:bg-[rgba(244,189,51,0.12)]"
-            >
-              <span className="flex h-9 w-9 items-center justify-center rounded-full border border-[rgba(244,189,51,0.55)] bg-[#050608] font-bold text-[var(--gold)]">
-                {`${(user.firstName || "U")[0]}${(user.lastName || "")[0]}`.toUpperCase()}
-              </span>
-              <span className="hidden max-w-[12rem] truncate sm:block">
-                {user.firstName || user.email}
-              </span>
-            </Link>
+            <StudentUserMenu
+              firstName={user.firstName}
+              lastName={user.lastName}
+              email={user.email}
+            />
           ) : (
             <>
               <ButtonLink href="/login" tone="secondary" className="min-w-28">

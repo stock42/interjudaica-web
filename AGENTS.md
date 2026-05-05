@@ -216,6 +216,64 @@ Admin CRUD endpoints, all requiring operator auth:
 | `PATCH` | `/api/admin/users/[uuid]` | Updates one user by UUID. |
 | `DELETE` | `/api/admin/users/[uuid]` | Deletes one user by UUID. |
 
+## Components (installed UI kit)
+
+This repo includes a pre-installed UI component kit under `./components/ui/*`.
+
+**Rule:** Always prefer these components first. Only create a new component when it does not exist in the list below, and when creating new shared components place them under `./components/share/*`.
+
+Available components (`components/ui`):
+- accordion
+- alert-dialog
+- alert
+- avatar
+- badge
+- breadcrumb
+- button-group
+- button
+- calendar
+- card
+- carousel
+- collapsible
+- combobox
+- command
+- context-menu
+- dialog
+- drawer
+- dropdown-menu
+- empty
+- field
+- hover-card
+- input-group
+- input-otp
+- input
+- item
+- kbd
+- label
+- menubar
+- navigation-menu
+- pagination
+- popover
+- progress
+- radio-group
+- resizable
+- scroll-area
+- select
+- separator
+- sheet
+- sidebar
+- skeleton
+- slider
+- sonner
+- spinner
+- switch
+- table
+- tabs
+- textarea
+- toggle-group
+- toggle
+- tooltip
+
 ## Frontend Rules
 
 Public pages mostly use static content from `app/lib/content.ts`; admin pages read MongoDB through storage services.
