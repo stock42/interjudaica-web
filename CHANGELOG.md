@@ -43,6 +43,7 @@
 
 
 ## Unreleased
+- Add social proof model + storage, admin CRUD, public /api/social-proof endpoint, and homepage integration.
 - Improve contact email templates styling to match the dark/gold website theme and include the brand logo.
 
 ## Unreleased

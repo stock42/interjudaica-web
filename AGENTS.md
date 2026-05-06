@@ -83,6 +83,7 @@ Collection names currently in use:
 - `papers`
 - `paper_categories`
 - `forum_threads`
+- `social_proof`
 - `users`
 - `operators`
 
@@ -162,6 +163,7 @@ Public content endpoints:
 | Method | Path | Notes |
 | --- | --- | --- |
 | `GET` | `/api/courses` | Lists published public courses as `{ items }`. |
+| `GET` | `/api/social-proof` | Lists published testimonials as `{ items }`. |
 
 Admin utility endpoints:
 
@@ -210,6 +212,11 @@ Admin CRUD endpoints, all requiring operator auth:
 | `GET` | `/api/admin/papers/[uuid]` | Gets one paper by UUID. |
 | `PATCH` | `/api/admin/papers/[uuid]` | Updates one paper by UUID. |
 | `DELETE` | `/api/admin/papers/[uuid]` | Deletes one paper by UUID. |
+| `GET` | `/api/admin/social-proof` | Lists testimonials as `{ items }`. |
+| `POST` | `/api/admin/social-proof` | Creates a testimonial and returns `{ item }`. |
+| `GET` | `/api/admin/social-proof/[uuid]` | Gets one testimonial by UUID. |
+| `PATCH` | `/api/admin/social-proof/[uuid]` | Updates one testimonial by UUID. |
+| `DELETE` | `/api/admin/social-proof/[uuid]` | Deletes one testimonial by UUID. |
 | `GET` | `/api/admin/users` | Lists users as `{ items }`, without password fields. |
 | `POST` | `/api/admin/users` | Creates a user and returns `{ item }`, without password fields. |
 | `GET` | `/api/admin/users/[uuid]` | Gets one user by UUID, without password fields. |
@@ -316,6 +323,7 @@ Admin route map:
 - `/admin/papers`, `/admin/papers/new`, `/admin/papers/[uuid]`
 - `/admin/paper-categories`, `/admin/paper-categories/new`, `/admin/paper-categories/[uuid]`
 - `/admin/foro`, `/admin/foro/new`, `/admin/foro/[uuid]`
+- `/admin/social-proof`, `/admin/social-proof/new`, `/admin/social-proof/[uuid]`
 - `/admin/suscripciones`
 - `/admin/pagos`
 - `/admin/analytics`

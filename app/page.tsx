@@ -1,7 +1,8 @@
 import Image from "next/image";
 import { ButtonLink, PageShell } from "@/app/components/portal-ui";
-import { testimonials } from "@/app/lib/content";
+import { testimonials as fallbackTestimonials } from "@/app/lib/content";
 import { listPublicCourses } from "@/app/lib/public-courses";
+import { listSocialProof } from "@/app/lib/social-proof";
 import type { TypePublicCourse } from "@/models/courses";
 
 export const runtime = "nodejs";
@@ -176,7 +177,11 @@ function SectionTitle({
 }
 
 export default async function Home() {
-  const homeCourses = await listPublicCourses();
+  const [homeCourses, socialProof] = await Promise.all([
+    listPublicCourses(),
+    listSocialProof(),
+  ]);
+  const testimonials = socialProof.length ? socialProof : fallbackTestimonials;
   const whyChoose = [
     {
       icon: "screen" as const,
@@ -373,7 +378,12 @@ export default async function Home() {
                   {testimonial.quote}
                 </blockquote>
                 <figcaption className="mt-5 flex items-center justify-between gap-4 text-sm text-white/78">
-                  <span>- {testimonial.name}</span>
+                  <div>
+                    <p>- {testimonial.name}</p>
+                    <p className="text-xs text-white/60">
+                      {testimonial.detail}
+                    </p>
+                  </div>
                   <span className="text-base tracking-[0.18em] text-[var(--gold)]">*****</span>
                 </figcaption>
               </figure>

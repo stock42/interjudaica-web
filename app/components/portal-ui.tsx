@@ -573,6 +573,7 @@ export function AdminShell({
     { href: "/admin/pagos", label: "Payments" },
     { href: "/admin/papers", label: "Papers" },
     { href: "/admin/paper-categories", label: "Paper categories" },
+    { href: "/admin/social-proof", label: "Social proof" },
     { href: "/admin/foro", label: "Forum" },
     { href: "/admin/analytics", label: "Analytics" },
   ];
