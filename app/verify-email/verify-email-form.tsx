@@ -8,15 +8,30 @@ import { Input } from "@/components/ui/input";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { Label } from "@/components/ui/label";
 
-type Status = "idle" | "sending" | "error";
+type Status = "idle" | "sending" | "error" | "resending" | "resent";
 
 export function VerifyEmailForm() {
 	const searchParams = useSearchParams();
 	const [status, setStatus] = useState<Status>("idle");
 	const [error, setError] = useState("");
 	const [code, setCode] = useState("");
+	const [cooldown, setCooldown] = useState(0);
 	const initialEmail = searchParams.get("email") ?? "";
 	const [email, setEmail] = useState(initialEmail);
+
+	function startCooldown(seconds: number) {
+		setCooldown(seconds);
+		const tick = (remaining: number) => {
+			if (remaining <= 0) {
+				return;
+			}
+			setTimeout(() => {
+				setCooldown(remaining - 1);
+				tick(remaining - 1);
+			}, 1000);
+		};
+		tick(seconds);
+	}
 
 	async function handleSubmit(event: FormEvent<HTMLFormElement>) {
 		event.preventDefault();
@@ -40,6 +55,36 @@ export function VerifyEmailForm() {
 			setError(err instanceof Error ? err.message : "Unable to verify email.");
 			setStatus("error");
 			setStatus("idle");
+		}
+	}
+
+	async function handleResend() {
+		if (!email || cooldown > 0) {
+			return;
+		}
+
+		setStatus("resending");
+		setError("");
+
+		try {
+			const response = await fetch("/api/user-auth/resend-verify", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ email }),
+			});
+
+			if (!response.ok) {
+				const data = await response.json().catch(() => ({}));
+				throw new Error(data.error ?? "Unable to resend code.");
+			}
+
+			setStatus("resent");
+			startCooldown(30);
+		} catch (err) {
+			setError(err instanceof Error ? err.message : "Unable to resend code.");
+			setStatus("error");
+		} finally {
+			setTimeout(() => setStatus("idle"), 500);
 		}
 	}
 
@@ -82,10 +127,32 @@ export function VerifyEmailForm() {
 					{error}
 				</p>
 			) : null}
+			{status === "resent" ? (
+				<p className="text-sm font-semibold text-[var(--jade)]">
+					We sent a new code to your inbox.
+				</p>
+			) : null}
 
-			<Button type="submit" disabled={status === "sending" || code.length !== 6}>
-				{status === "sending" ? "Verifying…" : "Verify email"}
-			</Button>
+			<div className="flex flex-wrap items-center gap-3">
+				<Button
+					type="submit"
+					disabled={status === "sending" || code.length !== 6}
+				>
+					{status === "sending" ? "Verifying…" : "Verify email"}
+				</Button>
+				<button
+					className="text-sm font-semibold text-[var(--sapphire)] underline underline-offset-4 disabled:cursor-not-allowed disabled:opacity-60"
+					type="button"
+					onClick={handleResend}
+					disabled={status === "resending" || cooldown > 0}
+				>
+					{status === "resending"
+						? "Resending…"
+						: cooldown > 0
+						? `Resend in ${cooldown}s`
+						: "Resend code"}
+				</button>
+			</div>
 		</form>
 	);
 }

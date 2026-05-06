@@ -191,6 +191,34 @@ export class UserStorage extends MongoDBStorage<TypeUser> {
       : ({ ok: false, error: "Unable to verify email" } as const);
   }
 
+  static async regenerateVerificationCode(email: string) {
+    await UserStorage.ensureIndexes();
+    const document = await UserStorage.findByEmail(email);
+
+    if (!document) {
+      return { ok: false, error: "Email not found" } as const;
+    }
+
+    if (document.data.status !== "pending") {
+      return { ok: false, error: "Email already verified" } as const;
+    }
+
+    const verificationCode = UserStorage.generateVerificationCode();
+    const verificationExpiresAt = UserStorage.getVerificationExpiry();
+
+    await UserStorage.update(document.uuid, {
+      emailVerificationCode: verificationCode,
+      emailVerificationExpiresAt: verificationExpiresAt,
+    });
+
+    return {
+      ok: true,
+      email: document.data.email,
+      firstName: document.data.firstName,
+      code: verificationCode,
+    } as const;
+  }
+
   static async authenticate(email: string, password: string) {
     const document = await UserStorage.findByEmail(email);
 
