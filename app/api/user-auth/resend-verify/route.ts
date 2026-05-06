@@ -41,6 +41,10 @@ function getClientKey(request: NextRequest) {
 	);
 }
 
+function makeKey(prefix: string, value: string) {
+	return `${prefix}:${value}`;
+}
+
 function checkRateLimit(key: string) {
 	const now = Date.now();
 	const windowMs = getRateLimitWindowSeconds() * 1000;
@@ -66,13 +70,15 @@ function checkRateLimit(key: string) {
 export async function POST(request: NextRequest) {
 	try {
 		const payload = schemaResend.parse(await readJson(request));
-		const limit = checkRateLimit(getClientKey(request));
+		const ipLimit = checkRateLimit(makeKey("ip", getClientKey(request)));
+		const emailLimit = checkRateLimit(makeKey("email", payload.email));
+		const retryAfter = Math.max(ipLimit.retryAfter, emailLimit.retryAfter);
 
-		if (!limit.allowed) {
+		if (!ipLimit.allowed || !emailLimit.allowed) {
 			return NextResponse.json(
 				{
 					error: "Too many requests",
-					retryAfter: limit.retryAfter,
+					retryAfter,
 				},
 				{ status: 429 },
 			);
