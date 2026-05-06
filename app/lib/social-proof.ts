@@ -3,8 +3,8 @@ import "server-only";
 import { headers } from "next/headers";
 import type { TypeSocialProof } from "@/models/social-proof";
 
-function getBaseUrl() {
-  const headerList = headers();
+async function getBaseUrl() {
+  const headerList = await headers();
   const host = headerList.get("host");
 
   if (!host) {
@@ -16,7 +16,8 @@ function getBaseUrl() {
 }
 
 export async function listSocialProof(): Promise<TypeSocialProof[]> {
-  const response = await fetch(`${getBaseUrl()}/api/social-proof`, {
+  const baseUrl = await getBaseUrl();
+  const response = await fetch(`${baseUrl}/api/social-proof`, {
     cache: "no-store",
   });
 
