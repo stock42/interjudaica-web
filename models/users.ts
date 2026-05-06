@@ -45,7 +45,10 @@ export const schemaAdminUser = schemaUser.omit({ password: true });
 export type TypeUser = z.infer<typeof schemaUser>;
 export type TypeUserSignup = z.infer<typeof schemaUserSignup>;
 export type TypeUserSignin = z.infer<typeof schemaUserSignin>;
-export type TypeSafeUser = Omit<TypeUser, "password" | "uuid"> & {
+export type TypeSafeUser = Omit<
+  TypeUser,
+  "password" | "uuid" | "emailVerificationCode" | "emailVerificationExpiresAt" | "emailVerifiedAt"
+> & {
   uuid: string;
 };
 
