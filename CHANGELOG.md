@@ -43,7 +43,7 @@
 
 
 ## Unreleased
-- Add OTP email verification for student signup (model, API, UI, resend flow, and email template).
+- Add OTP email verification for student signup (model, API, UI, resend flow, rate limit, and email template).
 - Add social proof model + storage, admin CRUD, public /api/social-proof endpoint, and homepage integration.
 - Improve contact email templates styling to match the dark/gold website theme and include the brand logo.
 

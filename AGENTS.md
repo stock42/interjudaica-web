@@ -37,7 +37,10 @@ The code currently reads:
 - `MONGODB_URL`, falling back to `MONGODB_URI`, then `MONGO_URI`, then `mongodb://localhost:27017`
 - `MONGODB_NAME`, falling back to `MONGODB_DATABASE`, then `MONGO_DB`, then `interjudaica`
 - `AUTH_SECRET`, falling back to `NEXTAUTH_SECRET`, then a local development secret
-
+- `VERIFY_RESEND_COOLDOWN_SECONDS` (default 30)
+- `VERIFY_RESEND_WINDOW_SECONDS` (default 600)
+- `VERIFY_RESEND_LIMIT` (default 3)
+- `NEXT_PUBLIC_VERIFY_RESEND_COOLDOWN_SECONDS` (default 30)
 
 ## Product Rules
 

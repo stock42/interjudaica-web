@@ -58,6 +58,10 @@ export function VerifyEmailForm() {
 		}
 	}
 
+	const defaultCooldown = Number(
+		process.env.NEXT_PUBLIC_VERIFY_RESEND_COOLDOWN_SECONDS ?? 30,
+	);
+
 	async function handleResend() {
 		if (!email || cooldown > 0) {
 			return;
@@ -73,13 +77,21 @@ export function VerifyEmailForm() {
 				body: JSON.stringify({ email }),
 			});
 
+			const data = await response.json().catch(() => ({}));
+
 			if (!response.ok) {
-				const data = await response.json().catch(() => ({}));
+				const retrySeconds =
+					Number(data.retryAfter) || Number(data.cooldownSeconds) || 0;
+				if (retrySeconds > 0) {
+					startCooldown(retrySeconds);
+				}
 				throw new Error(data.error ?? "Unable to resend code.");
 			}
 
 			setStatus("resent");
-			startCooldown(30);
+			const cooldownSeconds =
+				Number(data.cooldownSeconds) || defaultCooldown || 30;
+			startCooldown(cooldownSeconds);
 		} catch (err) {
 			setError(err instanceof Error ? err.message : "Unable to resend code.");
 			setStatus("error");
