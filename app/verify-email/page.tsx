@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { AuthPanel } from "@/app/components/portal-ui";
 import { VerifyEmailForm } from "@/app/verify-email/verify-email-form";
 
@@ -13,7 +14,9 @@ export default function VerifyEmailPage() {
 			title="Verify your email"
 			text="Enter the 6-digit code we sent to your inbox to activate your account."
 		>
-			<VerifyEmailForm />
+			<Suspense fallback={null}>
+				<VerifyEmailForm />
+			</Suspense>
 		</AuthPanel>
 	);
 }
