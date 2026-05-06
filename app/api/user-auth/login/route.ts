@@ -13,6 +13,20 @@ export const runtime = "nodejs";
 export async function POST(request: NextRequest) {
   try {
     const payload = schemaUserSignin.parse(await readJson(request));
+    const document = await UserStorage.findByEmail(payload.email);
+
+    if (!document) {
+      return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
+    }
+
+    if (document.data.status === "pending") {
+      return NextResponse.json({ error: "Email not verified" }, { status: 403 });
+    }
+
+    if (document.data.status !== "active") {
+      return NextResponse.json({ error: "Account disabled" }, { status: 403 });
+    }
+
     const user = await UserStorage.authenticate(payload.email, payload.password);
 
     if (!user) {

@@ -17,6 +17,7 @@ export function RegisterForm() {
 
     const formData = new FormData(event.currentTarget);
     const password = String(formData.get("password") ?? "");
+    const email = String(formData.get("email") ?? "");
     const confirmPassword = String(formData.get("confirmPassword") ?? "");
 
     if (password !== confirmPassword) {
@@ -30,7 +31,7 @@ export function RegisterForm() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        email: formData.get("email"),
+        email,
         firstName: formData.get("firstName"),
         lastName: formData.get("lastName"),
         country: formData.get("country"),
@@ -48,7 +49,7 @@ export function RegisterForm() {
       return;
     }
 
-    window.location.assign("/dashboard");
+    window.location.assign(`/verify-email?email=${encodeURIComponent(email)}`);
   }
 
   return (

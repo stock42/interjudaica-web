@@ -88,17 +88,22 @@ export class UserStorage extends MongoDBStorage<TypeUser> {
 
   static async register(input: TypeUserSignup) {
     await UserStorage.ensureIndexes();
+    const verificationCode = UserStorage.generateVerificationCode();
+    const verificationExpiresAt = UserStorage.getVerificationExpiry();
     const user = new UserModel({
       ...input,
       password: "",
       role: "student",
-      status: "active",
+      status: "pending",
       communityStatus: "none",
+      emailVerificationCode: verificationCode,
+      emailVerificationExpiresAt: verificationExpiresAt,
+      emailVerifiedAt: "",
     });
 
     await user.setPassword(input.password);
     await MongoDBStorage._insert<TypeUser>(UserStorage.COLLECTION, user);
-    return user.toSafeData();
+    return { user: user.toSafeData(), verificationCode };
   }
 
   static async update(uuid: string, input: Partial<TypeUser>) {
@@ -145,6 +150,47 @@ export class UserStorage extends MongoDBStorage<TypeUser> {
     return MongoDBStorage._getByUUID<TypeUser>(UserStorage.COLLECTION, uuid);
   }
 
+  static async markEmailVerified(uuid: string) {
+    await UserStorage.ensureIndexes();
+    return UserStorage.update(uuid, {
+      status: "active",
+      emailVerifiedAt: new Date().toISOString(),
+      emailVerificationCode: "",
+      emailVerificationExpiresAt: "",
+    });
+  }
+
+  static async verifyEmailCode(email: string, code: string) {
+    await UserStorage.ensureIndexes();
+    const document = await UserStorage.findByEmail(email);
+
+    if (!document) {
+      return { ok: false, error: "Email not found" } as const;
+    }
+
+    const { data } = document;
+    if (data.status !== "pending") {
+      return { ok: false, error: "Email already verified" } as const;
+    }
+
+    if (!data.emailVerificationCode || !data.emailVerificationExpiresAt) {
+      return { ok: false, error: "Verification code expired" } as const;
+    }
+
+    if (data.emailVerificationCode !== code) {
+      return { ok: false, error: "Invalid verification code" } as const;
+    }
+
+    if (Date.parse(data.emailVerificationExpiresAt) < Date.now()) {
+      return { ok: false, error: "Verification code expired" } as const;
+    }
+
+    const updated = await UserStorage.markEmailVerified(document.uuid);
+    return updated
+      ? ({ ok: true, user: updated } as const)
+      : ({ ok: false, error: "Unable to verify email" } as const);
+  }
+
   static async authenticate(email: string, password: string) {
     const document = await UserStorage.findByEmail(email);
 
@@ -160,5 +206,14 @@ export class UserStorage extends MongoDBStorage<TypeUser> {
     }
 
     return UserStorage.toSafeUser(document);
+  }
+
+  private static generateVerificationCode() {
+    return Math.floor(100000 + Math.random() * 900000).toString();
+  }
+
+  private static getVerificationExpiry() {
+    const expiresAt = new Date(Date.now() + 1000 * 60 * 20);
+    return expiresAt.toISOString();
   }
 }

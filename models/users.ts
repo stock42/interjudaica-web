@@ -20,6 +20,9 @@ export const schemaUser = z.object({
   role: z.string().trim().default("student"),
   status: z.enum(userStatuses).default("active"),
   communityStatus: z.enum(communityStatuses).default("none"),
+  emailVerificationCode: z.string().trim().default(""),
+  emailVerificationExpiresAt: z.string().trim().default(""),
+  emailVerifiedAt: z.string().trim().default(""),
 });
 
 export const schemaUserSignup = z.object({

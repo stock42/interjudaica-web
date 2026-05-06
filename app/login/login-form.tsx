@@ -10,10 +10,12 @@ type Status = "idle" | "sending" | "error";
 
 export function LoginForm({ nextPath }: { nextPath?: string }) {
   const [status, setStatus] = useState<Status>("idle");
+  const [error, setError] = useState("");
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setStatus("sending");
+    setError("");
 
     const form = event.currentTarget;
     const formData = new FormData(form);
@@ -31,12 +33,14 @@ export function LoginForm({ nextPath }: { nextPath?: string }) {
       });
 
       if (!response.ok) {
-        throw new Error("Request failed");
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data.error ?? "Request failed");
       }
 
       const next = nextPath && nextPath.startsWith("/") ? nextPath : "/dashboard";
       window.location.href = next;
-    } catch {
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unable to sign in.");
       setStatus("error");
       setStatus("idle");
     }
@@ -72,7 +76,7 @@ export function LoginForm({ nextPath }: { nextPath?: string }) {
 
       {status === "error" ? (
         <p className="text-sm font-semibold text-[var(--sumac)]">
-          Unable to sign in. Please check your email and password.
+          {error || "Unable to sign in. Please check your email and password."}
         </p>
       ) : null}
     </form>
