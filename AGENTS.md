@@ -88,6 +88,7 @@ Collection names currently in use:
 - `course_class_files`
 - `course_enrollments`
 - `course_payments`
+- `contacts`
 - `instructors`
 - `papers`
 - `paper_categories`
@@ -178,6 +179,7 @@ Public content endpoints:
 | `GET` | `/api/courses/classes/files/[fileUuid]` | Downloads a class file for enrolled students. |
 | `POST` | `/api/checkout` | Creates a Stripe checkout session for a course. |
 | `POST` | `/api/stripe/webhook` | Handles Stripe webhook events and enrolls students. |
+| `POST` | `/api/contact` | Saves a contact message and sends emails. |
 | `GET` | `/api/social-proof` | Lists published testimonials as `{ items }`. |
 
 Admin utility endpoints:
@@ -187,6 +189,9 @@ Admin utility endpoints:
 | `GET` | `/api/admin/overview` | Requires operator auth; returns dashboard stat objects. |
 | `POST` | `/api/admin/uploads/course-image` | Requires operator auth; accepts `multipart/form-data` with `file` and optional `kind`; returns `{ url }`. |
 | `POST` | `/api/admin/uploads/class-image` | Requires operator auth; accepts `multipart/form-data` with `file`; returns `{ url }`. |
+| `GET` | `/api/admin/contacts` | Lists contact messages as `{ items }`. |
+| `GET` | `/api/admin/contacts/[uuid]` | Gets a contact message by UUID. |
+| `POST` | `/api/admin/contacts/[uuid]/reply` | Sends a reply email and marks as replied. |
 | `POST` | `/api/admin/uploads/instructor-photo` | Requires operator auth; accepts `multipart/form-data` with `file`; returns `{ url }`. |
 
 Admin CRUD endpoints, all requiring operator auth:
@@ -343,6 +348,7 @@ Admin route map:
 - `/admin/operators`, `/admin/operators/new`, `/admin/operators/[uuid]`
 - `/admin/cursos`, `/admin/cursos/new`, `/admin/cursos/[uuid]`
 - `/admin/classes/[courseUuid]`, `/admin/classes/[courseUuid]/new`, `/admin/classes/[courseUuid]/edit/[classUuid]`
+- `/admin/contacts`, `/admin/contacts/[uuid]`
 - `/admin/course-categories`, `/admin/course-categories/new`, `/admin/course-categories/[uuid]`
 - `/admin/instructors`, `/admin/instructors/new`, `/admin/instructors/[uuid]`
 - `/admin/papers`, `/admin/papers/new`, `/admin/papers/[uuid]`

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 
 import { sendContactEmails } from "@/lib/send-contact-emails";
+import { ContactStorage } from "@/services/contacts-storage";
 
 export const runtime = "nodejs";
 
@@ -30,6 +31,7 @@ export async function POST(request: Request) {
   }
 
   try {
+    await ContactStorage.create(parsed.data);
     await sendContactEmails(parsed.data);
     return NextResponse.json({ ok: true });
   } catch (error) {
