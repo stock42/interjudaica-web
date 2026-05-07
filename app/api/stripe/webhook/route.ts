@@ -41,21 +41,30 @@ export async function POST(request: Request) {
 		const userUuid = session.metadata?.userUuid;
 
 		if (courseUuid && userUuid) {
-			await CourseEnrollmentStorage.ensureIndexes();
 			await CoursePaymentStorage.updateBySession(session.id, {
 				status: "paid",
 				paidAt: new Date().toISOString(),
 				stripePaymentIntentId: String(session.payment_intent ?? ""),
 			});
 
-			await CourseEnrollmentStorage.ensureIndexes();
-			await CourseEnrollmentStorage.create({
-				courseUuid,
-				userUuid,
-				status: "active",
-				purchasedAt: new Date().toISOString(),
-			});
+			try {
+				await CourseEnrollmentStorage.create({
+					courseUuid,
+					userUuid,
+					status: "active",
+					purchasedAt: new Date().toISOString(),
+				});
+			} catch {
+				// ignore duplicate enrollment
+			}
 		}
+	}
+
+	if (event.type === "checkout.session.expired") {
+		const session = event.data.object as Stripe.Checkout.Session;
+		await CoursePaymentStorage.updateBySession(session.id, {
+			status: "failed",
+		});
 	}
 
 	return NextResponse.json({ received: true });

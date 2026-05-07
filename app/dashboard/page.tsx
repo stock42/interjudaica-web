@@ -18,7 +18,12 @@ export const metadata: Metadata = {
   description: "InterJudaica student dashboard for courses and community.",
 };
 
-export default async function DashboardPage() {
+export default async function DashboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ payment?: string; course?: string }>;
+}) {
+  const { payment } = await searchParams;
   const courses = await listPublicCourses();
   const dashboardCourses = courses.slice(0, 2);
 
@@ -30,6 +35,12 @@ export default async function DashboardPage() {
           title="Welcome back"
           text="Continue purchased courses, manage the community membership, review live sessions, and jump back into forum threads."
         />
+
+        {payment === "success" ? (
+          <div className="rounded-lg border border-[var(--line)] bg-[rgba(244,189,51,0.12)] p-4 text-sm font-semibold text-[var(--ink)]">
+            Payment received. Your course enrollment is being activated.
+          </div>
+        ) : null}
 
         <div className="grid gap-5 lg:grid-cols-[1.2fr_0.8fr]">
           <section className="rounded-lg border border-[var(--line)] bg-white p-5 sm:p-6">

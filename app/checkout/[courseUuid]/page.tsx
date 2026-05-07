@@ -15,11 +15,14 @@ export const runtime = "nodejs";
 
 export default async function CheckoutPage({
 	params,
+	searchParams,
 }: {
 	params: Promise<{ courseUuid: string }>;
+	searchParams: Promise<{ payment?: string }>;
 }) {
 	const user = await getCurrentUser();
 	const { courseUuid } = await params;
+	const { payment } = await searchParams;
 
 	if (!user) {
 		redirect(`/login?next=/checkout/${courseUuid}`);
@@ -35,6 +38,11 @@ export default async function CheckoutPage({
 			title="Checkout"
 			text="Complete your enrollment and unlock the full course content."
 		>
+			{payment === "cancelled" ? (
+				<p className="rounded-md border border-[var(--line)] bg-[var(--paper)] px-4 py-3 text-sm font-semibold text-[var(--muted)]">
+					Payment was cancelled. You can try again when you are ready.
+				</p>
+			) : null}
 			<CheckoutForm course={course} priceLabel={formatUsd(course.price)} />
 		</AuthPanel>
 	);

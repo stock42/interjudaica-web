@@ -49,6 +49,7 @@
 - Add community link to header navigation.
 - Add course classes with admin CRUD, class file uploads, and public class titles.
 - Add Stripe checkout flow with payment records and enrollment creation.
+- Add checkout success/cancel messaging and handle expired sessions.
 - Add social proof model + storage, admin CRUD, public /api/social-proof endpoint, and homepage integration.
 - Improve contact email templates styling to match the dark/gold website theme and include the brand logo.
 
