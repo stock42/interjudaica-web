@@ -27,6 +27,7 @@ export default function ResetPasswordForm() {
 	);
 	const [status, setStatus] = useState<Status>("idle");
 	const [error, setError] = useState<string>("");
+	const [resendError, setResendError] = useState("");
 	const [resend, setResend] = useState<ResendState>({
 		cooldown: COOLDOWN_FALLBACK,
 		remaining: 0,
@@ -90,6 +91,7 @@ export default function ResetPasswordForm() {
 			return;
 		}
 
+		setResendError("");
 		setResend((current) => ({ ...current, status: "sending" }));
 
 		try {
@@ -107,6 +109,11 @@ export default function ResetPasswordForm() {
 					remaining: retryAfter,
 					status: "idle",
 				});
+				setResendError(
+					data.error === "Too many requests"
+						? `Too many requests. Try again in ${retryAfter}s.`
+						: `Please wait ${retryAfter}s before trying again.`,
+				);
 				return;
 			}
 
@@ -115,6 +122,7 @@ export default function ResetPasswordForm() {
 			setResend({ cooldown, remaining: cooldown, status: "idle" });
 		} catch {
 			setResend((current) => ({ ...current, status: "idle" }));
+			setResendError("Unable to resend the code.");
 		}
 	}
 
@@ -213,7 +221,13 @@ export default function ResetPasswordForm() {
 
 			{status === "error" ? (
 				<p className="text-sm font-semibold text-[var(--sumac)]">
-					Unable to reset password.
+					{error || "Unable to reset password."}
+				</p>
+			) : null}
+
+			{resendError ? (
+				<p className="text-sm font-semibold text-[var(--sumac)]">
+					{resendError}
 				</p>
 			) : null}
 

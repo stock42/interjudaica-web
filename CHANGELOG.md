@@ -55,6 +55,7 @@
 - Send welcome email after student email verification and payment confirmation after checkout.
 - Add OTP-based password reset flow with resend and confirmation email.
 - Add password reset confirmations, rate limits, and lockouts on failed OTP attempts.
+- Add UI feedback for lockouts/resend limits and admin reset attempt logs.
 - Add social proof model + storage, admin CRUD, public /api/social-proof endpoint, and homepage integration.
 - Improve contact email templates styling to match the dark/gold website theme and include the brand logo.
 

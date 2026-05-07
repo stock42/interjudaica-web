@@ -96,6 +96,7 @@ Collection names currently in use:
 - `course_enrollments`
 - `course_payments`
 - `contacts`
+- `password_reset_attempts`
 - `instructors`
 - `papers`
 - `paper_categories`
@@ -203,6 +204,7 @@ Admin utility endpoints:
 | `GET` | `/api/admin/contacts/[uuid]` | Gets a contact message by UUID. |
 | `POST` | `/api/admin/contacts/[uuid]/reply` | Sends a reply email (supports attachments) and marks as replied. |
 | `POST` | `/api/admin/contacts/[uuid]/mark-unread` | Marks a contact as new. |
+| `GET` | `/api/admin/password-resets` | Lists password reset attempts as `{ items }`. |
 | `POST` | `/api/admin/uploads/instructor-photo` | Requires operator auth; accepts `multipart/form-data` with `file`; returns `{ url }`. |
 
 Admin CRUD endpoints, all requiring operator auth:
@@ -361,6 +363,7 @@ Admin route map:
 - `/admin/cursos`, `/admin/cursos/new`, `/admin/cursos/[uuid]`
 - `/admin/classes/[courseUuid]`, `/admin/classes/[courseUuid]/new`, `/admin/classes/[courseUuid]/edit/[classUuid]`
 - `/admin/contacts`, `/admin/contacts/[uuid]`
+- `/admin/password-resets`
 - `/admin/course-categories`, `/admin/course-categories/new`, `/admin/course-categories/[uuid]`
 - `/admin/instructors`, `/admin/instructors/new`, `/admin/instructors/[uuid]`
 - `/admin/papers`, `/admin/papers/new`, `/admin/papers/[uuid]`

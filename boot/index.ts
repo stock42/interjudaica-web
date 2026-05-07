@@ -5,6 +5,7 @@ import { CourseClassFileStorage } from "@/services/course-class-files-storage";
 import { CourseEnrollmentStorage } from "@/services/course-enrollments-storage";
 import { CoursePaymentStorage } from "@/services/course-payments-storage";
 import { ContactStorage } from "@/services/contacts-storage";
+import { PasswordResetAttemptStorage } from "@/services/password-reset-attempts-storage";
 
 export async function Boot() {
   await UserStorage.ensureIndexes();
@@ -13,5 +14,6 @@ export async function Boot() {
   await CourseEnrollmentStorage.ensureIndexes();
   await CoursePaymentStorage.ensureIndexes();
   await ContactStorage.ensureIndexes();
+  await PasswordResetAttemptStorage.ensureIndexes();
   await OperatorStorage.ensureDefaultOperator();
 }
