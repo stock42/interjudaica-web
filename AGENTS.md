@@ -191,7 +191,8 @@ Admin utility endpoints:
 | `POST` | `/api/admin/uploads/class-image` | Requires operator auth; accepts `multipart/form-data` with `file`; returns `{ url }`. |
 | `GET` | `/api/admin/contacts` | Lists contact messages as `{ items }`. |
 | `GET` | `/api/admin/contacts/[uuid]` | Gets a contact message by UUID. |
-| `POST` | `/api/admin/contacts/[uuid]/reply` | Sends a reply email and marks as replied. |
+| `POST` | `/api/admin/contacts/[uuid]/reply` | Sends a reply email (supports attachments) and marks as replied. |
+| `POST` | `/api/admin/contacts/[uuid]/mark-unread` | Marks a contact as new. |
 | `POST` | `/api/admin/uploads/instructor-photo` | Requires operator auth; accepts `multipart/form-data` with `file`; returns `{ url }`. |
 
 Admin CRUD endpoints, all requiring operator auth:

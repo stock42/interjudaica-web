@@ -30,16 +30,21 @@ export function ContactReplyForm({ contact }: { contact: TypeContact }) {
 		contact.replySubject || `Re: InterJudaica contact request`,
 	);
 	const [message, setMessage] = useState(contact.replyMessage || "");
+	const [files, setFiles] = useState<File[]>([]);
 
 	async function handleSubmit(event: FormEvent<HTMLFormElement>) {
 		event.preventDefault();
 		setStatus("sending");
 
 		try {
+			const formData = new FormData();
+			formData.set("subject", subject);
+			formData.set("message", message);
+			files.forEach((file) => formData.append("files", file));
+
 			const response = await fetch(`/api/admin/contacts/${contact.uuid}/reply`, {
 				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ subject, message }),
+				body: formData,
 			});
 
 			if (!response.ok) {
@@ -47,6 +52,24 @@ export function ContactReplyForm({ contact }: { contact: TypeContact }) {
 			}
 
 			setStatus("sent");
+			setFiles([]);
+		} catch {
+			setStatus("error");
+		}
+	}
+
+	async function markUnread() {
+		try {
+			const response = await fetch(
+				`/api/admin/contacts/${contact.uuid}/mark-unread`,
+				{ method: "POST" },
+			);
+
+			if (!response.ok) {
+				throw new Error("Request failed");
+			}
+
+			window.location.assign(`/admin/contacts/${contact.uuid}`);
 		} catch {
 			setStatus("error");
 		}
@@ -80,7 +103,18 @@ export function ContactReplyForm({ contact }: { contact: TypeContact }) {
 			</section>
 
 			<section className="rounded-lg border border-[var(--line)] bg-white p-5">
-				<h2 className="font-display text-2xl font-semibold">Reply</h2>
+				<div className="flex flex-wrap items-center justify-between gap-2">
+					<h2 className="font-display text-2xl font-semibold">Reply</h2>
+					{contact.status === "replied" ? (
+						<button
+							type="button"
+							className="text-xs font-semibold text-[var(--sapphire)]"
+							onClick={markUnread}
+						>
+							Mark as new
+						</button>
+					) : null}
+				</div>
 				<form className="mt-4 grid gap-4" onSubmit={handleSubmit}>
 					<div className="grid gap-2">
 						<Label htmlFor="subject">Subject</Label>
@@ -100,6 +134,22 @@ export function ContactReplyForm({ contact }: { contact: TypeContact }) {
 							onChange={(event) => setMessage(event.target.value)}
 							required
 						/>
+					</div>
+					<div className="grid gap-2">
+						<Label htmlFor="files">Attachments</Label>
+						<Input
+							id="files"
+							type="file"
+							multiple
+							onChange={(event) =>
+								setFiles(Array.from(event.target.files ?? []))
+							}
+						/>
+						{files.length ? (
+							<p className="text-xs text-[var(--muted)]">
+								{files.length} attachment(s) selected.
+							</p>
+						) : null}
 					</div>
 
 					{status === "sent" ? (

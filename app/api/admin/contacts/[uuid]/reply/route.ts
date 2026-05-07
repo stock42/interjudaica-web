@@ -3,7 +3,7 @@ import { z } from "zod";
 
 import { ContactStorage } from "@/services/contacts-storage";
 import { sendContactReply } from "@/lib/send-contact-reply";
-import { readJson, requireAdminApi, routeError } from "@/app/api/_lib/admin-api";
+import { requireAdminApi, routeError } from "@/app/api/_lib/admin-api";
 
 export const runtime = "nodejs";
 
@@ -11,6 +11,14 @@ const schemaReply = z.object({
 	subject: z.string().trim().min(1),
 	message: z.string().trim().min(1).max(5000),
 });
+
+async function parseForm(request: NextRequest) {
+	const formData = await request.formData();
+	const subject = String(formData.get("subject") ?? "");
+	const message = String(formData.get("message") ?? "");
+	const files = formData.getAll("files");
+	return { subject, message, files };
+}
 
 export async function POST(
 	request: NextRequest,
@@ -23,11 +31,28 @@ export async function POST(
 
 	try {
 		const { uuid } = await params;
-		const payload = schemaReply.parse(await readJson(request));
+		const form = await parseForm(request);
+		const payload = schemaReply.parse({
+			subject: form.subject,
+			message: form.message,
+		});
 		const contact = await ContactStorage.get(uuid);
 
 		if (!contact) {
 			return NextResponse.json({ error: "Not found" }, { status: 404 });
+		}
+
+		const attachments = [] as { filename: string; content: string; type?: string }[];
+		for (const file of form.files) {
+			if (!(file instanceof File)) {
+				continue;
+			}
+			const buffer = Buffer.from(await file.arrayBuffer());
+			attachments.push({
+				filename: file.name || "attachment",
+				content: buffer.toString("base64"),
+				type: file.type || undefined,
+			});
 		}
 
 		await sendContactReply({
@@ -36,6 +61,7 @@ export async function POST(
 			lastName: contact.lastName,
 			subject: payload.subject,
 			replyMessage: payload.message,
+			attachments,
 		});
 
 		await ContactStorage.markReplied(uuid, {

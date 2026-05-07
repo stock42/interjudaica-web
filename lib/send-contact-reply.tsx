@@ -9,12 +9,14 @@ export async function sendContactReply({
 	lastName,
 	subject,
 	replyMessage,
+	attachments = [],
 }: {
 	email: string;
 	firstName: string;
 	lastName: string;
 	subject: string;
 	replyMessage: string;
+	attachments?: { filename: string; content: string; type?: string }[];
 }) {
 	const resend = getResend();
 	const from = getEmailFrom();
@@ -23,6 +25,7 @@ export async function sendContactReply({
 		from,
 		to: email,
 		subject,
+		attachments: attachments.length ? attachments : undefined,
 		react: (
 			<ContactReplyEmail
 				firstName={firstName}

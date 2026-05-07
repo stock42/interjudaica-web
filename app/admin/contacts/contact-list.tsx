@@ -22,6 +22,7 @@ function formatDate(value: string) {
 
 export function ContactList({ contacts }: { contacts: TypeContact[] }) {
 	const [query, setQuery] = useState("");
+	const [statusFilter, setStatusFilter] = useState("all");
 	const normalizedQuery = query.trim().toLowerCase();
 
 	const filteredContacts = useMemo(
@@ -38,10 +39,12 @@ export function ContactList({ contacts }: { contacts: TypeContact[] }) {
 						.join(" ")
 						.toLowerCase()
 						.includes(normalizedQuery);
+				const matchesStatus =
+					statusFilter === "all" || item.status === statusFilter;
 
-				return matchesQuery;
+				return matchesQuery && matchesStatus;
 			}),
-		[contacts, normalizedQuery],
+		[contacts, normalizedQuery, statusFilter],
 	);
 
 	return (
@@ -57,6 +60,18 @@ export function ContactList({ contacts }: { contacts: TypeContact[] }) {
 							value={query}
 							onChange={(event) => setQuery(event.target.value)}
 						/>
+					</label>
+					<label className="grid gap-2 text-sm font-semibold text-[var(--ink)]">
+						Status
+						<select
+							className={adminTextControlClass}
+							value={statusFilter}
+							onChange={(event) => setStatusFilter(event.target.value)}
+						>
+							<option value="all">All</option>
+							<option value="new">New</option>
+							<option value="replied">Replied</option>
+						</select>
 					</label>
 				</div>
 			</section>

@@ -82,4 +82,19 @@ export class ContactStorage extends MongoDBStorage<TypeContact> {
 			{ upsert: false },
 		);
 	}
+
+	static async markUnread(uuid: string) {
+		await ContactStorage.ensureIndexes();
+		return MongoDBStorage._update<TypeContact>(
+			ContactStorage.COLLECTION,
+			{ "data.uuid": uuid },
+			{
+				status: "new",
+				repliedAt: "",
+				replySubject: "",
+				replyMessage: "",
+			},
+			{ upsert: false },
+		);
+	}
 }
