@@ -48,6 +48,7 @@
 - Move user index initialization to boot and avoid ensureIndexes during signup.
 - Add community link to header navigation.
 - Add course classes with admin CRUD, class file uploads, and public class titles.
+- Add Stripe checkout flow with payment records and enrollment creation.
 - Add social proof model + storage, admin CRUD, public /api/social-proof endpoint, and homepage integration.
 - Improve contact email templates styling to match the dark/gold website theme and include the brand logo.
 

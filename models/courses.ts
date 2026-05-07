@@ -41,6 +41,7 @@ export const schemaCourse = z.object({
 export type TypeCourse = z.infer<typeof schemaCourse>;
 
 export const schemaPublicCourse = z.object({
+  uuid: z.string().uuid(),
   slug: z.string().trim(),
   title: z.string().trim(),
   category: z.string().trim(),
@@ -83,6 +84,7 @@ export function toPublicCourse(course: TypeCourse): TypePublicCourse {
   const parsedCourse = schemaCourse.parse(course);
 
   return schemaPublicCourse.parse({
+    uuid: parsedCourse.uuid ?? "",
     slug: parsedCourse.slug || slugify(parsedCourse.title),
     title: parsedCourse.title,
     category: parsedCourse.category,

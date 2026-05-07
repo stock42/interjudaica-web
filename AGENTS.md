@@ -37,6 +37,8 @@ The code currently reads:
 - `MONGODB_URL`, falling back to `MONGODB_URI`, then `MONGO_URI`, then `mongodb://localhost:27017`
 - `MONGODB_NAME`, falling back to `MONGODB_DATABASE`, then `MONGO_DB`, then `interjudaica`
 - `AUTH_SECRET`, falling back to `NEXTAUTH_SECRET`, then a local development secret
+- `STRIPE_SECRET_KEY`
+- `STRIPE_WEBHOOK_SECRET`
 - `VERIFY_RESEND_COOLDOWN_SECONDS` (default 30)
 - `VERIFY_RESEND_WINDOW_SECONDS` (default 600)
 - `VERIFY_RESEND_LIMIT` (default 3)
@@ -85,6 +87,7 @@ Collection names currently in use:
 - `course_classes`
 - `course_class_files`
 - `course_enrollments`
+- `course_payments`
 - `instructors`
 - `papers`
 - `paper_categories`
@@ -173,6 +176,8 @@ Public content endpoints:
 | `GET` | `/api/courses` | Lists published public courses as `{ items }`. |
 | `GET` | `/api/courses/[slug]/classes` | Lists classes for a published course as `{ items }`. |
 | `GET` | `/api/courses/classes/files/[fileUuid]` | Downloads a class file for enrolled students. |
+| `POST` | `/api/checkout` | Creates a Stripe checkout session for a course. |
+| `POST` | `/api/stripe/webhook` | Handles Stripe webhook events and enrolls students. |
 | `GET` | `/api/social-proof` | Lists published testimonials as `{ items }`. |
 
 Admin utility endpoints:

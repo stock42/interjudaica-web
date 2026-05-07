@@ -86,7 +86,7 @@ export default async function CoursePage({ params }: CoursePageProps) {
               </div>
             </div>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <ButtonLink href={course.stripePaymentLink}>
+              <ButtonLink href={`/checkout/${course.uuid}`}>
                 Buy course
               </ButtonLink>
               <ButtonLink href="/comunidad" tone="secondary">

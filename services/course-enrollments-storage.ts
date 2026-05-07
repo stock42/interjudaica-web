@@ -1,6 +1,6 @@
 import "server-only";
 
-import { type TypeCourseEnrollment } from "@/models/course-enrollments";
+import { CourseEnrollmentModel, type TypeCourseEnrollment } from "@/models/course-enrollments";
 import { MongoDBStorage } from "@/services/MongoDBStorage";
 
 export class CourseEnrollmentStorage extends MongoDBStorage<TypeCourseEnrollment> {
@@ -22,11 +22,24 @@ export class CourseEnrollmentStorage extends MongoDBStorage<TypeCourseEnrollment
 
 		await Promise.all([
 			collection.createIndex({ uuid: 1 }, { unique: true }),
-			collection.createIndex({ "data.courseUuid": 1, "data.userUuid": 1 }),
+			collection.createIndex(
+				{ "data.courseUuid": 1, "data.userUuid": 1 },
+				{ unique: true },
+			),
 			collection.createIndex({ "data.status": 1 }),
 		]);
 
 		CourseEnrollmentStorage.indexesReady = true;
+	}
+
+	static async create(input: Partial<TypeCourseEnrollment>) {
+		await CourseEnrollmentStorage.ensureIndexes();
+		const enrollment = new CourseEnrollmentModel(input as TypeCourseEnrollment);
+		await MongoDBStorage._insert<TypeCourseEnrollment>(
+			CourseEnrollmentStorage.COLLECTION,
+			enrollment,
+		);
+		return enrollment.getData();
 	}
 
 	static async isEnrolled(userUuid: string, courseUuid: string) {
