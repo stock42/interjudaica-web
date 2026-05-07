@@ -212,12 +212,22 @@ export function CourseForm({
             Slug is generated automatically from the title.
           </p>
         </div>
-        <Link
-          href="/admin/cursos"
-          className="inline-flex min-h-10 items-center justify-center rounded-full border border-[var(--line)] px-4 text-sm font-semibold transition hover:bg-[var(--paper)]"
-        >
-          Back to list
-        </Link>
+        <div className="flex flex-wrap gap-2">
+          {course?.uuid ? (
+            <Link
+              href={`/admin/classes/${course.uuid}`}
+              className="inline-flex min-h-10 items-center justify-center rounded-full border border-[var(--line)] px-4 text-sm font-semibold transition hover:bg-[var(--paper)]"
+            >
+              View classes
+            </Link>
+          ) : null}
+          <Link
+            href="/admin/cursos"
+            className="inline-flex min-h-10 items-center justify-center rounded-full border border-[var(--line)] px-4 text-sm font-semibold transition hover:bg-[var(--paper)]"
+          >
+            Back to list
+          </Link>
+        </div>
       </div>
 
       <form className="grid gap-4 md:grid-cols-2" onSubmit={handleSubmit}>

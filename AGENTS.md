@@ -82,6 +82,9 @@ Collection names currently in use:
 
 - `courses`
 - `course_categories`
+- `course_classes`
+- `course_class_files`
+- `course_enrollments`
 - `instructors`
 - `papers`
 - `paper_categories`
@@ -168,6 +171,8 @@ Public content endpoints:
 | Method | Path | Notes |
 | --- | --- | --- |
 | `GET` | `/api/courses` | Lists published public courses as `{ items }`. |
+| `GET` | `/api/courses/[slug]/classes` | Lists classes for a published course as `{ items }`. |
+| `GET` | `/api/courses/classes/files/[fileUuid]` | Downloads a class file for enrolled students. |
 | `GET` | `/api/social-proof` | Lists published testimonials as `{ items }`. |
 
 Admin utility endpoints:
@@ -176,6 +181,7 @@ Admin utility endpoints:
 | --- | --- | --- |
 | `GET` | `/api/admin/overview` | Requires operator auth; returns dashboard stat objects. |
 | `POST` | `/api/admin/uploads/course-image` | Requires operator auth; accepts `multipart/form-data` with `file` and optional `kind`; returns `{ url }`. |
+| `POST` | `/api/admin/uploads/class-image` | Requires operator auth; accepts `multipart/form-data` with `file`; returns `{ url }`. |
 | `POST` | `/api/admin/uploads/instructor-photo` | Requires operator auth; accepts `multipart/form-data` with `file`; returns `{ url }`. |
 
 Admin CRUD endpoints, all requiring operator auth:
@@ -184,6 +190,14 @@ Admin CRUD endpoints, all requiring operator auth:
 | --- | --- | --- |
 | `GET` | `/api/admin/course-categories` | Lists course categories as `{ items }`. |
 | `POST` | `/api/admin/course-categories` | Creates a course category and returns `{ item }`. |
+| `GET` | `/api/admin/classes` | Lists course classes by `courseUuid` as `{ items }`. |
+| `POST` | `/api/admin/classes` | Creates a course class and returns `{ item }`. |
+| `GET` | `/api/admin/classes/[uuid]` | Gets one course class by UUID. |
+| `PATCH` | `/api/admin/classes/[uuid]` | Updates one course class by UUID. |
+| `DELETE` | `/api/admin/classes/[uuid]` | Deletes one course class by UUID. |
+| `GET` | `/api/admin/classes/[uuid]/files` | Lists files for a class as `{ items }`. |
+| `POST` | `/api/admin/classes/[uuid]/files` | Uploads a file for a class and returns `{ item }`. |
+| `DELETE` | `/api/admin/classes/[uuid]/files/[fileUuid]` | Deletes a class file by UUID. |
 | `GET` | `/api/admin/course-categories/[uuid]` | Gets one course category by UUID. |
 | `PATCH` | `/api/admin/course-categories/[uuid]` | Updates one course category by UUID. |
 | `DELETE` | `/api/admin/course-categories/[uuid]` | Deletes one course category by UUID. |
@@ -323,6 +337,7 @@ Admin route map:
 - `/admin/usuarios`
 - `/admin/operators`, `/admin/operators/new`, `/admin/operators/[uuid]`
 - `/admin/cursos`, `/admin/cursos/new`, `/admin/cursos/[uuid]`
+- `/admin/classes/[courseUuid]`, `/admin/classes/[courseUuid]/new`, `/admin/classes/[courseUuid]/edit/[classUuid]`
 - `/admin/course-categories`, `/admin/course-categories/new`, `/admin/course-categories/[uuid]`
 - `/admin/instructors`, `/admin/instructors/new`, `/admin/instructors/[uuid]`
 - `/admin/papers`, `/admin/papers/new`, `/admin/papers/[uuid]`

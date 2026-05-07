@@ -10,6 +10,7 @@ import {
   SectionIntro,
 } from "@/app/components/portal-ui";
 import { getPublicCourseBySlug } from "@/app/lib/public-courses";
+import { listCourseClasses } from "@/app/lib/public-course-classes";
 import { formatUsd } from "@/app/lib/content";
 
 export const runtime = "nodejs";
@@ -37,7 +38,10 @@ export async function generateMetadata({
 
 export default async function CoursePage({ params }: CoursePageProps) {
   const { slug } = await params;
-  const course = await getPublicCourseBySlug(slug);
+  const [course, classes] = await Promise.all([
+    getPublicCourseBySlug(slug),
+    listCourseClasses(slug),
+  ]);
 
   if (!course) {
     notFound();
@@ -111,6 +115,32 @@ export default async function CoursePage({ params }: CoursePageProps) {
             />
             <InfoList items={course.outcomes} />
           </div>
+        </div>
+      </Section>
+
+      <Section tone="white">
+        <SectionIntro
+          eyebrow="Classes"
+          title="Class sessions"
+          text="Each class includes readings, recordings, and downloadable materials once you enroll."
+        />
+        <div className="rounded-lg border border-[var(--line)] bg-white p-5">
+          {classes.length ? (
+            <ul className="grid gap-3 text-sm text-[var(--muted)]">
+              {classes.map((item) => (
+                <li key={item.uuid} className="flex items-center gap-3">
+                  <span className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[var(--line)] text-xs font-semibold text-[var(--ink)]">
+                    {item.order + 1}
+                  </span>
+                  <span>{item.title}</span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-sm text-[var(--muted)]">
+              Classes will appear here once lessons are uploaded for this course.
+            </p>
+          )}
         </div>
       </Section>
     </PageShell>
