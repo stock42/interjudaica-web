@@ -25,6 +25,9 @@ export const schemaUser = z.object({
   emailVerifiedAt: z.string().trim().default(""),
   passwordResetCode: z.string().trim().default(""),
   passwordResetExpiresAt: z.string().trim().default(""),
+  passwordResetAttempts: z.coerce.number().int().min(0).default(0),
+  passwordResetAttemptsWindowStart: z.string().trim().default(""),
+  passwordResetLockedUntil: z.string().trim().default(""),
 });
 
 export const schemaUserSignup = z.object({
@@ -55,7 +58,10 @@ export type TypeSafeUser = Omit<
     "emailVerificationExpiresAt" |
     "emailVerifiedAt" |
     "passwordResetCode" |
-    "passwordResetExpiresAt"
+    "passwordResetExpiresAt" |
+    "passwordResetAttempts" |
+    "passwordResetAttemptsWindowStart" |
+    "passwordResetLockedUntil"
 > & {
   uuid: string;
 };

@@ -263,6 +263,9 @@ export class UserStorage extends MongoDBStorage<TypeUser> {
     await UserStorage.update(document.uuid, {
       passwordResetCode: resetCode,
       passwordResetExpiresAt: resetExpiresAt,
+      passwordResetAttempts: 0,
+      passwordResetAttemptsWindowStart: "",
+      passwordResetLockedUntil: "",
     });
 
     return {
@@ -282,17 +285,52 @@ export class UserStorage extends MongoDBStorage<TypeUser> {
     }
 
     const { data } = document;
+    const now = Date.now();
+    const lockUntil = data.passwordResetLockedUntil
+      ? Date.parse(data.passwordResetLockedUntil)
+      : 0;
+
+    if (lockUntil && lockUntil > now) {
+      return { ok: false, error: "Too many attempts. Try again later." } as const;
+    }
+
     if (!data.passwordResetCode || !data.passwordResetExpiresAt) {
       return { ok: false, error: "Reset code expired" } as const;
     }
 
+    if (Date.parse(data.passwordResetExpiresAt) < now) {
+      return { ok: false, error: "Reset code expired" } as const;
+    }
+
+    const windowStart = data.passwordResetAttemptsWindowStart
+      ? Date.parse(data.passwordResetAttemptsWindowStart)
+      : 0;
+    const withinWindow = windowStart && now - windowStart <= UserStorage.getResetAttemptWindowMs();
+    const attempts = withinWindow ? data.passwordResetAttempts : 0;
+
     if (data.passwordResetCode !== code) {
+      const nextAttempts = attempts + 1;
+      const lockSeconds = UserStorage.getResetAttemptLockSeconds();
+      const shouldLock = nextAttempts >= UserStorage.getResetAttemptLimit();
+
+      await UserStorage.update(document.uuid, {
+        passwordResetAttempts: nextAttempts,
+        passwordResetAttemptsWindowStart: withinWindow
+          ? data.passwordResetAttemptsWindowStart
+          : new Date(now).toISOString(),
+        passwordResetLockedUntil: shouldLock
+          ? new Date(now + lockSeconds * 1000).toISOString()
+          : data.passwordResetLockedUntil,
+      });
+
       return { ok: false, error: "Invalid email or code" } as const;
     }
 
-    if (Date.parse(data.passwordResetExpiresAt) < Date.now()) {
-      return { ok: false, error: "Reset code expired" } as const;
-    }
+    await UserStorage.update(document.uuid, {
+      passwordResetAttempts: 0,
+      passwordResetAttemptsWindowStart: "",
+      passwordResetLockedUntil: "",
+    });
 
     return { ok: true, user: document } as const;
   }
@@ -315,6 +353,9 @@ export class UserStorage extends MongoDBStorage<TypeUser> {
       password: userModel.getData().password,
       passwordResetCode: "",
       passwordResetExpiresAt: "",
+      passwordResetAttempts: 0,
+      passwordResetAttemptsWindowStart: "",
+      passwordResetLockedUntil: "",
     });
 
     return { ok: true, user: UserStorage.toSafeUser(result.user) } as const;
@@ -332,5 +373,18 @@ export class UserStorage extends MongoDBStorage<TypeUser> {
   private static getResetExpiry() {
     const expiresAt = new Date(Date.now() + 1000 * 60 * 15);
     return expiresAt.toISOString();
+  }
+
+  private static getResetAttemptLimit() {
+    return Number(process.env.RESET_ATTEMPT_LIMIT ?? "5");
+  }
+
+  private static getResetAttemptWindowMs() {
+    const seconds = Number(process.env.RESET_ATTEMPT_WINDOW_SECONDS ?? "900");
+    return seconds * 1000;
+  }
+
+  private static getResetAttemptLockSeconds() {
+    return Number(process.env.RESET_ATTEMPT_LOCK_SECONDS ?? "900");
   }
 }

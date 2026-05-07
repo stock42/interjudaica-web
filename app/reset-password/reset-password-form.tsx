@@ -57,6 +57,13 @@ export default function ResetPasswordForm() {
 		const formData = new FormData(form);
 		const code = String(formData.get("code") ?? "");
 		const password = String(formData.get("password") ?? "");
+		const confirmPassword = String(formData.get("confirmPassword") ?? "");
+
+		if (password !== confirmPassword) {
+			setError("Passwords do not match.");
+			setStatus("idle");
+			return;
+		}
 
 		try {
 			const response = await fetch("/api/user-auth/reset-password", {
@@ -163,6 +170,18 @@ export default function ResetPasswordForm() {
 				<Input
 					id="password"
 					name="password"
+					type="password"
+					autoComplete="new-password"
+					required
+					minLength={8}
+				/>
+			</div>
+
+			<div className="grid gap-2">
+				<Label htmlFor="confirmPassword">Confirm new password</Label>
+				<Input
+					id="confirmPassword"
+					name="confirmPassword"
 					type="password"
 					autoComplete="new-password"
 					required

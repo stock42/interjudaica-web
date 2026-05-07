@@ -14,7 +14,12 @@ const schemaResend = z.object({
 const RESEND_COOLDOWN_SECONDS = Number(
 	process.env.RESET_RESEND_COOLDOWN_SECONDS ?? "30",
 );
+const RESEND_WINDOW_SECONDS = Number(
+	process.env.RESET_RESEND_WINDOW_SECONDS ?? "600",
+);
+const RESEND_LIMIT = Number(process.env.RESET_RESEND_LIMIT ?? "5");
 const resendCooldowns = new Map<string, number>();
+const resendWindows = new Map<string, { count: number; start: number }>();
 
 function getCooldownKey(email: string, ip: string | null) {
 	return `${email}:${ip ?? "unknown"}`;
@@ -38,6 +43,22 @@ export async function POST(request: NextRequest) {
 				},
 				{ status: 429 },
 			);
+		}
+
+		const window = resendWindows.get(key);
+		if (window && now - window.start < RESEND_WINDOW_SECONDS * 1000) {
+			if (window.count >= RESEND_LIMIT) {
+				return NextResponse.json(
+					{
+						error: "Too many requests",
+						retryAfter: RESEND_WINDOW_SECONDS,
+					},
+					{ status: 429 },
+				);
+			}
+			window.count += 1;
+		} else {
+			resendWindows.set(key, { count: 1, start: now });
 		}
 
 		resendCooldowns.set(key, now + RESEND_COOLDOWN_SECONDS * 1000);
