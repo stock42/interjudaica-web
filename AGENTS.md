@@ -159,9 +159,9 @@ Student/user auth endpoints:
 | `POST` | `/api/user-auth/login` | Authenticates a student user, sets `interjudaica_user_session`, returns `{ user }`. |
 | `POST` | `/api/user-auth/logout` | Clears `interjudaica_user_session` and redirects to `/login`. |
 | `GET` | `/api/user-auth/me` | Returns current student user or `401` with `{ user: null }`. |
-| `POST` | `/api/user-auth/verify` | Verifies email with a 6-digit code and activates the user. |
+| `POST` | `/api/user-auth/verify` | Verifies email with a 6-digit code, activates the user, and sends a welcome email. |
 | `POST` | `/api/user-auth/resend-verify` | Resends the 6-digit verification code email. |
-| `POST` | `/api/user-auth/register` | Registers a student, sends verification + welcome email. |
+| `POST` | `/api/user-auth/register` | Registers a student and sends verification email. |
 
 Operator/auth endpoints:
 

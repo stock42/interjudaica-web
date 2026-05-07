@@ -8,6 +8,7 @@ import {
 } from "@/services/user-auth";
 import { UserStorage } from "@/services/users-storage";
 import { readJson, routeError } from "@/app/api/_lib/admin-api";
+import { sendWelcomeEmail } from "@/lib/send-welcome-email";
 
 export const runtime = "nodejs";
 
@@ -34,6 +35,11 @@ export async function POST(request: NextRequest) {
 			createUserSessionToken(result.user),
 			userSessionCookieOptions(),
 		);
+
+		await sendWelcomeEmail({
+			email: result.user.email,
+			firstName: result.user.firstName,
+		});
 
 		return response;
 	} catch (error) {
