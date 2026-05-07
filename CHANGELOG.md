@@ -53,6 +53,7 @@
 - Save contact messages and add admin replies from the backoffice.
 - Add contact filters, mark-unread, and reply attachments.
 - Send welcome email after student email verification and payment confirmation after checkout.
+- Add OTP-based password reset flow with resend and confirmation email.
 - Add social proof model + storage, admin CRUD, public /api/social-proof endpoint, and homepage integration.
 - Improve contact email templates styling to match the dark/gold website theme and include the brand logo.
 

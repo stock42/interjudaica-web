@@ -30,9 +30,20 @@ export default function ResetPasswordForm() {
     }
 
     try {
-      // TODO: wire token + endpoint when backend is ready.
-      // Suggested endpoint: POST /api/user-auth/reset-password
-      await new Promise((resolve) => setTimeout(resolve, 300));
+      const response = await fetch("/api/user-auth/reset-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: "",
+          code: "",
+          password,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Request failed");
+      }
+
       form.reset();
       setStatus("sent");
     } catch {

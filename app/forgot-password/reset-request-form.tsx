@@ -35,6 +35,7 @@ export default function ForgotPasswordForm() {
 
       form.reset();
       setStatus("sent");
+      window.location.assign(`/reset-password?email=${encodeURIComponent(payload.email)}`);
     } catch {
       setStatus("error");
     }
@@ -50,7 +51,7 @@ export default function ForgotPasswordForm() {
           Check your inbox
         </h2>
         <p className="mt-3 text-sm leading-6 text-[var(--muted)]">
-          If an account exists for that email, you will receive a reset link
+          If an account exists for that email, you will receive a 6-digit code
           shortly.
         </p>
       </div>
@@ -72,19 +73,13 @@ export default function ForgotPasswordForm() {
       </div>
 
       <Button type="submit" disabled={status === "sending"}>
-        {status === "sending" ? "Sending…" : "Send reset link"}
+        {status === "sending" ? "Sending…" : "Send code"}
       </Button>
 
       {status === "error" ? (
         <p className="text-sm font-semibold text-[var(--sumac)]">
           Unable to send reset email.
         </p>
-      ) : null}
-
-      <p className="text-xs text-[var(--muted)]">
-        Note: this endpoint is pending. If it is not implemented yet, this page
-        should be wired once backend is ready.
-      </p>
-    </form>
+      ) : null}    </form>
   );
 }

@@ -112,6 +112,8 @@ export class UserStorage extends MongoDBStorage<TypeUser> {
       emailVerificationCode: verificationCode,
       emailVerificationExpiresAt: verificationExpiresAt,
       emailVerifiedAt: "",
+      passwordResetCode: "",
+      passwordResetExpiresAt: "",
     });
 
     await user.setPassword(input.password);
@@ -247,12 +249,88 @@ export class UserStorage extends MongoDBStorage<TypeUser> {
     return UserStorage.toSafeUser(document);
   }
 
+  static async createPasswordResetCode(email: string) {
+    await UserStorage.ensureIndexes();
+    const document = await UserStorage.findByEmail(email);
+
+    if (!document || document.data.status !== "active") {
+      return { ok: false } as const;
+    }
+
+    const resetCode = UserStorage.generateVerificationCode();
+    const resetExpiresAt = UserStorage.getResetExpiry();
+
+    await UserStorage.update(document.uuid, {
+      passwordResetCode: resetCode,
+      passwordResetExpiresAt: resetExpiresAt,
+    });
+
+    return {
+      ok: true,
+      email: document.data.email,
+      firstName: document.data.firstName,
+      code: resetCode,
+    } as const;
+  }
+
+  static async verifyPasswordResetCode(email: string, code: string) {
+    await UserStorage.ensureIndexes();
+    const document = await UserStorage.findByEmail(email);
+
+    if (!document || document.data.status !== "active") {
+      return { ok: false, error: "Invalid email or code" } as const;
+    }
+
+    const { data } = document;
+    if (!data.passwordResetCode || !data.passwordResetExpiresAt) {
+      return { ok: false, error: "Reset code expired" } as const;
+    }
+
+    if (data.passwordResetCode !== code) {
+      return { ok: false, error: "Invalid email or code" } as const;
+    }
+
+    if (Date.parse(data.passwordResetExpiresAt) < Date.now()) {
+      return { ok: false, error: "Reset code expired" } as const;
+    }
+
+    return { ok: true, user: document } as const;
+  }
+
+  static async resetPasswordWithCode(
+    email: string,
+    code: string,
+    newPassword: string,
+  ) {
+    const result = await UserStorage.verifyPasswordResetCode(email, code);
+
+    if (!result.ok) {
+      return result;
+    }
+
+    const userModel = new UserModel(result.user.data);
+    await userModel.setPassword(newPassword);
+
+    await UserStorage.update(result.user.uuid, {
+      password: userModel.getData().password,
+      passwordResetCode: "",
+      passwordResetExpiresAt: "",
+    });
+
+    return { ok: true, user: UserStorage.toSafeUser(result.user) } as const;
+  }
+
   private static generateVerificationCode() {
     return Math.floor(100000 + Math.random() * 900000).toString();
   }
 
   private static getVerificationExpiry() {
     const expiresAt = new Date(Date.now() + 1000 * 60 * 20);
+    return expiresAt.toISOString();
+  }
+
+  private static getResetExpiry() {
+    const expiresAt = new Date(Date.now() + 1000 * 60 * 15);
     return expiresAt.toISOString();
   }
 }

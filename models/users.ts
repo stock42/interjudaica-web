@@ -23,6 +23,8 @@ export const schemaUser = z.object({
   emailVerificationCode: z.string().trim().default(""),
   emailVerificationExpiresAt: z.string().trim().default(""),
   emailVerifiedAt: z.string().trim().default(""),
+  passwordResetCode: z.string().trim().default(""),
+  passwordResetExpiresAt: z.string().trim().default(""),
 });
 
 export const schemaUserSignup = z.object({
@@ -47,7 +49,13 @@ export type TypeUserSignup = z.infer<typeof schemaUserSignup>;
 export type TypeUserSignin = z.infer<typeof schemaUserSignin>;
 export type TypeSafeUser = Omit<
   TypeUser,
-  "password" | "uuid" | "emailVerificationCode" | "emailVerificationExpiresAt" | "emailVerifiedAt"
+  "password" |
+    "uuid" |
+    "emailVerificationCode" |
+    "emailVerificationExpiresAt" |
+    "emailVerifiedAt" |
+    "passwordResetCode" |
+    "passwordResetExpiresAt"
 > & {
   uuid: string;
 };

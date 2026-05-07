@@ -13,7 +13,7 @@ export default function ForgotPasswordPage() {
   return (
     <AuthPanel
       title="Reset your password"
-      text="Enter the email connected to your InterJudaica account and continue from the reset link sent to your inbox."
+      text="Enter the email connected to your InterJudaica account and we will send a 6-digit code."
     >
       <ForgotPasswordForm />
       <Link
