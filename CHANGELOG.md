@@ -46,6 +46,7 @@
 - Add OTP email verification for student signup (model, API, UI, resend flow, IP+email rate limits, and email template).
 - Guard duplicate signup by email and ignore existing user text index conflicts.
 - Move user index initialization to boot and avoid ensureIndexes during signup.
+- Add community link to header navigation.
 - Add social proof model + storage, admin CRUD, public /api/social-proof endpoint, and homepage integration.
 - Improve contact email templates styling to match the dark/gold website theme and include the brand logo.
 
