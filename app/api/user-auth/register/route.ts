@@ -9,6 +9,15 @@ export const runtime = "nodejs";
 export async function POST(request: NextRequest) {
   try {
     const payload = schemaUserSignup.parse(await readJson(request));
+    const existing = await UserStorage.findByEmail(payload.email);
+
+    if (existing) {
+      return NextResponse.json(
+        { error: "Email already registered" },
+        { status: 409 },
+      );
+    }
+
     const { user, verificationCode } = await UserStorage.register(payload);
 
     await sendVerificationEmail({

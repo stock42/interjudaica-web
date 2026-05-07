@@ -44,15 +44,29 @@ export class UserStorage extends MongoDBStorage<TypeUser> {
       collection.createIndex({ uuid: 1 }, { unique: true }),
       collection.createIndex({ "data.email": 1 }, { unique: true }),
       collection.createIndex({ "data.status": 1, "data.communityStatus": 1 }),
-      collection.createIndex({
+    ]);
+
+    try {
+      await collection.createIndex({
         "data.email": "text",
         "data.firstName": "text",
         "data.lastName": "text",
         "data.country": "text",
         "data.state": "text",
         "data.city": "text",
-      }),
-    ]);
+      });
+    } catch (error) {
+      if (
+        typeof error === "object" &&
+        error !== null &&
+        "code" in error &&
+        error.code === 85
+      ) {
+        // Ignore index option conflicts (existing text index)
+      } else {
+        throw error;
+      }
+    }
 
     UserStorage.indexesReady = true;
   }
