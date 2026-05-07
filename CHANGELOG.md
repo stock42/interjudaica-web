@@ -52,6 +52,7 @@
 - Add checkout success/cancel messaging and handle expired sessions.
 - Save contact messages and add admin replies from the backoffice.
 - Add contact filters, mark-unread, and reply attachments.
+- Send welcome email on student registration and payment confirmation after checkout.
 - Add social proof model + storage, admin CRUD, public /api/social-proof endpoint, and homepage integration.
 - Improve contact email templates styling to match the dark/gold website theme and include the brand logo.
 

@@ -3,7 +3,11 @@ import Stripe from "stripe";
 
 import { CourseEnrollmentStorage } from "@/services/course-enrollments-storage";
 import { CoursePaymentStorage } from "@/services/course-payments-storage";
+import { CourseStorage } from "@/services/courses-storage";
+import { UserStorage } from "@/services/users-storage";
 import { getStripe } from "@/lib/stripe";
+import { sendCoursePaymentConfirmation } from "@/lib/send-course-payment-confirmation";
+import { formatUsd } from "@/app/lib/content";
 
 export const runtime = "nodejs";
 
@@ -56,6 +60,20 @@ export async function POST(request: Request) {
 				});
 			} catch {
 				// ignore duplicate enrollment
+			}
+
+			const [course, user] = await Promise.all([
+				CourseStorage.get(courseUuid),
+				UserStorage.get(userUuid),
+			]);
+
+			if (course && user) {
+				await sendCoursePaymentConfirmation({
+					email: user.email,
+					firstName: user.firstName,
+					courseTitle: course.title,
+					priceLabel: formatUsd(course.price),
+				});
 			}
 		}
 	}

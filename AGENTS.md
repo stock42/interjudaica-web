@@ -161,6 +161,7 @@ Student/user auth endpoints:
 | `GET` | `/api/user-auth/me` | Returns current student user or `401` with `{ user: null }`. |
 | `POST` | `/api/user-auth/verify` | Verifies email with a 6-digit code and activates the user. |
 | `POST` | `/api/user-auth/resend-verify` | Resends the 6-digit verification code email. |
+| `POST` | `/api/user-auth/register` | Registers a student, sends verification + welcome email. |
 
 Operator/auth endpoints:
 
