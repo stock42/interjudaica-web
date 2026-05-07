@@ -101,7 +101,6 @@ export class UserStorage extends MongoDBStorage<TypeUser> {
   }
 
   static async register(input: TypeUserSignup) {
-    await UserStorage.ensureIndexes();
     const verificationCode = UserStorage.generateVerificationCode();
     const verificationExpiresAt = UserStorage.getVerificationExpiry();
     const user = new UserModel({
@@ -152,8 +151,6 @@ export class UserStorage extends MongoDBStorage<TypeUser> {
   }
 
   static async findByEmail(email: string) {
-    await UserStorage.ensureIndexes();
-
     return MongoDBStorage._findOne<TypeUser>(UserStorage.COLLECTION, {
       "data.email": email.toLowerCase(),
     });
