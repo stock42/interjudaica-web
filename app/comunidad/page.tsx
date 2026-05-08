@@ -31,7 +31,7 @@ export default function CommunityPage() {
               course discounts, and early access to new cohorts.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <ButtonLink href="#" tone="dark">
+              <ButtonLink href="/checkout-community" tone="dark">
                 Subscribe
               </ButtonLink>
               <ButtonLink

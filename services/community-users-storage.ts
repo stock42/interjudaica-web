@@ -1,0 +1,61 @@
+import "server-only";
+
+import { CommunityUserModel, type TypeCommunityUser } from "@/models/community-users";
+import { MongoDBStorage } from "@/services/MongoDBStorage";
+
+export class CommunityUserStorage extends MongoDBStorage<TypeCommunityUser> {
+	static readonly COLLECTION = "community_users";
+	private static indexesReady = false;
+
+	constructor() {
+		super(CommunityUserStorage.COLLECTION);
+	}
+
+	static async ensureIndexes() {
+		if (CommunityUserStorage.indexesReady) {
+			return;
+		}
+
+		const collection = await MongoDBStorage.getCollection<TypeCommunityUser>(
+			CommunityUserStorage.COLLECTION,
+		);
+
+		await Promise.all([
+			collection.createIndex({ uuid: 1 }, { unique: true }),
+			collection.createIndex({ "data.userUuid": 1 }, { unique: true }),
+			collection.createIndex({ "data.status": 1 }),
+		]);
+
+		CommunityUserStorage.indexesReady = true;
+	}
+
+	static async upsertActive(input: Partial<TypeCommunityUser>) {
+		await CommunityUserStorage.ensureIndexes();
+		const existing = await MongoDBStorage._findOne<TypeCommunityUser>(
+			CommunityUserStorage.COLLECTION,
+			{ "data.userUuid": input.userUuid },
+		);
+
+		const user = new CommunityUserModel({
+			status: "active",
+			subscribedAt: new Date().toISOString(),
+			...existing?.data,
+			...input,
+		} as TypeCommunityUser);
+
+		if (existing?.uuid) {
+			await MongoDBStorage._replaceData<TypeCommunityUser>(
+				CommunityUserStorage.COLLECTION,
+				existing.uuid,
+				user.getData(),
+			);
+		} else {
+			await MongoDBStorage._insert<TypeCommunityUser>(
+				CommunityUserStorage.COLLECTION,
+				user,
+			);
+		}
+
+		return user.getData();
+	}
+}

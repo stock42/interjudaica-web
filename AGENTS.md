@@ -98,6 +98,7 @@ Collection names currently in use:
 - `contacts`
 - `password_reset_attempts`
 - `rabbi_bio`
+- `community_users`
 - `instructors`
 - `papers`
 - `paper_categories`
@@ -192,6 +193,7 @@ Public content endpoints:
 | `POST` | `/api/checkout` | Creates a Stripe checkout session for a course. |
 | `POST` | `/api/stripe/webhook` | Handles Stripe webhook events and enrolls students. |
 | `POST` | `/api/contact` | Saves a contact message and sends emails. |
+| `POST` | `/api/community/checkout` | Creates a Stripe checkout session for community membership. |
 | `GET` | `/api/rabbi-bio` | Returns the public rabbi bio. |
 | `GET` | `/api/social-proof` | Lists published testimonials as `{ items }`. |
 
@@ -356,6 +358,7 @@ Public route map:
 - `/forgot-password`
 - `/reset-password`
 - `/reset-password/[token]` (redirects)
+- `/checkout-community`
 - `/ernesto-yattah`
 - `/verify-email`
 - `/operator-login`

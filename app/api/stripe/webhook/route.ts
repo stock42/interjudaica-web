@@ -4,6 +4,7 @@ import Stripe from "stripe";
 import { CourseEnrollmentStorage } from "@/services/course-enrollments-storage";
 import { CoursePaymentStorage } from "@/services/course-payments-storage";
 import { CourseStorage } from "@/services/courses-storage";
+import { CommunityUserStorage } from "@/services/community-users-storage";
 import { UserStorage } from "@/services/users-storage";
 import { getStripe } from "@/lib/stripe";
 import { sendCoursePaymentConfirmation } from "@/lib/send-course-payment-confirmation";
@@ -43,6 +44,23 @@ export async function POST(request: Request) {
 		const session = event.data.object as Stripe.Checkout.Session;
 		const courseUuid = session.metadata?.courseUuid;
 		const userUuid = session.metadata?.userUuid;
+		const isCommunity = session.metadata?.community === "true";
+
+		if (isCommunity && userUuid) {
+			const user = await UserStorage.get(userUuid);
+
+			if (user) {
+				await CommunityUserStorage.upsertActive({
+					userUuid: user.uuid,
+					stripeCustomerId: String(session.customer ?? ""),
+					stripeSubscriptionId: String(session.subscription ?? ""),
+				});
+
+				await UserStorage.update(user.uuid, {
+					communityStatus: "active",
+				});
+			}
+		}
 
 		if (courseUuid && userUuid) {
 			await CoursePaymentStorage.updateBySession(session.id, {
