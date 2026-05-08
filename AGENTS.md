@@ -97,6 +97,7 @@ Collection names currently in use:
 - `course_payments`
 - `contacts`
 - `password_reset_attempts`
+- `rabbi_bio`
 - `instructors`
 - `papers`
 - `paper_categories`
@@ -191,6 +192,7 @@ Public content endpoints:
 | `POST` | `/api/checkout` | Creates a Stripe checkout session for a course. |
 | `POST` | `/api/stripe/webhook` | Handles Stripe webhook events and enrolls students. |
 | `POST` | `/api/contact` | Saves a contact message and sends emails. |
+| `GET` | `/api/rabbi-bio` | Returns the public rabbi bio. |
 | `GET` | `/api/social-proof` | Lists published testimonials as `{ items }`. |
 
 Admin utility endpoints:
@@ -205,6 +207,8 @@ Admin utility endpoints:
 | `POST` | `/api/admin/contacts/[uuid]/reply` | Sends a reply email (supports attachments) and marks as replied. |
 | `POST` | `/api/admin/contacts/[uuid]/mark-unread` | Marks a contact as new. |
 | `GET` | `/api/admin/password-resets` | Lists password reset attempts as `{ items }`. |
+| `GET` | `/api/admin/rabbi-bio` | Returns the current rabbi bio. |
+| `PUT` | `/api/admin/rabbi-bio` | Updates the rabbi bio content. |
 | `POST` | `/api/admin/uploads/instructor-photo` | Requires operator auth; accepts `multipart/form-data` with `file`; returns `{ url }`. |
 
 Admin CRUD endpoints, all requiring operator auth:
@@ -352,6 +356,7 @@ Public route map:
 - `/forgot-password`
 - `/reset-password`
 - `/reset-password/[token]` (redirects)
+- `/ernesto-yattah`
 - `/verify-email`
 - `/operator-login`
 
@@ -364,6 +369,7 @@ Admin route map:
 - `/admin/classes/[courseUuid]`, `/admin/classes/[courseUuid]/new`, `/admin/classes/[courseUuid]/edit/[classUuid]`
 - `/admin/contacts`, `/admin/contacts/[uuid]`
 - `/admin/password-resets`
+- `/admin/rabbi-bio`
 - `/admin/course-categories`, `/admin/course-categories/new`, `/admin/course-categories/[uuid]`
 - `/admin/instructors`, `/admin/instructors/new`, `/admin/instructors/[uuid]`
 - `/admin/papers`, `/admin/papers/new`, `/admin/papers/[uuid]`

@@ -578,6 +578,7 @@ export function AdminShell({
     { href: "/admin/social-proof", label: "Social proof" },
     { href: "/admin/foro", label: "Forum" },
     { href: "/admin/analytics", label: "Analytics" },
+    { href: "/admin/rabbi-bio", label: "Rabbi bio" },
   ];
 
   return (
