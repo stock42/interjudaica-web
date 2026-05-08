@@ -11,6 +11,7 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  allowedDevOrigins: ['interjudaica.com'],
 };
 
 console.info(JSON.stringify(nextConfig))
