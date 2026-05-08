@@ -51,6 +51,12 @@ export async function POST() {
 			community: "true",
 			userUuid: user.uuid,
 		},
+		subscription_data: {
+			metadata: {
+				community: "true",
+				userUuid: user.uuid,
+			},
+		},
 	});
 
 	return NextResponse.json({ url: session.url });

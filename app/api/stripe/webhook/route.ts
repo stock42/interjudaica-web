@@ -103,5 +103,16 @@ export async function POST(request: Request) {
 		});
 	}
 
+	if (event.type === "customer.subscription.deleted") {
+		const subscription = event.data.object as Stripe.Subscription;
+		const userUuid = subscription.metadata?.userUuid;
+
+		await CommunityUserStorage.markCancelledBySubscription(subscription.id);
+
+		if (userUuid) {
+			await UserStorage.update(userUuid, { communityStatus: "cancelled" });
+		}
+	}
+
 	return NextResponse.json({ received: true });
 }
