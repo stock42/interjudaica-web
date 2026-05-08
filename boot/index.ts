@@ -8,6 +8,7 @@ import { ContactStorage } from "@/services/contacts-storage";
 import { PasswordResetAttemptStorage } from "@/services/password-reset-attempts-storage";
 import { RabbiBioStorage } from "@/services/rabbi-bio-storage";
 import { CommunityUserStorage } from "@/services/community-users-storage";
+import { ForumStorage } from "@/services/forums-storage";
 
 export async function Boot() {
   await UserStorage.ensureIndexes();
@@ -19,5 +20,6 @@ export async function Boot() {
   await PasswordResetAttemptStorage.ensureIndexes();
   await RabbiBioStorage.ensureIndexes();
   await CommunityUserStorage.ensureIndexes();
+  await ForumStorage.ensureSystemThreads();
   await OperatorStorage.ensureDefaultOperator();
 }

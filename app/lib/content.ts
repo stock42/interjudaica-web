@@ -43,6 +43,7 @@ export const navItems = [
   { href: "/", label: "Home" },
   { href: "/cursos", label: "Courses" },
   { href: "/comunidad", label: "Community" },
+  { href: "/forum", label: "Forum" },
   { href: "/#about-rabbi", label: "About Rabbi" },
   { href: "/contact", label: "Contact" },
 ];

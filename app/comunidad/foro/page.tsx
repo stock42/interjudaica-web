@@ -1,11 +1,15 @@
 import type { Metadata } from "next";
+import Image from "next/image";
+import { redirect } from "next/navigation";
 import {
   ButtonLink,
   PageShell,
   Section,
   SectionIntro,
 } from "@/app/components/portal-ui";
-import { forumThreads } from "@/app/lib/content";
+import { listForumThreads } from "@/app/lib/forums";
+import { getCurrentUser } from "@/services/user-auth";
+import { CommunityThreadForm } from "@/app/comunidad/foro/forum-form";
 
 export const metadata: Metadata = {
   title: "Community Forum",
@@ -13,7 +17,19 @@ export const metadata: Metadata = {
     "Private InterJudaica community forum for member discussions and Rabbi Yattah papers.",
 };
 
-export default function CommunityForumPage() {
+export default async function CommunityForumPage() {
+  const user = await getCurrentUser();
+
+  if (!user) {
+    redirect("/login?next=/comunidad/foro");
+  }
+
+  if (user.communityStatus !== "active") {
+    redirect("/comunidad");
+  }
+
+  const threads = await listForumThreads({ area: "Community Forum" });
+
   return (
     <PageShell>
       <Section tone="transparent">
@@ -28,7 +44,8 @@ export default function CommunityForumPage() {
           }
         />
         <div className="grid gap-4">
-          {forumThreads.map((thread) => (
+          <CommunityThreadForm />
+          {threads.map((thread) => (
             <article
               key={thread.title}
               className="rounded-lg border border-[var(--line)] bg-white p-5"
@@ -44,22 +61,31 @@ export default function CommunityForumPage() {
                 </div>
                 <div className="flex gap-3 text-sm">
                   <span className="rounded-full bg-[var(--paper)] px-3 py-1">
-                    {thread.replies} replies
+                    {thread.repliesCount ?? 0} replies
                   </span>
                   <span className="rounded-full bg-[rgba(22,74,159,0.1)] px-3 py-1 text-[var(--sapphire)]">
-                    {thread.unread} unread
+                    {thread.unreadCount ?? 0} unread
                   </span>
                 </div>
               </div>
               <div className="mt-5 grid gap-3 border-l border-[var(--line)] pl-4">
                 <p className="text-sm leading-6 text-[var(--muted)]">
-                  Rachel B.: I am trying to connect the paper&apos;s argument to
-                  last week&apos;s class on prayer language.
+                  {thread.content || ""}
                 </p>
-                <p className="text-sm leading-6 text-[var(--muted)]">
-                  Rabbi Yattah: Start with the repeated phrase and ask what
-                  habit it trains before asking what idea it proves.
-                </p>
+                {thread.imageUrls?.length ? (
+                  <div className="grid gap-2">
+                    {thread.imageUrls.map((url) => (
+                      <Image
+                        key={url}
+                        src={url}
+                        alt="Thread attachment"
+                        width={960}
+                        height={540}
+                        className="max-w-full rounded-lg border border-[var(--line)]"
+                      />
+                    ))}
+                  </div>
+                ) : null}
               </div>
             </article>
           ))}

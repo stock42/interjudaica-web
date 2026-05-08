@@ -194,6 +194,9 @@ Public content endpoints:
 | `POST` | `/api/stripe/webhook` | Handles Stripe webhook events and enrolls students. |
 | `POST` | `/api/contact` | Saves a contact message and sends emails. |
 | `POST` | `/api/community/checkout` | Creates a Stripe checkout session for community membership. |
+| `GET` | `/api/forums` | Lists forum threads by area/course.
+| `POST` | `/api/forums` | Creates a forum thread (student).
+| `POST` | `/api/forums/upload-image` | Uploads an image for a forum thread.
 | `GET` | `/api/rabbi-bio` | Returns the public rabbi bio. |
 | `GET` | `/api/social-proof` | Lists published testimonials as `{ items }`. |
 
@@ -212,6 +215,7 @@ Admin utility endpoints:
 | `GET` | `/api/admin/rabbi-bio` | Returns the current rabbi bio. |
 | `PUT` | `/api/admin/rabbi-bio` | Updates the rabbi bio content. |
 | `POST` | `/api/admin/uploads/instructor-photo` | Requires operator auth; accepts `multipart/form-data` with `file`; returns `{ url }`. |
+| `POST` | `/api/admin/uploads/forum-asset` | Requires operator auth; accepts `multipart/form-data` with `file`; returns `{ url }`. |
 
 Admin CRUD endpoints, all requiring operator auth:
 
@@ -360,6 +364,7 @@ Public route map:
 - `/reset-password/[token]` (redirects)
 - `/checkout-community`
 - `/ernesto-yattah`
+- `/forum`
 - `/verify-email`
 - `/operator-login`
 

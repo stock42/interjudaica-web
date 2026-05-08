@@ -25,7 +25,10 @@ export async function POST(request: NextRequest) {
 
   try {
     const payload = schemaForumThread.parse(await readJson(request));
-    const item = await ForumStorage.create(payload);
+    const item = await ForumStorage.create({
+      ...payload,
+      createdBy: "rabbi",
+    });
     return NextResponse.json({ item }, { status: 201 });
   } catch (error) {
     return routeError(error);

@@ -1,6 +1,7 @@
 import "server-only";
 
 import { ForumThreadModel, type TypeForumThread } from "@/models/forums";
+import { slugify } from "@/models/model-utils";
 import { MongoDBStorage } from "@/services/MongoDBStorage";
 
 export class ForumStorage extends MongoDBStorage<TypeForumThread> {
@@ -24,6 +25,9 @@ export class ForumStorage extends MongoDBStorage<TypeForumThread> {
       collection.createIndex({ uuid: 1 }, { unique: true }),
       collection.createIndex({ "data.slug": 1 }, { unique: true }),
       collection.createIndex({ "data.status": 1, "data.featured": 1 }),
+      collection.createIndex({ "data.area": 1, _added: -1 }),
+      collection.createIndex({ "data.courseSlug": 1, _added: -1 }),
+      collection.createIndex({ "data.paperUuid": 1 }),
       collection.createIndex({ "data.title": "text", "data.area": "text" }),
     ]);
 
@@ -40,6 +44,83 @@ export class ForumStorage extends MongoDBStorage<TypeForumThread> {
     );
 
     return docs.map((doc) => doc.data);
+  }
+
+  static async listByFilter({
+    area,
+    courseSlug,
+  }: {
+    area?: string;
+    courseSlug?: string;
+  }) {
+    await ForumStorage.ensureIndexes();
+    const filter: Record<string, string> = {};
+    if (area) {
+      filter["data.area"] = area;
+    }
+    if (courseSlug) {
+      filter["data.courseSlug"] = courseSlug;
+    }
+
+    const docs = await MongoDBStorage._find<TypeForumThread>(
+      ForumStorage.COLLECTION,
+      filter,
+      undefined,
+      { _added: -1 },
+    );
+
+    return docs.map((doc) => doc.data);
+  }
+
+  static async getByPaperUuid(paperUuid: string) {
+    await ForumStorage.ensureIndexes();
+    const doc = await MongoDBStorage._findOne<TypeForumThread>(
+      ForumStorage.COLLECTION,
+      { "data.paperUuid": paperUuid },
+    );
+
+    return doc?.data ?? null;
+  }
+
+  static async ensureSystemThreads() {
+    await ForumStorage.ensureIndexes();
+    const defaults = [
+      {
+        title: "Community Forum",
+        area: "Community Forum",
+        createdBy: "system",
+      },
+      {
+        title: "Technical Support",
+        area: "Technical Support",
+        createdBy: "system",
+      },
+      {
+        title: "Announcements",
+        area: "Announcements",
+        createdBy: "system",
+      },
+    ];
+
+    for (const item of defaults) {
+      const existing = await MongoDBStorage._findOne<TypeForumThread>(
+        ForumStorage.COLLECTION,
+        { "data.slug": slugify(item.title) },
+      );
+
+      if (!existing) {
+        const thread = new ForumThreadModel({
+          title: item.title,
+          area: item.area,
+          createdBy: item.createdBy,
+          status: "open",
+        } as TypeForumThread);
+        await MongoDBStorage._insert<TypeForumThread>(
+          ForumStorage.COLLECTION,
+          thread,
+        );
+      }
+    }
   }
 
   static async get(uuid: string) {

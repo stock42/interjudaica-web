@@ -25,6 +25,9 @@ type ForumFormState = {
   title: string;
   area: string;
   courseSlug: string;
+  content: string;
+  documentUrls: string;
+  videoUrls: string;
   status: string;
   featured: boolean;
 };
@@ -44,6 +47,9 @@ function createFormState(thread?: TypeForumThread): ForumFormState {
     title: thread?.title ?? "",
     area: thread?.area ?? "Community Forum",
     courseSlug: thread?.courseSlug ?? "",
+    content: thread?.content ?? "",
+    documentUrls: thread?.documentUrls?.join("\n") ?? "",
+    videoUrls: thread?.videoUrls?.join("\n") ?? "",
     status: thread?.status ?? "open",
     featured: thread?.featured ?? false,
   };
@@ -87,6 +93,15 @@ export function ForumForm({
           title: form.title,
           area: form.area,
           courseSlug: form.courseSlug,
+          content: form.content,
+          documentUrls: form.documentUrls
+            .split("\n")
+            .map((item) => item.trim())
+            .filter(Boolean),
+          videoUrls: form.videoUrls
+            .split("\n")
+            .map((item) => item.trim())
+            .filter(Boolean),
           status: form.status,
           featured: form.featured,
         }),
@@ -140,6 +155,14 @@ export function ForumForm({
             Generated slug: {slugPreview(form.title) || "thread-title"}
           </p>
         </div>
+        <div className="grid gap-2 md:col-span-2">
+          <Label>Body</Label>
+          <textarea
+            className="min-h-32 rounded-md border border-[var(--line)] bg-[var(--paper)] p-4 text-sm"
+            value={form.content}
+            onChange={(event) => setField("content", event.target.value)}
+          />
+        </div>
         <div className="grid gap-2 text-sm font-semibold text-[var(--ink)]">
           <Label>Area</Label>
           <Select value={form.area} onValueChange={(value) => setField("area", value)}>
@@ -173,6 +196,28 @@ export function ForumForm({
               ))}
             </SelectContent>
           </Select>
+        </div>
+        <div className="grid gap-2 text-sm font-semibold text-[var(--ink)] md:col-span-2">
+          <Label>Document URLs (one per line)</Label>
+          <textarea
+            className="min-h-24 rounded-md border border-[var(--line)] bg-[var(--paper)] p-3 text-sm"
+            value={form.documentUrls}
+            onChange={(event) => setField("documentUrls", event.target.value)}
+          />
+          <span className="text-xs text-[var(--muted)]">
+            Only rabbi-created threads should include documents.
+          </span>
+        </div>
+        <div className="grid gap-2 text-sm font-semibold text-[var(--ink)] md:col-span-2">
+          <Label>Video URLs (one per line)</Label>
+          <textarea
+            className="min-h-24 rounded-md border border-[var(--line)] bg-[var(--paper)] p-3 text-sm"
+            value={form.videoUrls}
+            onChange={(event) => setField("videoUrls", event.target.value)}
+          />
+          <span className="text-xs text-[var(--muted)]">
+            Only rabbi-created threads should include videos.
+          </span>
         </div>
         <div className="grid gap-2 text-sm font-semibold text-[var(--ink)]">
           <Label>Status</Label>

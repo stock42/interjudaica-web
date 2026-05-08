@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { schemaCourse } from "@/models/courses";
 import { CourseStorage } from "@/services/courses-storage";
+import { ForumStorage } from "@/services/forums-storage";
 import { readJson, requireAdminApi, routeError } from "@/app/api/_lib/admin-api";
 
 export const runtime = "nodejs";
@@ -26,6 +27,14 @@ export async function POST(request: NextRequest) {
   try {
     const payload = schemaCourse.parse(await readJson(request));
     const item = await CourseStorage.create(payload);
+    await ForumStorage.create({
+      title: `${item.title} discussion`,
+      area: "Course Forum",
+      courseSlug: item.slug ?? "",
+      createdBy: "system",
+      content: "Use this thread to ask questions about the course.",
+      status: "open",
+    });
     return NextResponse.json({ item }, { status: 201 });
   } catch (error) {
     return routeError(error);
