@@ -15,7 +15,8 @@ type AdminKind =
   | "forums"
   | "instructors"
   | "papers"
-  | "users";
+  | "users"
+  | "coupons";
 type AdminRecord = Record<string, unknown> & {
   uuid?: string;
 };
@@ -221,6 +222,33 @@ const configs: Record<AdminKind, EntityConfig> = {
       { label: "Role", value: (item) => String(item.role ?? "") },
       { label: "Status", value: (item) => String(item.status ?? "") },
       { label: "Community", value: (item) => String(item.communityStatus ?? "") },
+    ],
+  },
+  coupons: {
+    api: "/api/admin/coupons",
+    singular: "coupon",
+    plural: "coupons",
+    fields: [
+      { name: "code", label: "Code" },
+      { name: "percentOff", label: "Percent off", type: "number" },
+      {
+        name: "scope",
+        label: "Scope",
+        type: "select",
+        options: ["all", "course", "community"],
+      },
+      { name: "courseUuid", label: "Course UUID" },
+      { name: "active", label: "Active", type: "checkbox" },
+      { name: "expiresAt", label: "Expires at" },
+      { name: "usageLimit", label: "Usage limit", type: "number" },
+      { name: "usageCount", label: "Usage count", type: "number" },
+    ],
+    columns: [
+      { label: "Code", value: (item) => String(item.code ?? "") },
+      { label: "Percent", value: (item) => `${Number(item.percentOff ?? 0)}%` },
+      { label: "Scope", value: (item) => String(item.scope ?? "") },
+      { label: "Active", value: (item) => (item.active ? "Yes" : "No") },
+      { label: "Usage", value: (item) => `${item.usageCount ?? 0}/${item.usageLimit ?? 0}` },
     ],
   },
 };

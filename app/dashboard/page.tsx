@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
 import {
   ButtonLink,
@@ -7,8 +8,10 @@ import {
   Section,
   SectionIntro,
 } from "@/app/components/portal-ui";
-import { forumThreads } from "@/app/lib/content";
-import { listPublicCourses } from "@/app/lib/public-courses";
+import { getCurrentUser } from "@/services/user-auth";
+import { CourseEnrollmentStorage } from "@/services/course-enrollments-storage";
+import { CourseStorage } from "@/services/courses-storage";
+import { listForumThreads } from "@/app/lib/forums";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -24,8 +27,24 @@ export default async function DashboardPage({
   searchParams: Promise<{ payment?: string; course?: string }>;
 }) {
   const { payment } = await searchParams;
-  const courses = await listPublicCourses();
-  const dashboardCourses = courses.slice(0, 2);
+  const user = await getCurrentUser();
+
+  if (!user) {
+    redirect("/login?next=/dashboard");
+  }
+
+  const enrollments = await CourseEnrollmentStorage.listByUser(user.uuid);
+  const courses = await Promise.all(
+    enrollments.map((enrollment) => CourseStorage.get(enrollment.courseUuid)),
+  );
+  const dashboardCourses = courses.filter(
+    (course): course is NonNullable<typeof course> => Boolean(course),
+  );
+  const forumResult = await listForumThreads({
+    area: "Announcements",
+    page: 1,
+    limit: 3,
+  });
 
   return (
     <PageShell>
@@ -100,21 +119,36 @@ export default async function DashboardPage({
                 Community subscription
               </p>
               <h2 className="mt-3 font-display text-3xl font-semibold">
-                Active
+                {user.communityStatus === "active" ? "Active" : "Not subscribed"}
               </h2>
               <p className="mt-3 text-sm leading-6 text-white/70">
-                Renews at $19 USD/month.
+                {user.communityStatus === "active"
+                  ? "Renews at $19 USD/month."
+                  : "Subscribe to unlock the community forum and papers."}
               </p>
               <div className="mt-5 flex flex-col gap-2 sm:flex-row lg:flex-col">
-                <ButtonLink href="/comunidad/foro" tone="dark">
-                  Community forum
-                </ButtonLink>
+                {user.communityStatus === "active" ? (
+                  <ButtonLink href="/comunidad/foro" tone="dark">
+                    Community forum
+                  </ButtonLink>
+                ) : (
+                  <ButtonLink href="/checkout-community" tone="dark">
+                    Subscribe
+                  </ButtonLink>
+                )}
                 <ButtonLink
                   href="/comunidad/papers"
                   tone="quiet"
                   className="text-white hover:bg-white/10"
                 >
                   Papers
+                </ButtonLink>
+                <ButtonLink
+                  href="/support"
+                  tone="quiet"
+                  className="text-white hover:bg-white/10"
+                >
+                  Technical support
                 </ButtonLink>
               </div>
             </section>
@@ -124,23 +158,29 @@ export default async function DashboardPage({
                 Forum activity
               </h2>
               <div className="mt-5 grid gap-3">
-                {forumThreads.map((thread) => (
-                  <Link
-                    key={thread.title}
-                    href="/comunidad/foro"
-                    className="rounded-lg border border-[var(--line)] bg-[var(--paper)] p-4 transition hover:border-[var(--sapphire)]"
-                  >
-                    <span className="text-xs font-bold uppercase text-[var(--muted)]">
-                      {thread.area}
-                    </span>
-                    <span className="mt-2 block text-sm font-semibold leading-6">
-                      {thread.title}
-                    </span>
-                    <span className="mt-2 block text-xs text-[var(--sapphire)]">
-                      {thread.unread} unread updates
-                    </span>
-                  </Link>
-                ))}
+                {forumResult.items.length === 0 ? (
+                  <p className="text-sm text-[var(--muted)]">
+                    No announcements yet.
+                  </p>
+                ) : (
+                  forumResult.items.map((thread) => (
+                    <Link
+                      key={thread.uuid}
+                      href="/forum"
+                      className="rounded-lg border border-[var(--line)] bg-[var(--paper)] p-4 transition hover:border-[var(--sapphire)]"
+                    >
+                      <span className="text-xs font-bold uppercase text-[var(--muted)]">
+                        {thread.area}
+                      </span>
+                      <span className="mt-2 block text-sm font-semibold leading-6">
+                        {thread.title}
+                      </span>
+                      <span className="mt-2 block text-xs text-[var(--sapphire)]">
+                        {thread.unreadCount ?? 0} unread updates
+                      </span>
+                    </Link>
+                  ))
+                )}
               </div>
             </section>
           </aside>

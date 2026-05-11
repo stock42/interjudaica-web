@@ -49,9 +49,13 @@ export class ForumStorage extends MongoDBStorage<TypeForumThread> {
   static async listByFilter({
     area,
     courseSlug,
+    page = 1,
+    limit = 10,
   }: {
     area?: string;
     courseSlug?: string;
+    page?: number;
+    limit?: number;
   }) {
     await ForumStorage.ensureIndexes();
     const filter: Record<string, string> = {};
@@ -62,14 +66,22 @@ export class ForumStorage extends MongoDBStorage<TypeForumThread> {
       filter["data.courseSlug"] = courseSlug;
     }
 
-    const docs = await MongoDBStorage._find<TypeForumThread>(
+    const result = await MongoDBStorage._search<TypeForumThread>(
       ForumStorage.COLLECTION,
       filter,
       undefined,
-      { _added: -1 },
+      {
+        page,
+        limit,
+        sort: { _added: -1 },
+      },
     );
 
-    return docs.map((doc) => doc.data);
+    return {
+      items: result.docs.map((doc) => doc.data),
+      page: result.page,
+      totalPages: result.totalPages,
+    };
   }
 
   static async getByPaperUuid(paperUuid: string) {

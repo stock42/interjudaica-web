@@ -42,6 +42,18 @@ export class CourseEnrollmentStorage extends MongoDBStorage<TypeCourseEnrollment
 		return enrollment.getData();
 	}
 
+	static async listByUser(userUuid: string) {
+		await CourseEnrollmentStorage.ensureIndexes();
+		const docs = await MongoDBStorage._find<TypeCourseEnrollment>(
+			CourseEnrollmentStorage.COLLECTION,
+			{ "data.userUuid": userUuid, "data.status": "active" },
+			undefined,
+			{ _added: -1 },
+		);
+
+		return docs.map((doc) => doc.data);
+	}
+
 	static async isEnrolled(userUuid: string, courseUuid: string) {
 		await CourseEnrollmentStorage.ensureIndexes();
 		const doc = await MongoDBStorage._findOne<TypeCourseEnrollment>(

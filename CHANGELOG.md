@@ -61,6 +61,10 @@
 - Add community checkout flow and community users registry.
 - Handle community subscription cancellations via Stripe webhook.
 - Add forum threads for courses, community, and announcements with student posting.
+- Replace mock content in dashboard/community with live endpoints and add forum pagination.
+- Add support forum page for logged-in users.
+- Add admin enrollments/community grants and coupon system.
+- Add admin coupons page and apply coupons in checkout flows.
 - Add social proof model + storage, admin CRUD, public /api/social-proof endpoint, and homepage integration.
 - Improve contact email templates styling to match the dark/gold website theme and include the brand logo.
 

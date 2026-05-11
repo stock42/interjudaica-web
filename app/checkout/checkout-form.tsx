@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import type { TypeCourse } from "@/models/courses";
 
 export function CheckoutForm({
@@ -13,6 +14,7 @@ export function CheckoutForm({
 }) {
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState("");
+	const [couponCode, setCouponCode] = useState("");
 
 	async function handleSubmit(event: FormEvent<HTMLFormElement>) {
 		event.preventDefault();
@@ -23,7 +25,10 @@ export function CheckoutForm({
 			const response = await fetch("/api/checkout", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ courseUuid: course.uuid }),
+				body: JSON.stringify({
+					courseUuid: course.uuid,
+					couponCode: couponCode.trim() || undefined,
+				}),
 			});
 
 			const data = await response.json().catch(() => ({}));
@@ -51,6 +56,15 @@ export function CheckoutForm({
 					{priceLabel}
 				</p>
 			</div>
+
+			<label className="grid gap-2 text-sm font-semibold text-[var(--ink)]">
+				Coupon code
+				<Input
+					value={couponCode}
+					onChange={(event) => setCouponCode(event.target.value)}
+					placeholder="Enter code"
+				/>
+			</label>
 
 			{error ? (
 				<p className="text-sm font-semibold text-[var(--sumac)]">{error}</p>

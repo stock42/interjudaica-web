@@ -7,7 +7,6 @@ import StudentUserMenu from "@/components/share/student-user-menu";
 import OperatorUserMenu from "@/components/share/operator-user-menu";
 import {
   type Course,
-  adminStats,
   contactInfo,
   formatUsd,
   navItems,
@@ -579,6 +578,9 @@ export function AdminShell({
     { href: "/admin/foro", label: "Forum" },
     { href: "/admin/analytics", label: "Analytics" },
     { href: "/admin/rabbi-bio", label: "Rabbi bio" },
+    { href: "/admin/enrollments", label: "Enrollments" },
+    { href: "/admin/community-users", label: "Community access" },
+    { href: "/admin/coupons", label: "Coupons" },
   ];
 
   return (
@@ -632,7 +634,7 @@ export function AdminShell({
 }
 
 export function AdminStatGrid({
-  stats = adminStats,
+  stats = [],
 }: {
   stats?: { label: string; value: string; note: string }[];
 }) {

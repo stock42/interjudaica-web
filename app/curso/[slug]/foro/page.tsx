@@ -19,6 +19,7 @@ export const dynamic = "force-dynamic";
 
 type CourseForumPageProps = {
   params: Promise<{ slug: string }>;
+  searchParams?: Promise<{ page?: string }>;
 };
 
 export async function generateMetadata({
@@ -32,7 +33,10 @@ export async function generateMetadata({
   };
 }
 
-export default async function CourseForumPage({ params }: CourseForumPageProps) {
+export default async function CourseForumPage({
+  params,
+  searchParams,
+}: CourseForumPageProps & { searchParams: Promise<{ page?: string }> }) {
   const { slug } = await params;
   const course = await getPublicCourseBySlug(slug);
 
@@ -53,7 +57,14 @@ export default async function CourseForumPage({ params }: CourseForumPageProps) 
     redirect(`/curso/${slug}`);
   }
 
-  const threads = await listForumThreads({ area: "Course Forum", courseSlug: slug });
+  const { page } = await searchParams;
+  const pageNumber = Math.max(Number(page ?? "1"), 1);
+  const forumResult = await listForumThreads({
+    area: "Course Forum",
+    courseSlug: slug,
+    page: pageNumber,
+    limit: 10,
+  });
 
   return (
     <PageShell>
@@ -71,10 +82,10 @@ export default async function CourseForumPage({ params }: CourseForumPageProps) 
 
         <div className="grid gap-4">
           <CourseThreadForm courseSlug={slug} />
-          {threads.length === 0 ? (
+          {forumResult.items.length === 0 ? (
             <p className="text-sm text-[var(--muted)]">No threads yet.</p>
           ) : (
-            threads.map((thread) => (
+            forumResult.items.map((thread) => (
               <article
                 key={thread.uuid}
                 className="rounded-lg border border-[var(--line)] bg-white p-5 sm:p-6"
@@ -108,6 +119,26 @@ export default async function CourseForumPage({ params }: CourseForumPageProps) 
             ))
           )}
         </div>
+        {forumResult.totalPages > 1 ? (
+          <div className="mt-6 flex flex-wrap gap-3">
+            {pageNumber > 1 ? (
+              <ButtonLink
+                href={`/curso/${slug}/foro?page=${pageNumber - 1}`}
+                tone="secondary"
+              >
+                Previous
+              </ButtonLink>
+            ) : null}
+            {pageNumber < forumResult.totalPages ? (
+              <ButtonLink
+                href={`/curso/${slug}/foro?page=${pageNumber + 1}`}
+                tone="secondary"
+              >
+                Next
+              </ButtonLink>
+            ) : null}
+          </div>
+        ) : null}
       </Section>
     </PageShell>
   );

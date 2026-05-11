@@ -6,7 +6,9 @@ import {
   Section,
   SectionIntro,
 } from "@/app/components/portal-ui";
-import { communityBenefits, papers } from "@/app/lib/content";
+import { communityBenefits } from "@/app/lib/content";
+import { listCommunityPapers } from "@/app/lib/papers";
+import { getCurrentUser } from "@/services/user-auth";
 
 export const metadata: Metadata = {
   title: "Community",
@@ -14,7 +16,11 @@ export const metadata: Metadata = {
     "Join the InterJudaica community for private forums, Rabbi Yattah papers, and member pricing on courses.",
 };
 
-export default function CommunityPage() {
+export default async function CommunityPage() {
+  const user = await getCurrentUser();
+  const isMember = user?.communityStatus === "active";
+  const papers = isMember ? await listCommunityPapers() : [];
+
   return (
     <PageShell>
       <Section tone="ink">
@@ -71,22 +77,32 @@ export default function CommunityPage() {
           <div>
             <SectionIntro eyebrow="Latest papers" title="Rabbi Yattah essays" />
             <div className="grid gap-4">
-              {papers.map((paper) => (
-                <article
-                  key={paper.title}
-                  className="rounded-lg border border-[var(--line)] bg-white p-5"
-                >
-                  <p className="text-xs font-bold uppercase text-[var(--sapphire)]">
-                    {paper.category} / {paper.date}
-                  </p>
-                  <h2 className="mt-3 font-display text-2xl font-semibold">
-                    {paper.title}
-                  </h2>
-                  <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
-                    {paper.summary}
-                  </p>
-                </article>
-              ))}
+              {!isMember ? (
+                <p className="text-sm text-[var(--muted)]">
+                  Community members can access Rabbi Yattah papers after subscribing.
+                </p>
+              ) : papers.length === 0 ? (
+                <p className="text-sm text-[var(--muted)]">
+                  No papers published yet.
+                </p>
+              ) : (
+                papers.map((paper) => (
+                  <article
+                    key={paper.uuid}
+                    className="rounded-lg border border-[var(--line)] bg-white p-5"
+                  >
+                    <p className="text-xs font-bold uppercase text-[var(--sapphire)]">
+                      {paper.category} / {paper.date}
+                    </p>
+                    <h2 className="mt-3 font-display text-2xl font-semibold">
+                      {paper.title}
+                    </h2>
+                    <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
+                      {paper.summary}
+                    </p>
+                  </article>
+                ))
+              )}
             </div>
           </div>
         </div>

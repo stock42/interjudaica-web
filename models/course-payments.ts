@@ -17,6 +17,9 @@ export const schemaCoursePayment = z.object({
 	status: z.enum(paymentStatuses).default("pending"),
 	stripeSessionId: z.string().trim().default(""),
 	stripePaymentIntentId: z.string().trim().default(""),
+	couponCode: z.string().trim().default(""),
+	couponPercentOff: z.coerce.number().min(0).max(100).default(0),
+	discountedAmount: z.coerce.number().nonnegative().default(0),
 	createdAt: z.string().trim().default(""),
 	paidAt: z.string().trim().default(""),
 });

@@ -9,6 +9,7 @@ import { PasswordResetAttemptStorage } from "@/services/password-reset-attempts-
 import { RabbiBioStorage } from "@/services/rabbi-bio-storage";
 import { CommunityUserStorage } from "@/services/community-users-storage";
 import { ForumStorage } from "@/services/forums-storage";
+import { CouponStorage } from "@/services/coupons-storage";
 
 export async function Boot() {
   await UserStorage.ensureIndexes();
@@ -20,6 +21,7 @@ export async function Boot() {
   await PasswordResetAttemptStorage.ensureIndexes();
   await RabbiBioStorage.ensureIndexes();
   await CommunityUserStorage.ensureIndexes();
+  await CouponStorage.ensureIndexes();
   await ForumStorage.ensureSystemThreads();
   await OperatorStorage.ensureDefaultOperator();
 }

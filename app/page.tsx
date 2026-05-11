@@ -1,6 +1,5 @@
 import Image from "next/image";
 import { ButtonLink, PageShell } from "@/app/components/portal-ui";
-import { testimonials as fallbackTestimonials } from "@/app/lib/content";
 import { listPublicCourses } from "@/app/lib/public-courses";
 import { listSocialProof } from "@/app/lib/social-proof";
 import type { TypePublicCourse } from "@/models/courses";
@@ -177,11 +176,10 @@ function SectionTitle({
 }
 
 export default async function Home() {
-  const [homeCourses, socialProof] = await Promise.all([
+  const [homeCourses, testimonials] = await Promise.all([
     listPublicCourses(),
     listSocialProof(),
   ]);
-  const testimonials = socialProof.length ? socialProof : fallbackTestimonials;
   const whyChoose = [
     {
       icon: "screen" as const,
@@ -366,28 +364,34 @@ export default async function Home() {
         <div className={homeFrame}>
           <SectionTitle>What Our Students Say</SectionTitle>
           <div className="grid gap-7 md:grid-cols-3">
-            {testimonials.map((testimonial) => (
-              <figure
-                key={testimonial.name}
-                className="rounded-lg border border-[rgba(244,189,51,0.58)] bg-[#080b0d] p-6"
-              >
-                <p className="font-display text-4xl leading-none text-[var(--gold)]">
-                  &quot;
-                </p>
-                <blockquote className="mt-1 text-base italic leading-7 text-white/86">
-                  {testimonial.quote}
-                </blockquote>
-                <figcaption className="mt-5 flex items-center justify-between gap-4 text-sm text-white/78">
-                  <div>
-                    <p>- {testimonial.name}</p>
-                    <p className="text-xs text-white/60">
-                      {testimonial.detail}
-                    </p>
-                  </div>
-                  <span className="text-base tracking-[0.18em] text-[var(--gold)]">*****</span>
-                </figcaption>
-              </figure>
-            ))}
+            {testimonials.length === 0 ? (
+              <p className="text-sm text-white/70">
+                No testimonials have been published yet.
+              </p>
+            ) : (
+              testimonials.map((testimonial) => (
+                <figure
+                  key={testimonial.name}
+                  className="rounded-lg border border-[rgba(244,189,51,0.58)] bg-[#080b0d] p-6"
+                >
+                  <p className="font-display text-4xl leading-none text-[var(--gold)]">
+                    &quot;
+                  </p>
+                  <blockquote className="mt-1 text-base italic leading-7 text-white/86">
+                    {testimonial.quote}
+                  </blockquote>
+                  <figcaption className="mt-5 flex items-center justify-between gap-4 text-sm text-white/78">
+                    <div>
+                      <p>- {testimonial.name}</p>
+                      <p className="text-xs text-white/60">
+                        {testimonial.detail}
+                      </p>
+                    </div>
+                    <span className="text-base tracking-[0.18em] text-[var(--gold)]">*****</span>
+                  </figcaption>
+                </figure>
+              ))
+            )}
           </div>
         </div>
       </section>

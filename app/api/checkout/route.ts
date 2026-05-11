@@ -3,8 +3,11 @@ import { z } from "zod";
 
 import { CourseStorage } from "@/services/courses-storage";
 import { CoursePaymentStorage } from "@/services/course-payments-storage";
+import { CourseEnrollmentStorage } from "@/services/course-enrollments-storage";
+import { CouponStorage } from "@/services/coupons-storage";
 import { getCurrentUser } from "@/services/user-auth";
 import { getStripe } from "@/lib/stripe";
+import { sendCoursePaymentConfirmation } from "@/lib/send-course-payment-confirmation";
 import { readJson, routeError } from "@/app/api/_lib/admin-api";
 import { headers } from "next/headers";
 
@@ -12,6 +15,7 @@ export const runtime = "nodejs";
 
 const schemaCheckout = z.object({
 	courseUuid: z.string().uuid(),
+	couponCode: z.string().trim().optional(),
 });
 
 async function getBaseUrl() {
@@ -43,6 +47,59 @@ export async function POST(request: NextRequest) {
 		const baseUrl = await getBaseUrl();
 		const amount = Math.round(course.price * 100);
 
+		const couponCode = payload.couponCode?.trim().toUpperCase() ?? "";
+		let percentOff = 0;
+		if (couponCode) {
+			const coupon = await CouponStorage.findValid({
+				code: couponCode,
+				scope: "course",
+				courseUuid: course.uuid ?? "",
+			});
+			if (!coupon) {
+				return NextResponse.json({ error: "Invalid coupon" }, { status: 400 });
+			}
+			percentOff = coupon.coupon.percentOff;
+			await CouponStorage.incrementUsage(coupon.uuid);
+		}
+
+		const discountedAmount = Math.max(
+			0,
+			Math.round(amount - amount * (percentOff / 100)),
+		);
+
+		if (percentOff === 100 || discountedAmount === 0) {
+			await CourseEnrollmentStorage.create({
+				courseUuid: course.uuid ?? "",
+				userUuid: user.uuid,
+				status: "active",
+				purchasedAt: new Date().toISOString(),
+			});
+
+			await CoursePaymentStorage.createPending({
+				courseUuid: course.uuid ?? "",
+				userUuid: user.uuid,
+				amount: 0,
+				currency: "usd",
+				couponCode,
+				couponPercentOff: percentOff,
+				discountedAmount: 0,
+				stripeSessionId: "",
+				status: "paid",
+				paidAt: new Date().toISOString(),
+			});
+
+			await sendCoursePaymentConfirmation({
+				email: user.email,
+				firstName: user.firstName,
+				courseTitle: course.title,
+				priceLabel: "$0",
+			});
+
+			return NextResponse.json({
+				url: `${baseUrl}/dashboard?payment=success&course=${course.uuid}`,
+			});
+		}
+
 		const description = (course.summary || course.description || "").trim();
 		const session = await stripe.checkout.sessions.create({
 			mode: "payment",
@@ -56,7 +113,7 @@ export async function POST(request: NextRequest) {
 							name: course.title,
 							...(description ? { description } : {}),
 						},
-						unit_amount: amount,
+						unit_amount: discountedAmount,
 					},
 					quantity: 1,
 				},
@@ -74,6 +131,9 @@ export async function POST(request: NextRequest) {
 			userUuid: user.uuid,
 			amount: course.price,
 			currency: "usd",
+			couponCode,
+			couponPercentOff: percentOff,
+			discountedAmount: discountedAmount / 100,
 			stripeSessionId: session.id,
 		});
 

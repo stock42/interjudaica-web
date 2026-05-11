@@ -10,7 +10,7 @@ import { readJson, routeError } from "@/app/api/_lib/admin-api";
 export const runtime = "nodejs";
 
 const schemaCreate = z.object({
-	scope: z.enum(["community", "course"]),
+	scope: z.enum(["community", "course", "support"]),
 	courseSlug: z.string().trim().optional().or(z.literal("")),
 	title: z.string().trim().min(2),
 	content: z.string().trim().min(1),
@@ -20,10 +20,12 @@ const schemaCreate = z.object({
 export async function GET(request: NextRequest) {
 	const area = request.nextUrl.searchParams.get("area") ?? "";
 	const courseSlug = request.nextUrl.searchParams.get("courseSlug") ?? "";
+	const page = Number(request.nextUrl.searchParams.get("page") ?? "1");
+	const limit = Number(request.nextUrl.searchParams.get("limit") ?? "10");
 
 	if (area === "Announcements") {
-		const items = await ForumStorage.listByFilter({ area, courseSlug });
-		return NextResponse.json({ items });
+		const result = await ForumStorage.listByFilter({ area, courseSlug, page, limit });
+		return NextResponse.json(result);
 	}
 
 	const user = await getCurrentUser();
@@ -34,6 +36,12 @@ export async function GET(request: NextRequest) {
 	if (area === "Community Forum") {
 		if (user.communityStatus !== "active") {
 			return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+		}
+	}
+
+	if (area === "Technical Support") {
+		if (!user) {
+			return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 		}
 	}
 
@@ -56,8 +64,8 @@ export async function GET(request: NextRequest) {
 		}
 	}
 
-	const items = await ForumStorage.listByFilter({ area, courseSlug });
-	return NextResponse.json({ items });
+	const result = await ForumStorage.listByFilter({ area, courseSlug, page, limit });
+	return NextResponse.json(result);
 }
 
 export async function POST(request: NextRequest) {
@@ -97,9 +105,16 @@ export async function POST(request: NextRequest) {
 			courseSlug = course.slug ?? payload.courseSlug;
 		}
 
+		const area =
+			payload.scope === "community"
+				? "Community Forum"
+				: payload.scope === "support"
+					? "Technical Support"
+					: "Course Forum";
+
 		const item = await ForumStorage.create({
 			title: payload.title,
-			area: payload.scope === "community" ? "Community Forum" : "Course Forum",
+			area,
 			courseSlug,
 			createdBy: "student",
 			createdByUuid: user.uuid,

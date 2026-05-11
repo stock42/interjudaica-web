@@ -99,6 +99,7 @@ Collection names currently in use:
 - `password_reset_attempts`
 - `rabbi_bio`
 - `community_users`
+- `coupons`
 - `instructors`
 - `papers`
 - `paper_categories`
@@ -187,16 +188,16 @@ Public content endpoints:
 
 | Method | Path | Notes |
 | --- | --- | --- |
-| `GET` | `/api/courses` | Lists published public courses as `{ items }`. |
 | `GET` | `/api/courses/[slug]/classes` | Lists classes for a published course as `{ items }`. |
 | `GET` | `/api/courses/classes/files/[fileUuid]` | Downloads a class file for enrolled students. |
 | `POST` | `/api/checkout` | Creates a Stripe checkout session for a course. |
 | `POST` | `/api/stripe/webhook` | Handles Stripe webhook events and enrolls students. |
 | `POST` | `/api/contact` | Saves a contact message and sends emails. |
 | `POST` | `/api/community/checkout` | Creates a Stripe checkout session for community membership. |
-| `GET` | `/api/forums` | Lists forum threads by area/course.
+| `GET` | `/api/forums` | Lists forum threads by area/course with pagination. |
 | `POST` | `/api/forums` | Creates a forum thread (student).
 | `POST` | `/api/forums/upload-image` | Uploads an image for a forum thread.
+| `GET` | `/api/papers` | Lists published papers by visibility. |
 | `GET` | `/api/rabbi-bio` | Returns the public rabbi bio. |
 | `GET` | `/api/social-proof` | Lists published testimonials as `{ items }`. |
 
@@ -204,7 +205,6 @@ Admin utility endpoints:
 
 | Method | Path | Notes |
 | --- | --- | --- |
-| `GET` | `/api/admin/overview` | Requires operator auth; returns dashboard stat objects. |
 | `POST` | `/api/admin/uploads/course-image` | Requires operator auth; accepts `multipart/form-data` with `file` and optional `kind`; returns `{ url }`. |
 | `POST` | `/api/admin/uploads/class-image` | Requires operator auth; accepts `multipart/form-data` with `file`; returns `{ url }`. |
 | `GET` | `/api/admin/contacts` | Lists contact messages as `{ items }`. |
@@ -216,6 +216,13 @@ Admin utility endpoints:
 | `PUT` | `/api/admin/rabbi-bio` | Updates the rabbi bio content. |
 | `POST` | `/api/admin/uploads/instructor-photo` | Requires operator auth; accepts `multipart/form-data` with `file`; returns `{ url }`. |
 | `POST` | `/api/admin/uploads/forum-asset` | Requires operator auth; accepts `multipart/form-data` with `file`; returns `{ url }`. |
+| `POST` | `/api/admin/enrollments` | Creates a course enrollment for a student. |
+| `POST` | `/api/admin/community-users` | Grants community access to a student. |
+| `GET` | `/api/admin/coupons` | Lists coupons as `{ items }`. |
+| `POST` | `/api/admin/coupons` | Creates a coupon and returns `{ item }`. |
+| `GET` | `/api/admin/coupons/[uuid]` | Gets one coupon by UUID. |
+| `PATCH` | `/api/admin/coupons/[uuid]` | Updates one coupon by UUID. |
+| `DELETE` | `/api/admin/coupons/[uuid]` | Deletes one coupon by UUID. |
 
 Admin CRUD endpoints, all requiring operator auth:
 
@@ -365,6 +372,7 @@ Public route map:
 - `/checkout-community`
 - `/ernesto-yattah`
 - `/forum`
+- `/support`
 - `/verify-email`
 - `/operator-login`
 
@@ -378,6 +386,9 @@ Admin route map:
 - `/admin/contacts`, `/admin/contacts/[uuid]`
 - `/admin/password-resets`
 - `/admin/rabbi-bio`
+- `/admin/enrollments`
+- `/admin/community-users`
+- `/admin/coupons`
 - `/admin/course-categories`, `/admin/course-categories/new`, `/admin/course-categories/[uuid]`
 - `/admin/instructors`, `/admin/instructors/new`, `/admin/instructors/[uuid]`
 - `/admin/papers`, `/admin/papers/new`, `/admin/papers/[uuid]`

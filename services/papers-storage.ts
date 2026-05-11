@@ -43,6 +43,18 @@ export class PaperStorage extends MongoDBStorage<TypePaper> {
     return docs.map((doc) => doc.data);
   }
 
+  static async listPublishedByVisibility(visibility: string) {
+    await PaperStorage.ensureIndexes();
+    const docs = await MongoDBStorage._find<TypePaper>(
+      PaperStorage.COLLECTION,
+      { "data.status": "published", "data.visibility": visibility },
+      undefined,
+      { _added: -1 },
+    );
+
+    return docs.map((doc) => doc.data);
+  }
+
   static async get(uuid: string) {
     await PaperStorage.ensureIndexes();
     const doc = await MongoDBStorage._getByUUID<TypePaper>(
