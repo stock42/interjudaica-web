@@ -56,6 +56,13 @@ export default async function CommunityPapersPage() {
                 <h2 className="mt-4 font-display text-2xl font-semibold leading-tight">
                   {paper.title}
                 </h2>
+                <ButtonLink
+                  href={`/comunidad/papers/${paper.slug}`}
+                  tone="secondary"
+                  className="mt-4"
+                >
+                  Read paper
+                </ButtonLink>
                 <p className="mt-2 text-sm text-[var(--muted)]">{paper.date}</p>
                 <p className="mt-4 text-sm leading-6 text-[var(--muted)]">
                   {paper.summary}

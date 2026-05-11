@@ -198,6 +198,8 @@ Public content endpoints:
 | `POST` | `/api/forums` | Creates a forum thread (student).
 | `POST` | `/api/forums/upload-image` | Uploads an image for a forum thread.
 | `GET` | `/api/papers` | Lists published papers by visibility. |
+| `GET` | `/api/papers/[slug]` | Returns one published paper by slug. |
+| `GET` | `/api/papers/[slug]/download` | Downloads a paper markdown file. |
 | `GET` | `/api/rabbi-bio` | Returns the public rabbi bio. |
 | `GET` | `/api/social-proof` | Lists published testimonials as `{ items }`. |
 
@@ -374,6 +376,7 @@ Public route map:
 - `/forum`
 - `/support`
 - `/verify-email`
+- `/comunidad/papers/[slug]`
 - `/operator-login`
 
 Admin route map:

@@ -29,6 +29,18 @@ export class CommunityUserStorage extends MongoDBStorage<TypeCommunityUser> {
 		CommunityUserStorage.indexesReady = true;
 	}
 
+	static async list() {
+		await CommunityUserStorage.ensureIndexes();
+		const docs = await MongoDBStorage._find<TypeCommunityUser>(
+			CommunityUserStorage.COLLECTION,
+			{},
+			undefined,
+			{ _added: -1 },
+		);
+
+		return docs.map((doc) => doc.data);
+	}
+
 	static async upsertActive(input: Partial<TypeCommunityUser>) {
 		await CommunityUserStorage.ensureIndexes();
 		const existing = await MongoDBStorage._findOne<TypeCommunityUser>(

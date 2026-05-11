@@ -1,0 +1,71 @@
+import type { Metadata } from "next";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import rehypeSanitize from "rehype-sanitize";
+
+import { ButtonLink, PageShell, Section } from "@/app/components/portal-ui";
+import { getPaperBySlug } from "@/app/lib/papers";
+
+export const runtime = "nodejs";
+
+export async function generateMetadata({
+	params,
+}: {
+	params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+	const { slug } = await params;
+	const paper = await getPaperBySlug(slug);
+
+	return {
+		title: paper?.title ?? "Paper",
+	};
+}
+
+export default async function PaperDetailPage({
+	params,
+}: {
+	params: Promise<{ slug: string }>;
+}) {
+	const { slug } = await params;
+	const paper = await getPaperBySlug(slug);
+
+	if (!paper) {
+		return (
+			<PageShell>
+				<Section tone="transparent">
+					<p className="text-sm text-[var(--muted)]">Paper not found.</p>
+				</Section>
+			</PageShell>
+		);
+	}
+
+	return (
+		<PageShell>
+			<Section tone="transparent">
+				<div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+					<div>
+						<p className="text-xs font-bold uppercase text-[var(--sapphire)]">
+							{paper.category}
+						</p>
+						<h1 className="mt-2 font-display text-3xl font-semibold">
+							{paper.title}
+						</h1>
+						<p className="mt-1 text-sm text-[var(--muted)]">{paper.date}</p>
+					</div>
+					<ButtonLink href={`/api/papers/${paper.slug}/download`} tone="secondary">
+						Download
+					</ButtonLink>
+				</div>
+
+				<div className="prose max-w-none text-[var(--ink)]">
+					<ReactMarkdown
+						remarkPlugins={[remarkGfm]}
+						rehypePlugins={[rehypeSanitize]}
+					>
+						{paper.content || ""}
+					</ReactMarkdown>
+				</div>
+			</Section>
+		</PageShell>
+	);
+}

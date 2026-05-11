@@ -65,6 +65,8 @@
 - Add support forum page for logged-in users.
 - Add admin enrollments/community grants and coupon system.
 - Add admin coupons page and apply coupons in checkout flows.
+- Add paper reader/download pages and community users list in admin.
+- Add admin overview API with real stats.
 - Add social proof model + storage, admin CRUD, public /api/social-proof endpoint, and homepage integration.
 - Improve contact email templates styling to match the dark/gold website theme and include the brand logo.
 
