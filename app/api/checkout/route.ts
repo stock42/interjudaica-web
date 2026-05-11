@@ -43,6 +43,7 @@ export async function POST(request: NextRequest) {
 		const baseUrl = await getBaseUrl();
 		const amount = Math.round(course.price * 100);
 
+		const description = (course.summary || course.description || "").trim();
 		const session = await stripe.checkout.sessions.create({
 			mode: "payment",
 			payment_method_types: ["card"],
@@ -53,7 +54,7 @@ export async function POST(request: NextRequest) {
 						currency: "usd",
 						product_data: {
 							name: course.title,
-							description: course.summary || course.description,
+							...(description ? { description } : {}),
 						},
 						unit_amount: amount,
 					},
