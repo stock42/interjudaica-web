@@ -52,11 +52,12 @@ export async function POST(
 	const bytes = await file.arrayBuffer();
 	const buffer = Buffer.from(bytes);
 	const filename = `${randomUUID()}-${file.name}`;
+	const classUuid = courseClass.uuid ?? uuid;
 	const uploadDir = path.join(
 		process.cwd(),
 		"uploads",
 		"classes",
-		courseClass.uuid,
+		classUuid,
 	);
 	const filepath = path.join(uploadDir, filename);
 
