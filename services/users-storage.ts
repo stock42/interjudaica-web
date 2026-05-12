@@ -114,6 +114,9 @@ export class UserStorage extends MongoDBStorage<TypeUser> {
       emailVerifiedAt: "",
       passwordResetCode: "",
       passwordResetExpiresAt: "",
+      passwordResetAttempts: 0,
+      passwordResetAttemptsWindowStart: "",
+      passwordResetLockedUntil: "",
     });
 
     await user.setPassword(input.password);
