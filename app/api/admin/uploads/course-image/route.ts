@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
 
   const formData = await request.formData();
   const file = formData.get("file");
-  const kind = String(formData.get("kind") ?? "course");
+  const kind = String(formData.get("kind") ?? "course").replace(/[^a-zA-Z0-9_-]/g, "").slice(0, 32) || "course";
 
   if (!(file instanceof File)) {
     return NextResponse.json({ error: "Missing image file" }, { status: 400 });

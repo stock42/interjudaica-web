@@ -3,7 +3,7 @@ import { z } from "zod";
 
 import { UserStorage } from "@/services/users-storage";
 import { sendPasswordResetCode } from "@/lib/send-password-reset-code";
-import { readJson, routeError } from "@/app/api/_lib/admin-api";
+import { readJson } from "@/app/api/_lib/admin-api";
 
 export const runtime = "nodejs";
 
@@ -27,7 +27,13 @@ function getCooldownKey(email: string, ip: string | null) {
 
 export async function POST(request: NextRequest) {
 	try {
-		const payload = schemaResend.parse(await readJson(request));
+		const json = await readJson(request);
+		const parsed = schemaResend.safeParse(json);
+		if (!parsed.success) {
+			return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
+		}
+
+		const payload = parsed.data;
 		const ip =
 			request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "";
 		const key = getCooldownKey(payload.email, ip);
@@ -74,6 +80,7 @@ export async function POST(request: NextRequest) {
 
 		return NextResponse.json({ ok: true, cooldown: RESEND_COOLDOWN_SECONDS });
 	} catch (error) {
-		return routeError(error);
+		console.error("Resend reset error:", error instanceof Error ? error.message : error);
+		return NextResponse.json({ error: "Unexpected server error" }, { status: 500 });
 	}
 }

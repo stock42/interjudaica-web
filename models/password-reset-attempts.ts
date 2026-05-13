@@ -5,7 +5,7 @@ export const passwordResetAttemptStatuses = ["success", "failed"] as const;
 
 export const schemaPasswordResetAttempt = z.object({
 	uuid: z.string().uuid().optional(),
-	email: z.string().email(),
+	email: z.string().email().toLowerCase(),
 	userUuid: z.string().uuid().optional(),
 	status: z.enum(passwordResetAttemptStatuses),
 	reason: z.string().trim().default(""),

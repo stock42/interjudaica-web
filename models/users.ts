@@ -16,7 +16,7 @@ export const schemaUser = z.object({
   country: z.string().trim().default(""),
   state: z.string().trim().default(""),
   city: z.string().trim().default(""),
-  password: z.string().default(""),
+	password: z.string().default(""),
   role: z.string().trim().default("student"),
   status: z.enum(userStatuses).default("active"),
   communityStatus: z.enum(communityStatuses).default("none"),
@@ -37,7 +37,7 @@ export const schemaUserSignup = z.object({
   country: z.string().trim().min(1),
   state: z.string().trim().min(1),
   city: z.string().trim().min(1),
-  password: z.string().min(8),
+  password: z.string().min(8).max(128),
 });
 
 export const schemaUserSignin = z.object({

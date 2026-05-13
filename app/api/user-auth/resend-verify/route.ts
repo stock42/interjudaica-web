@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
 
 import { UserStorage } from "@/services/users-storage";
-import { readJson, routeError } from "@/app/api/_lib/admin-api";
+import { readJson } from "@/app/api/_lib/admin-api";
 import { sendVerificationEmail } from "@/lib/send-verification-email";
 
 export const runtime = "nodejs";
@@ -69,7 +69,13 @@ function checkRateLimit(key: string) {
 
 export async function POST(request: NextRequest) {
 	try {
-		const payload = schemaResend.parse(await readJson(request));
+		const json = await readJson(request);
+		const parsed = schemaResend.safeParse(json);
+		if (!parsed.success) {
+			return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
+		}
+
+		const payload = parsed.data;
 		const ipLimit = checkRateLimit(makeKey("ip", getClientKey(request)));
 		const emailLimit = checkRateLimit(makeKey("email", payload.email));
 		const retryAfter = Math.max(ipLimit.retryAfter, emailLimit.retryAfter);
@@ -98,6 +104,7 @@ export async function POST(request: NextRequest) {
 
 		return NextResponse.json({ ok: true, cooldownSeconds: getCooldownSeconds() });
 	} catch (error) {
-		return routeError(error);
+		console.error("Resend verify error:", error instanceof Error ? error.message : error);
+		return NextResponse.json({ error: "Unexpected server error" }, { status: 500 });
 	}
 }

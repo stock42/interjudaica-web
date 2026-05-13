@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { randomInt } from "crypto";
 import { createUuid } from "@/models/model-utils";
 import {
   hashPassword,
@@ -27,7 +28,7 @@ export const schemaOperatorCreate = z.object({
   firstName: z.string().trim().nullable().optional(),
   lastName: z.string().trim().nullable().optional(),
   enabled: z.coerce.boolean().default(true),
-  password: z.string().min(8),
+	password: z.string().min(8).max(128),
   level: z.coerce.number().int().min(1).max(50).default(50),
 });
 
@@ -128,6 +129,6 @@ export class OperatorModel {
   }
 
   static generateOTP(): string {
-    return Math.floor(100000 + Math.random() * 900000).toString();
+    return randomInt(100000, 999999).toString();
   }
 }

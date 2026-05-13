@@ -9,6 +9,12 @@ import { requireAdminApi } from "@/app/api/_lib/admin-api";
 
 export const runtime = "nodejs";
 
+const maxFileSize = 50 * 1024 * 1024;
+
+function safeName(originalName: string) {
+	return path.basename(originalName).replace(/[^a-zA-Z0-9._-]/g, "_");
+}
+
 export async function GET(
 	request: NextRequest,
 	{ params }: { params: Promise<{ uuid: string }> },
@@ -49,9 +55,17 @@ export async function POST(
 		return NextResponse.json({ error: "Missing file" }, { status: 400 });
 	}
 
+	if (file.size > maxFileSize) {
+		return NextResponse.json(
+			{ error: `File must be smaller than ${maxFileSize / (1024 * 1024)} MB` },
+			{ status: 400 },
+		);
+	}
+
 	const bytes = await file.arrayBuffer();
 	const buffer = Buffer.from(bytes);
-	const filename = `${randomUUID()}-${file.name}`;
+	const sanitized = safeName(file.name);
+	const filename = `${randomUUID()}-${sanitized}`;
 	const classUuid = courseClass.uuid ?? uuid;
 	const uploadDir = path.join(
 		process.cwd(),

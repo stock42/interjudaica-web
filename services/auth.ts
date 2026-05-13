@@ -7,7 +7,7 @@ import type { NextRequest } from "next/server";
 import type { TypeSafeOperator } from "@/models/operators";
 import { OperatorStorage } from "@/services/operators-storage";
 
-export const SESSION_COOKIE_NAME = "interjudaica_operator_session";
+export const SESSION_COOKIE_NAME = "__Host-interjudaica_operator_session";
 const SESSION_MAX_AGE = 60 * 60 * 8;
 
 type SessionPayload = {
@@ -45,8 +45,8 @@ function signaturesMatch(left: string, right: string) {
 export function sessionCookieOptions() {
   return {
     httpOnly: true,
-    sameSite: "lax" as const,
-    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict" as const,
+    secure: true,
     path: "/",
     maxAge: SESSION_MAX_AGE,
   };

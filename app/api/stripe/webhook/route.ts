@@ -6,8 +6,10 @@ import { CoursePaymentStorage } from "@/services/course-payments-storage";
 import { CourseStorage } from "@/services/courses-storage";
 import { CommunityUserStorage } from "@/services/community-users-storage";
 import { UserStorage } from "@/services/users-storage";
+import { BookSaleStorage } from "@/services/book-sales-storage";
 import { getStripe } from "@/lib/stripe";
 import { sendCoursePaymentConfirmation } from "@/lib/send-course-payment-confirmation";
+import { sendBookPaymentConfirmation } from "@/lib/send-book-payment-confirmation";
 import { formatUsd } from "@/app/lib/content";
 
 export const runtime = "nodejs";
@@ -45,6 +47,7 @@ export async function POST(request: Request) {
 		const courseUuid = session.metadata?.courseUuid;
 		const userUuid = session.metadata?.userUuid;
 		const isCommunity = session.metadata?.community === "true";
+		const bookUuid = session.metadata?.bookUuid;
 
 		if (isCommunity && userUuid) {
 			const user = await UserStorage.get(userUuid);
@@ -94,6 +97,24 @@ export async function POST(request: Request) {
 				});
 			}
 		}
+
+		if (bookUuid) {
+			await BookSaleStorage.markPaid(
+				session.id,
+				String(session.payment_intent ?? ""),
+			);
+
+			const sale = await BookSaleStorage.getBySession(session.id);
+
+			if (sale) {
+				await sendBookPaymentConfirmation({
+					email: sale.buyerEmail,
+					firstName: sale.buyerFirstName,
+					bookTitle: sale.bookTitle,
+					priceLabel: formatUsd(sale.amount),
+				});
+			}
+		}
 	}
 
 	if (event.type === "checkout.session.expired") {
@@ -101,6 +122,7 @@ export async function POST(request: Request) {
 		await CoursePaymentStorage.updateBySession(session.id, {
 			status: "failed",
 		});
+		await BookSaleStorage.markFailed(session.id);
 	}
 
 	if (event.type === "customer.subscription.deleted") {

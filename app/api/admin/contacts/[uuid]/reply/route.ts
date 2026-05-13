@@ -3,7 +3,7 @@ import { z } from "zod";
 
 import { ContactStorage } from "@/services/contacts-storage";
 import { sendContactReply } from "@/lib/send-contact-reply";
-import { requireAdminApi, routeError } from "@/app/api/_lib/admin-api";
+import { requireAdminApi } from "@/app/api/_lib/admin-api";
 
 export const runtime = "nodejs";
 
@@ -11,6 +11,9 @@ const schemaReply = z.object({
 	subject: z.string().trim().min(1),
 	message: z.string().trim().min(1).max(5000),
 });
+
+const maxAttachmentSize = 5 * 1024 * 1024;
+const maxAttachmentCount = 5;
 
 async function parseForm(request: NextRequest) {
 	const formData = await request.formData();
@@ -32,10 +35,16 @@ export async function POST(
 	try {
 		const { uuid } = await params;
 		const form = await parseForm(request);
-		const payload = schemaReply.parse({
+		const parsed = schemaReply.safeParse({
 			subject: form.subject,
 			message: form.message,
 		});
+
+		if (!parsed.success) {
+			return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
+		}
+
+		const payload = parsed.data;
 		const contact = await ContactStorage.get(uuid);
 
 		if (!contact) {
@@ -47,9 +56,18 @@ export async function POST(
 			if (!(file instanceof File)) {
 				continue;
 			}
+			if (attachments.length >= maxAttachmentCount) {
+				break;
+			}
+			if (file.size > maxAttachmentSize) {
+				return NextResponse.json(
+					{ error: "Attachment must be smaller than 5 MB" },
+					{ status: 400 },
+				);
+			}
 			const buffer = Buffer.from(await file.arrayBuffer());
 			attachments.push({
-				filename: file.name || "attachment",
+				filename: file.name?.replace(/[^a-zA-Z0-9._-]/g, "_") || "attachment",
 				content: buffer.toString("base64"),
 				type: file.type || undefined,
 			});
@@ -71,6 +89,7 @@ export async function POST(
 
 		return NextResponse.json({ ok: true });
 	} catch (error) {
-		return routeError(error);
+		console.error("Contact reply error:", error instanceof Error ? error.message : error);
+		return NextResponse.json({ error: "Unexpected server error" }, { status: 500 });
 	}
 }

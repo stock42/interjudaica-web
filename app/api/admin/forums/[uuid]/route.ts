@@ -38,10 +38,7 @@ export async function PATCH(
   try {
     const { uuid } = await params;
     const payload = schemaForumThread.partial().parse(await readJson(request));
-    const item = await ForumStorage.update(uuid, {
-      ...payload,
-      createdBy: "rabbi",
-    });
+    const item = await ForumStorage.update(uuid, payload);
 
     if (!item) {
       return NextResponse.json({ error: "Not found" }, { status: 404 });

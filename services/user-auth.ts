@@ -6,8 +6,8 @@ import type { NextRequest } from "next/server";
 import type { TypeSafeUser } from "@/models/users";
 import { UserStorage } from "@/services/users-storage";
 
-export const USER_SESSION_COOKIE_NAME = "interjudaica_user_session";
-const USER_SESSION_MAX_AGE = 60 * 60 * 24 * 30;
+export const USER_SESSION_COOKIE_NAME = "__Host-interjudaica_user_session";
+const USER_SESSION_MAX_AGE = 60 * 60 * 24 * 7;
 
 type UserSessionPayload = {
   sub: string;
@@ -44,7 +44,7 @@ export function userSessionCookieOptions() {
   return {
     httpOnly: true,
     sameSite: "lax" as const,
-    secure: process.env.NODE_ENV === "production",
+    secure: true,
     path: "/",
     maxAge: USER_SESSION_MAX_AGE,
   };

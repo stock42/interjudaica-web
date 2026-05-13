@@ -5,7 +5,7 @@ export const contactStatuses = ["new", "replied"] as const;
 
 export const schemaContact = z.object({
 	uuid: z.string().uuid().optional(),
-	email: z.string().email(),
+	email: z.string().email().toLowerCase(),
 	firstName: z.string().trim().min(1),
 	lastName: z.string().trim().min(1),
 	message: z.string().trim().min(1).max(5000),

@@ -146,7 +146,7 @@ function CourseFeatureCard({
           {course.summary || "Course details coming soon."}
         </p>
         <div className="mt-5">
-          <ButtonLink href={`/curso/${course.slug}`} tone="secondary">
+          <ButtonLink href={`/course/${course.slug}`} tone="secondary">
             More information <span aria-hidden="true">&gt;</span>
           </ButtonLink>
         </div>
@@ -245,7 +245,7 @@ export default async function Home() {
               Yattah.
             </p>
             <div className="mt-9 flex flex-col gap-4 sm:flex-row">
-              <ButtonLink href="/cursos">
+              <ButtonLink href="/courses">
                 View courses <span aria-hidden="true">&gt;</span>
               </ButtonLink>
               <ButtonLink href="#about-rabbi" tone="secondary">
@@ -328,7 +328,7 @@ export default async function Home() {
               </p>
             </div>
             <div className="mt-6">
-              <ButtonLink href="/cursos" tone="secondary">
+              <ButtonLink href="/courses" tone="secondary">
                 Learn more about the Rabbi <span aria-hidden="true">&gt;</span>
               </ButtonLink>
             </div>

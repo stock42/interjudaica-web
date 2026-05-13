@@ -11,6 +11,7 @@ import { InstructorStorage } from "@/services/instructors-storage";
 import { OperatorStorage } from "@/services/operators-storage";
 import { PaperCategoryStorage } from "@/services/paper-categories-storage";
 import { PaperStorage } from "@/services/papers-storage";
+import { PageStorage } from "@/services/pages-storage";
 import { UserStorage } from "@/services/users-storage";
 
 export const metadata: Metadata = {
@@ -30,6 +31,7 @@ export default async function AdminPage() {
     paperCategories,
     papers,
     users,
+    cmsPages,
   ] = await Promise.all([
     CourseCategoryStorage.list(),
     CourseStorage.list(),
@@ -39,12 +41,14 @@ export default async function AdminPage() {
     PaperCategoryStorage.list(),
     PaperStorage.list(),
     UserStorage.list(),
+    PageStorage.list(),
   ]);
 
   const publishedCourses = courses.filter(
     (course) => course.status === "published",
   );
   const publishedPapers = papers.filter((paper) => paper.status === "published");
+  const publishedPages = cmsPages.filter((page) => page.status === "published");
   const openThreads = forums.filter((thread) => thread.status === "open");
   const activeUsers = users.filter((user) => user.status === "active");
   const enabledOperators = operators.filter((operator) => operator.enabled);
@@ -82,6 +86,11 @@ export default async function AdminPage() {
               value: String(operators.length),
               note: `${enabledOperators.length} enabled`,
             },
+            {
+              label: "CMS Pages",
+              value: String(cmsPages.length),
+              note: `${publishedPages.length} published`,
+            },
           ]}
         />
         <DataTable
@@ -91,7 +100,7 @@ export default async function AdminPage() {
               "Courses",
               String(courses.length),
               String(publishedCourses.length),
-              "/admin/cursos",
+              "/admin/courses",
             ],
             [
               "Course categories",
@@ -131,13 +140,19 @@ export default async function AdminPage() {
               "Forum",
               String(forums.length),
               String(openThreads.length),
-              "/admin/foro",
+              "/admin/forum",
             ],
             [
               "Users",
               String(users.length),
               String(activeUsers.length),
-              "/admin/usuarios",
+              "/admin/users",
+            ],
+            [
+              "CMS Pages",
+              String(cmsPages.length),
+              String(publishedPages.length),
+              "/admin/pages",
             ],
           ]}
         />

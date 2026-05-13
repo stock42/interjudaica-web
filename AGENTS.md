@@ -107,10 +107,15 @@ Collection names currently in use:
 - `social_proof`
 - `users`
 - `operators`
+- `books`
+- `book_sales`
+- `pages`
 
 Use the native MongoDB driver through `services/mongodb.ts` and `services/MongoDBStorage.ts`. Do not add Mongoose.
 
 All request validation and model validation should go through Zod schemas in `models/`. Keep normalization there when possible:
+
+- `BookModel` and `PageModel` generate slugs.
 
 - `CourseModel`, `PaperModel`, `ForumThreadModel`, and category/instructor models generate slugs.
 - `UserModel` and `OperatorModel` hash and verify passwords using scrypt.
@@ -156,7 +161,7 @@ For new entities, follow the existing model/storage/API layering:
 3. Add App Router route handlers under `app/api/admin/...`.
 4. Add admin pages or forms using existing `AdminShell` patterns.
 
-Upload routes currently write validated image files under `public/uploads/courses` or `public/uploads/instructors`. They allow JPG, PNG, WEBP, and GIF up to 5 MB and require admin auth.
+Upload routes currently write validated image files under `public/uploads/courses`, `public/uploads/instructors`, or `public/uploads/books`. They allow JPG, PNG, WEBP, and GIF up to 5 MB and require admin auth.
 
 ## Current Endpoints
 
@@ -202,6 +207,8 @@ Public content endpoints:
 | `GET` | `/api/papers/[slug]/download` | Downloads a paper markdown file. |
 | `GET` | `/api/rabbi-bio` | Returns the public rabbi bio. |
 | `GET` | `/api/social-proof` | Lists published testimonials as `{ items }`. |
+| `POST` | `/api/books/checkout` | Creates a Stripe checkout session for a book. |
+| `GET` | `/api/books/[slug]` | Returns one published book by slug. |
 
 Admin utility endpoints:
 
@@ -218,6 +225,7 @@ Admin utility endpoints:
 | `PUT` | `/api/admin/rabbi-bio` | Updates the rabbi bio content. |
 | `POST` | `/api/admin/uploads/instructor-photo` | Requires operator auth; accepts `multipart/form-data` with `file`; returns `{ url }`. |
 | `POST` | `/api/admin/uploads/forum-asset` | Requires operator auth; accepts `multipart/form-data` with `file`; returns `{ url }`. |
+| `POST` | `/api/admin/uploads/book-cover` | Requires operator auth; accepts `multipart/form-data` with `file`; returns `{ url }`. |
 | `POST` | `/api/admin/enrollments` | Creates a course enrollment for a student. |
 | `POST` | `/api/admin/community-users` | Grants community access to a student. |
 | `GET` | `/api/admin/coupons` | Lists coupons as `{ items }`. |
@@ -283,6 +291,17 @@ Admin CRUD endpoints, all requiring operator auth:
 | `GET` | `/api/admin/users/[uuid]` | Gets one user by UUID, without password fields. |
 | `PATCH` | `/api/admin/users/[uuid]` | Updates one user by UUID. |
 | `DELETE` | `/api/admin/users/[uuid]` | Deletes one user by UUID. |
+| `GET` | `/api/admin/books` | Lists books as `{ items }`. |
+| `POST` | `/api/admin/books` | Creates a book and returns `{ item }`. |
+| `GET` | `/api/admin/books/[uuid]` | Gets one book by UUID. |
+| `PATCH` | `/api/admin/books/[uuid]` | Updates one book by UUID. |
+| `DELETE` | `/api/admin/books/[uuid]` | Deletes one book by UUID. |
+| `GET` | `/api/admin/book-sales` | Lists book sales as `{ items }`. |
+| `GET` | `/api/admin/pages` | Lists CMS pages as `{ items }`. |
+| `POST` | `/api/admin/pages` | Creates a CMS page and returns `{ item }`. |
+| `GET` | `/api/admin/pages/[uuid]` | Gets one CMS page by UUID. |
+| `PATCH` | `/api/admin/pages/[uuid]` | Updates one CMS page by UUID. |
+| `DELETE` | `/api/admin/pages/[uuid]` | Deletes one CMS page by UUID. |
 
 ## Components (installed UI kit)
 
@@ -358,13 +377,13 @@ Shared style conventions:
 Public route map:
 
 - `/`
-- `/cursos`
-- `/curso/[slug]`
-- `/curso/[slug]/clases`
-- `/curso/[slug]/foro`
-- `/comunidad`
-- `/comunidad/papers`
-- `/comunidad/foro`
+- `/courses`
+- `/course/[slug]`
+- `/course/[slug]/classes`
+- `/course/[slug]/forum`
+- `/community`
+- `/community/papers`
+- `/community/forum`
 - `/dashboard`
 - `/login`
 - `/register`
@@ -376,15 +395,17 @@ Public route map:
 - `/forum`
 - `/support`
 - `/verify-email`
-- `/comunidad/papers/[slug]`
+- `/community/papers/[slug]`
+- `/book/[slug]`
+- `/page/[slug]`
 - `/operator-login`
 
 Admin route map:
 
 - `/admin`
-- `/admin/usuarios`
+- `/admin/users`
 - `/admin/operators`, `/admin/operators/new`, `/admin/operators/[uuid]`
-- `/admin/cursos`, `/admin/cursos/new`, `/admin/cursos/[uuid]`
+- `/admin/courses`, `/admin/courses/new`, `/admin/courses/[uuid]`
 - `/admin/classes/[courseUuid]`, `/admin/classes/[courseUuid]/new`, `/admin/classes/[courseUuid]/edit/[classUuid]`
 - `/admin/contacts`, `/admin/contacts/[uuid]`
 - `/admin/password-resets`
@@ -396,10 +417,13 @@ Admin route map:
 - `/admin/instructors`, `/admin/instructors/new`, `/admin/instructors/[uuid]`
 - `/admin/papers`, `/admin/papers/new`, `/admin/papers/[uuid]`
 - `/admin/paper-categories`, `/admin/paper-categories/new`, `/admin/paper-categories/[uuid]`
-- `/admin/foro`, `/admin/foro/new`, `/admin/foro/[uuid]`
+- `/admin/forum`, `/admin/forum/new`, `/admin/forum/[uuid]`
 - `/admin/social-proof`, `/admin/social-proof/new`, `/admin/social-proof/[uuid]`
-- `/admin/suscripciones`
-- `/admin/pagos`
+- `/admin/books`, `/admin/books/new`, `/admin/books/[uuid]`
+- `/admin/book-sales`
+- `/admin/pages`, `/admin/pages/new`, `/admin/pages/[uuid]`
+- `/admin/subscriptions`
+- `/admin/payments`
 - `/admin/analytics`
 
 Some public and admin pages are still static placeholders, especially password recovery, email verification, payments, subscriptions, analytics, and parts of the student dashboard/forum. Do not describe them as fully integrated unless you implement the backing flow.
@@ -408,16 +432,17 @@ Some public and admin pages are still static placeholders, especially password r
 
 Prefer dedicated route-level screens for create/edit flows, matching existing modules:
 
-- `app/admin/cursos/course-form.tsx`
+- `app/admin/courses/course-form.tsx`
 - `app/admin/instructors/instructor-form.tsx`
 - `app/admin/operators/operator-form.tsx`
 - `app/admin/papers/paper-form.tsx`
-- `app/admin/foro/forum-form.tsx`
+- `app/admin/forum/forum-form.tsx`
+- `app/admin/books/book-form.tsx`
 - category forms under `app/admin/course-categories/` and `app/admin/paper-categories/`
 
 List screens usually provide client-side filtering and delete actions, then call `router.refresh()`.
 
-`AdminCollectionManager` exists for generic CRUD management and is currently used by `/admin/usuarios`. Prefer module-specific forms/lists for richer entities.
+`AdminCollectionManager` exists for generic CRUD management and is currently used by `/admin/users`. Prefer module-specific forms/lists for richer entities.
 
 ## Next.js Conventions
 

@@ -9,7 +9,6 @@ import { getCurrentUser } from "@/services/user-auth";
 import { getStripe } from "@/lib/stripe";
 import { sendCoursePaymentConfirmation } from "@/lib/send-course-payment-confirmation";
 import { readJson, routeError } from "@/app/api/_lib/admin-api";
-import { headers } from "next/headers";
 
 export const runtime = "nodejs";
 
@@ -18,16 +17,10 @@ const schemaCheckout = z.object({
 	couponCode: z.string().trim().optional(),
 });
 
-async function getBaseUrl() {
-	const headerList = await headers();
-	const host = headerList.get("host");
-
-	if (!host) {
-		return "http://localhost:3025";
-	}
-
-	const protocol = host.includes("localhost") ? "http" : "https";
-	return `${protocol}://${host}`;
+function getBaseUrl() {
+	const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
+	if (siteUrl) return siteUrl;
+	return "http://localhost:3025";
 }
 
 export async function POST(request: NextRequest) {
@@ -44,7 +37,7 @@ export async function POST(request: NextRequest) {
 		}
 
 		const stripe = getStripe();
-		const baseUrl = await getBaseUrl();
+		const baseUrl = getBaseUrl();
 		const amount = Math.round(course.price * 100);
 
 		const couponCode = payload.couponCode?.trim().toUpperCase() ?? "";

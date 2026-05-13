@@ -12,6 +12,7 @@ const allowedTypes = new Map([
 	["image/webp", "webp"],
 	["image/gif", "gif"],
 ]);
+const maxFileSize = 5 * 1024 * 1024;
 
 export async function POST(request: NextRequest) {
 	const auth = await requireAdminApi(request);
@@ -32,6 +33,13 @@ export async function POST(request: NextRequest) {
 	if (!extension) {
 		return NextResponse.json(
 			{ error: "Only JPG, PNG, WEBP, and GIF images are allowed" },
+			{ status: 400 },
+		);
+	}
+
+	if (file.size > maxFileSize) {
+		return NextResponse.json(
+			{ error: "Image must be smaller than 5 MB" },
 			{ status: 400 },
 		);
 	}

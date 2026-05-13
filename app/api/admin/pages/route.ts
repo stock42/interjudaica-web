@@ -1,0 +1,29 @@
+import { NextResponse, type NextRequest } from "next/server";
+import { schemaPage } from "@/models/pages";
+import { PageStorage } from "@/services/pages-storage";
+import { readJson, requireAdminApi, routeError } from "@/app/api/_lib/admin-api";
+
+export const runtime = "nodejs";
+
+export async function GET(request: NextRequest) {
+	const auth = await requireAdminApi(request);
+	if ("response" in auth) {
+		return auth.response;
+	}
+	const items = await PageStorage.list();
+	return NextResponse.json({ items });
+}
+
+export async function POST(request: NextRequest) {
+	const auth = await requireAdminApi(request);
+	if ("response" in auth) {
+		return auth.response;
+	}
+	try {
+		const payload = schemaPage.parse(await readJson(request));
+		const item = await PageStorage.create(payload);
+		return NextResponse.json({ item }, { status: 201 });
+	} catch (error) {
+		return routeError(error);
+	}
+}

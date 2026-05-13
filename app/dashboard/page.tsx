@@ -67,7 +67,7 @@ export default async function DashboardPage({
               <h2 className="font-display text-3xl font-semibold">
                 My courses
               </h2>
-              <ButtonLink href="/cursos" tone="secondary">
+              <ButtonLink href="/courses" tone="secondary">
                 Find a course
               </ButtonLink>
             </div>
@@ -94,13 +94,13 @@ export default async function DashboardPage({
                       </div>
                       <div className="flex flex-wrap gap-2">
                         <ButtonLink
-                          href={`/curso/${course.slug}/clases`}
+                          href={`/course/${course.slug}/clases`}
                           tone="primary"
                         >
                           Classes
                         </ButtonLink>
                         <ButtonLink
-                          href={`/curso/${course.slug}/foro`}
+                          href={`/course/${course.slug}/foro`}
                           tone="secondary"
                         >
                           Forum
@@ -128,7 +128,7 @@ export default async function DashboardPage({
               </p>
               <div className="mt-5 flex flex-col gap-2 sm:flex-row lg:flex-col">
                 {user.communityStatus === "active" ? (
-                  <ButtonLink href="/comunidad/foro" tone="dark">
+                  <ButtonLink href="/community/foro" tone="dark">
                     Community forum
                   </ButtonLink>
                 ) : (
@@ -137,7 +137,7 @@ export default async function DashboardPage({
                   </ButtonLink>
                 )}
                 <ButtonLink
-                  href="/comunidad/papers"
+                  href="/community/papers"
                   tone="quiet"
                   className="text-white hover:bg-white/10"
                 >

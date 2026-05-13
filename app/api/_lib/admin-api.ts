@@ -25,7 +25,7 @@ export async function readJson(request: NextRequest) {
 export function routeError(error: unknown) {
   if (error instanceof ZodError) {
     return NextResponse.json(
-      { error: "Invalid payload", issues: error.issues },
+      { error: "Invalid payload" },
       { status: 400 },
     );
   }

@@ -1,5 +1,6 @@
 import "server-only";
 
+import { randomInt } from "crypto";
 import {
   UserModel,
   type TypeSafeUser,
@@ -365,7 +366,7 @@ export class UserStorage extends MongoDBStorage<TypeUser> {
   }
 
   private static generateVerificationCode() {
-    return Math.floor(100000 + Math.random() * 900000).toString();
+    return randomInt(100000, 999999).toString();
   }
 
   private static getVerificationExpiry() {

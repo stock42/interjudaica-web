@@ -1,13 +1,12 @@
 import { NextResponse, type NextRequest } from "next/server";
-
-import { getStripe } from "@/lib/stripe";
-import { CouponStorage } from "@/services/coupons-storage";
-import { CommunityUserStorage } from "@/services/community-users-storage";
-import { UserStorage } from "@/services/users-storage";
-import { getCurrentUser } from "@/services/user-auth";
-import { headers } from "next/headers";
-import { readJson, routeError } from "@/app/api/_lib/admin-api";
 import { z } from "zod";
+
+import { getCurrentUser } from "@/services/user-auth";
+import { UserStorage } from "@/services/users-storage";
+import { CommunityUserStorage } from "@/services/community-users-storage";
+import { CouponStorage } from "@/services/coupons-storage";
+import { getStripe } from "@/lib/stripe";
+import { readJson, routeError } from "@/app/api/_lib/admin-api";
 
 export const runtime = "nodejs";
 
@@ -15,16 +14,10 @@ const schemaCheckout = z.object({
 	couponCode: z.string().trim().optional(),
 });
 
-async function getBaseUrl() {
-	const headerList = await headers();
-	const host = headerList.get("host");
-
-	if (!host) {
-		return "http://localhost:3025";
-	}
-
-	const protocol = host.includes("localhost") ? "http" : "https";
-	return `${protocol}://${host}`;
+function getBaseUrl() {
+	const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
+	if (siteUrl) return siteUrl;
+	return "http://localhost:3025";
 }
 
 export async function POST(request: NextRequest) {
@@ -36,7 +29,7 @@ export async function POST(request: NextRequest) {
 
 		const payload = schemaCheckout.parse(await readJson(request));
 		const stripe = getStripe();
-		const baseUrl = await getBaseUrl();
+		const baseUrl = getBaseUrl();
 		const baseAmount = 1900;
 
 		const couponCode = payload.couponCode?.trim().toUpperCase() ?? "";

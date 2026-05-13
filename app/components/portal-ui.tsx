@@ -11,6 +11,8 @@ import {
   formatUsd,
   navItems,
 } from "@/app/lib/content";
+import { PageStorage } from "@/services/pages-storage";
+import { MoreContentMenu } from "@/app/components/more-content-menu";
 
 type CourseCardItem = Pick<
   Course,
@@ -66,9 +68,10 @@ export function ButtonLink({
 }
 
 export async function SiteHeader() {
-  const [operator, user] = await Promise.all([
+  const [operator, user, publishedPages] = await Promise.all([
     getCurrentOperator(),
     getCurrentUser(),
+    PageStorage.listPublished(),
   ]);
   return (
     <header className="sticky top-0 z-50 border-b border-[var(--gold)] bg-black shadow-[0_12px_40px_rgba(0,0,0,0.28)] backdrop-blur-xl">
@@ -109,6 +112,7 @@ export async function SiteHeader() {
               {item.label}
             </Link>
           ))}
+          <MoreContentMenu pages={publishedPages} />
         </nav>
 
         <div className="flex shrink-0 items-center gap-2">
@@ -140,7 +144,18 @@ export async function SiteHeader() {
   );
 }
 
-export function SiteFooter() {
+export async function SiteFooter() {
+  const publishedPages = await PageStorage.listPublished();
+  const footerNavLinks = [
+    { href: "/", label: "Home" },
+    { href: "/courses", label: "Courses" },
+    { href: "/#about-rabbi", label: "About Rabbi" },
+    { href: "/#contact", label: "Contact" },
+    ...publishedPages.map((page) => ({
+      href: `/page/${page.slug}`,
+      label: page.title,
+    })),
+  ];
   return (
     <footer
       id="contact"
@@ -181,12 +196,7 @@ export function SiteFooter() {
 
         <FooterColumn
           title="Navigation"
-          links={[
-            { href: "/", label: "Home" },
-            { href: "/cursos", label: "Courses" },
-            { href: "/#about-rabbi", label: "About Rabbi" },
-            { href: "/#contact", label: "Contact" },
-          ]}
+          links={footerNavLinks}
         />
 
         <div>
@@ -378,7 +388,7 @@ export function CourseCard({ course }: { course: CourseCardItem }) {
               Community: {formatUsd(course.communityPrice)}
             </p>
           </div>
-          <ButtonLink href={`/curso/${course.slug}`} tone="secondary">
+          <ButtonLink href={`/course/${course.slug}`} tone="secondary">
             View course
           </ButtonLink>
         </div>
@@ -563,24 +573,27 @@ export function AdminShell({
 }) {
   const adminLinks = [
     { href: "/admin", label: "Overview" },
-    { href: "/admin/usuarios", label: "Users" },
+    { href: "/admin/users", label: "Users" },
     { href: "/admin/operators", label: "Operators" },
-    { href: "/admin/cursos", label: "Courses" },
+    { href: "/admin/courses", label: "Courses" },
     { href: "/admin/course-categories", label: "Course categories" },
     { href: "/admin/instructors", label: "Instructors" },
-    { href: "/admin/suscripciones", label: "Subscriptions" },
-    { href: "/admin/pagos", label: "Payments" },
+    { href: "/admin/subscriptions", label: "Subscriptions" },
+    { href: "/admin/payments", label: "Payments" },
     { href: "/admin/papers", label: "Papers" },
     { href: "/admin/password-resets", label: "Password resets" },
     { href: "/admin/contacts", label: "Contacts" },
     { href: "/admin/paper-categories", label: "Paper categories" },
     { href: "/admin/social-proof", label: "Social proof" },
-    { href: "/admin/foro", label: "Forum" },
+    { href: "/admin/forum", label: "Forum" },
     { href: "/admin/analytics", label: "Analytics" },
     { href: "/admin/rabbi-bio", label: "Rabbi bio" },
     { href: "/admin/enrollments", label: "Enrollments" },
     { href: "/admin/community-users", label: "Community access" },
     { href: "/admin/coupons", label: "Coupons" },
+    { href: "/admin/books", label: "Books" },
+    { href: "/admin/book-sales", label: "Book sales" },
+    { href: "/admin/pages", label: "Pages" },
   ];
 
   return (

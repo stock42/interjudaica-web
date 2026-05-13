@@ -79,7 +79,7 @@ export function CourseClassList({
 							/>
 						</label>
 						<Link
-							href={`/admin/cursos/${course.uuid}`}
+							href={`/admin/courses/${course.uuid}`}
 							className="inline-flex h-11 items-center justify-center rounded-full border border-[var(--line)] px-4 text-sm font-semibold transition hover:bg-[var(--paper)]"
 						>
 							Back to course
