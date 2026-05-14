@@ -1,6 +1,8 @@
 # Changelog
 
 ## 2026-05-14
+- Overhaul public CMS page rendering (`app/page/markdown-page.tsx`): gold headings (h1-h3), styled lists with bullets/numbers, bold/italic emphasis, blockquotes with gold left border, styled images with border, proper code blocks, tables, and dark-theme links
+- Enable images in markdown content via rehype-sanitize schema allowing `<img>` elements with safe attributes
 - Remove CSRF token validation from admin API (was causing constant auth failures on all admin forms)
 - Fix logout redirect: both student and operator logout now redirect to `/` (home) instead of `/login` and `/operator-login`
 - Fix Stripe checkout redirect: use request host header instead of hardcoded localhost for success/cancel URLs
