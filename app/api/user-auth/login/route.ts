@@ -8,6 +8,8 @@ import {
 import { UserStorage } from "@/services/users-storage";
 import { readJson } from "@/app/api/_lib/admin-api";
 import { createRateLimiter } from "@/services/rate-limiter";
+import { AuditLogStorage } from "@/services/audit-log-storage";
+import { generateCsrfToken, csrfCookieOptions, CSRF_COOKIE } from "@/services/csrf";
 
 export const runtime = "nodejs";
 
@@ -16,7 +18,7 @@ const loginLimiter = createRateLimiter("user-login");
 export async function POST(request: NextRequest) {
 	try {
 		const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
-		const rateCheck = loginLimiter.check(ip, 10, 60_000);
+		const rateCheck = await loginLimiter.check(ip, 10, 60_000);
 		if (!rateCheck.allowed) {
 			return NextResponse.json(
 				{ error: "Too many attempts" },
@@ -33,23 +35,79 @@ export async function POST(request: NextRequest) {
 		const payload = parsed.data;
 		const document = await UserStorage.findByEmail(payload.email);
 
+		if (document?.data.loginLockedUntil) {
+			const lockedUntil = new Date(document.data.loginLockedUntil).getTime();
+			if (Date.now() < lockedUntil) {
+				const retryAfter = Math.ceil((lockedUntil - Date.now()) / 1000);
+				await AuditLogStorage.log({
+					action: "user.login.locked",
+					email: payload.email,
+					ip,
+					details: `Account locked until ${document.data.loginLockedUntil}`,
+				});
+				return NextResponse.json(
+					{ error: "Account temporarily locked" },
+					{ status: 429, headers: { "Retry-After": String(retryAfter) } },
+				);
+			}
+		}
+
 		if (!document || document.data.status !== "active") {
+			await AuditLogStorage.log({
+				action: "user.login.failed",
+				email: payload.email,
+				ip,
+				details: "Invalid credentials or inactive account",
+			});
 			return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
 		}
 
 		const user = await UserStorage.authenticate(payload.email, payload.password);
 
 		if (!user) {
+			if (document) {
+				const attempts = (document.data.loginAttempts ?? 0) + 1;
+				const updateData: Record<string, unknown> = { loginAttempts: attempts };
+				if (attempts >= 5) {
+					updateData.loginLockedUntil = new Date(Date.now() + 900000).toISOString();
+				}
+				await UserStorage.update(document.uuid, updateData as Partial<import("@/models/users").TypeUser>);
+			}
+			await AuditLogStorage.log({
+				action: "user.login.failed",
+				email: payload.email,
+				ip,
+				details: "Invalid credentials",
+			});
 			return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
 		}
 
-		loginLimiter.reset(ip);
+		await loginLimiter.reset(ip);
+
+		if (document) {
+			await UserStorage.update(document.uuid, {
+				loginAttempts: 0,
+				loginLockedUntil: "",
+			} as Partial<import("@/models/users").TypeUser>);
+		}
+
+		await AuditLogStorage.log({
+			action: "user.login.success",
+			email: payload.email,
+			ip,
+			details: "Login successful",
+		});
 
 		const response = NextResponse.json({ user });
 		response.cookies.set(
 			USER_SESSION_COOKIE_NAME,
-			createUserSessionToken(user),
+			await createUserSessionToken(user),
 			userSessionCookieOptions(),
+		);
+		response.cookies.set(
+			CSRF_COOKIE,
+			generateCsrfToken(),
+			csrfCookieOptions(),
 		);
 
 		return response;

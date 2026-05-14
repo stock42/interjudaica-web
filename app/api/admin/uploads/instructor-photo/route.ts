@@ -3,6 +3,8 @@ import { mkdir, writeFile } from "fs/promises";
 import path from "path";
 import { NextResponse, type NextRequest } from "next/server";
 import { requireAdminApi } from "@/app/api/_lib/admin-api";
+import { ConfigStorage } from "@/services/config-storage";
+import { verifyMagicBytes } from "@/lib/magic-bytes";
 
 export const runtime = "nodejs";
 
@@ -12,7 +14,6 @@ const allowedTypes = new Map([
   ["image/webp", "webp"],
   ["image/gif", "gif"],
 ]);
-const maxFileSize = 5 * 1024 * 1024;
 
 export async function POST(request: NextRequest) {
   const auth = await requireAdminApi(request);
@@ -20,6 +21,9 @@ export async function POST(request: NextRequest) {
   if ("response" in auth) {
     return auth.response;
   }
+
+  const maxFileSizeMb = await ConfigStorage.getNumber("upload_image_max_size_mb");
+  const maxFileSize = maxFileSizeMb * 1024 * 1024;
 
   const formData = await request.formData();
   const file = formData.get("file");
@@ -39,12 +43,19 @@ export async function POST(request: NextRequest) {
 
   if (file.size > maxFileSize) {
     return NextResponse.json(
-      { error: "Image must be smaller than 5 MB" },
+      { error: `Image must be smaller than ${maxFileSizeMb} MB` },
       { status: 400 },
     );
   }
 
   const buffer = Buffer.from(await file.arrayBuffer());
+
+  if (!verifyMagicBytes(buffer, file.type)) {
+    return NextResponse.json(
+      { error: "File content does not match the claimed image type" },
+      { status: 400 },
+    );
+  }
   const uploadDir = path.join(process.cwd(), "public", "uploads", "instructors");
   const filename = `instructor-${Date.now()}-${randomUUID()}.${extension}`;
   const filepath = path.join(uploadDir, filename);

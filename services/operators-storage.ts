@@ -135,6 +135,7 @@ export class OperatorStorage extends MongoDBStorage<TypeOperator> {
 
     if (input.password?.trim()) {
       await operator.setPassword(input.password);
+      operator.getData().passwordChangedAt = new Date().toISOString();
     }
 
     await MongoDBStorage._replaceData<TypeOperator>(
@@ -184,5 +185,18 @@ export class OperatorStorage extends MongoDBStorage<TypeOperator> {
     }
 
     return OperatorStorage.toSafeOperator(document);
+  }
+
+  static async updateRaw(uuid: string, data: Partial<TypeOperator>) {
+    await OperatorStorage.ensureIndexes();
+    const update: Record<string, unknown> = { _updated: new Date() };
+    for (const [key, value] of Object.entries(data)) {
+      update[`data.${key}`] = value;
+    }
+    return MongoDBStorage._update<TypeOperator>(
+      OperatorStorage.COLLECTION,
+      { "data.uuid": uuid },
+      update,
+    );
   }
 }

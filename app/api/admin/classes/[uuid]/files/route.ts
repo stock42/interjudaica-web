@@ -6,10 +6,9 @@ import { NextResponse, type NextRequest } from "next/server";
 import { CourseClassFileStorage } from "@/services/course-class-files-storage";
 import { CourseClassStorage } from "@/services/course-classes-storage";
 import { requireAdminApi } from "@/app/api/_lib/admin-api";
+import { ConfigStorage } from "@/services/config-storage";
 
 export const runtime = "nodejs";
-
-const maxFileSize = 50 * 1024 * 1024;
 
 function safeName(originalName: string) {
 	return path.basename(originalName).replace(/[^a-zA-Z0-9._-]/g, "_");
@@ -47,7 +46,10 @@ export async function POST(
 		return NextResponse.json({ error: "Class not found" }, { status: 404 });
 	}
 
-	const formData = await request.formData();
+  const maxFileSizeMb = await ConfigStorage.getNumber("upload_class_file_max_size_mb");
+  const maxFileSize = maxFileSizeMb * 1024 * 1024;
+
+  const formData = await request.formData();
 	const file = formData.get("file");
 	const title = String(formData.get("title") ?? "");
 

@@ -110,6 +110,7 @@ Collection names currently in use:
 - `books`
 - `book_sales`
 - `pages`
+- `config`
 
 Use the native MongoDB driver through `services/mongodb.ts` and `services/MongoDBStorage.ts`. Do not add Mongoose.
 
@@ -302,6 +303,8 @@ Admin CRUD endpoints, all requiring operator auth:
 | `GET` | `/api/admin/pages/[uuid]` | Gets one CMS page by UUID. |
 | `PATCH` | `/api/admin/pages/[uuid]` | Updates one CMS page by UUID. |
 | `DELETE` | `/api/admin/pages/[uuid]` | Deletes one CMS page by UUID. |
+| `GET` | `/api/admin/config` | Returns all configuration entries as `{ items }`. |
+| `PUT` | `/api/admin/config` | Updates configuration entries by key-value map.
 
 ## Components (installed UI kit)
 
@@ -422,6 +425,7 @@ Admin route map:
 - `/admin/books`, `/admin/books/new`, `/admin/books/[uuid]`
 - `/admin/book-sales`
 - `/admin/pages`, `/admin/pages/new`, `/admin/pages/[uuid]`
+- `/admin/config`
 - `/admin/subscriptions`
 - `/admin/payments`
 - `/admin/analytics`

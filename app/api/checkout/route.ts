@@ -43,16 +43,15 @@ export async function POST(request: NextRequest) {
 		const couponCode = payload.couponCode?.trim().toUpperCase() ?? "";
 		let percentOff = 0;
 		if (couponCode) {
-			const coupon = await CouponStorage.findValid({
+			const claimed = await CouponStorage.claimCoupon({
 				code: couponCode,
 				scope: "course",
 				courseUuid: course.uuid ?? "",
 			});
-			if (!coupon) {
+			if (!claimed) {
 				return NextResponse.json({ error: "Invalid coupon" }, { status: 400 });
 			}
-			percentOff = coupon.coupon.percentOff;
-			await CouponStorage.incrementUsage(coupon.uuid);
+			percentOff = claimed.coupon.percentOff;
 		}
 
 		const discountedAmount = Math.max(

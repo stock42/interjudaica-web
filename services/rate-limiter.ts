@@ -1,56 +1,81 @@
 import "server-only";
 
-interface RateLimitEntry {
+import { MongoDBStorage } from "@/services/MongoDBStorage";
+
+type RateLimitDoc = {
+	key: string;
 	count: number;
-	resetAt: number;
+	resetAt: Date;
+};
+
+let indexesReady = false;
+
+async function ensureIndexes() {
+	if (indexesReady) return;
+	const collection = await MongoDBStorage.getCollection<RateLimitDoc>(
+		"rate_limit_entries",
+	);
+	await Promise.all([
+		collection.createIndex({ key: 1, resetAt: 1 }),
+		collection.createIndex({ resetAt: 1 }, { expireAfterSeconds: 0 }),
+	]);
+	indexesReady = true;
 }
 
-const stores = new Map<string, Map<string, RateLimitEntry>>();
-
 export function createRateLimiter(namespace: string) {
-	if (!stores.has(namespace)) {
-		stores.set(namespace, new Map());
-	}
-
-	const store = stores.get(namespace)!;
-
-	function cleanup() {
-		const now = Date.now();
-		for (const [key, entry] of store) {
-			if (now > entry.resetAt) {
-				store.delete(key);
-			}
-		}
-	}
+	const prefix = `${namespace}:`;
 
 	return {
-		check(
+		async check(
 			key: string,
 			limit: number,
 			windowMs: number,
-		): { allowed: boolean; retryAfter?: number } {
-			cleanup();
+		): Promise<{ allowed: boolean; retryAfter?: number }> {
+			await ensureIndexes();
+			const collection = await MongoDBStorage.getCollection<RateLimitDoc>(
+				"rate_limit_entries",
+			);
 
-			const now = Date.now();
-			const entry = store.get(key);
+			const fullKey = `${prefix}${key}`;
+			const now = new Date();
 
-			if (!entry || now > entry.resetAt) {
-				store.set(key, { count: 1, resetAt: now + windowMs });
+			const updated = await collection.findOneAndUpdate(
+				{
+					key: fullKey,
+					resetAt: { $gt: now },
+				},
+				{ $inc: { count: 1 } },
+				{ returnDocument: "after" },
+			);
+
+			if (updated) {
+				const count = updated.data?.count ?? 0;
+				const resetAt = updated.data?.resetAt ?? new Date();
+				if (count > limit) {
+					const retryAfter = Math.ceil(
+						(resetAt.getTime() - Date.now()) / 1000,
+					);
+					return { allowed: false, retryAfter };
+				}
 				return { allowed: true };
 			}
 
-			entry.count++;
-
-			if (entry.count > limit) {
-				const retryAfter = Math.ceil((entry.resetAt - now) / 1000);
-				return { allowed: false, retryAfter };
-			}
+			const resetAt = new Date(Date.now() + windowMs);
+			await collection.updateOne(
+				{ key: fullKey },
+				{ $set: { key: fullKey, count: 1, resetAt } },
+				{ upsert: true },
+			);
 
 			return { allowed: true };
 		},
 
-		reset(key: string) {
-			store.delete(key);
+		async reset(key: string) {
+			await ensureIndexes();
+			const collection = await MongoDBStorage.getCollection<RateLimitDoc>(
+				"rate_limit_entries",
+			);
+			await collection.deleteOne({ key: `${prefix}${key}` });
 		},
 	};
 }

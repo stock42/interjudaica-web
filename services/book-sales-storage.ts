@@ -69,6 +69,18 @@ export class BookSaleStorage extends MongoDBStorage<TypeBookSale> {
 		return doc?.data ?? null;
 	}
 
+	static async listByEmail(email: string) {
+		await BookSaleStorage.ensureIndexes();
+		const docs = await MongoDBStorage._find<TypeBookSale>(
+			BookSaleStorage.COLLECTION,
+			{ "data.buyerEmail": email.toLowerCase() },
+			undefined,
+			{ _added: -1 },
+		);
+
+		return docs.map((doc) => doc.data);
+	}
+
 	static async getByAccessToken(token: string) {
 		await BookSaleStorage.ensureIndexes();
 		const doc = await MongoDBStorage._findOne<TypeBookSale>(

@@ -5,9 +5,9 @@ import { publishingStatuses } from "@/models/courses";
 export const schemaBook = z.object({
 	uuid: z.string().uuid().optional(),
 	slug: z.string().trim().optional(),
-	title: z.string().trim().min(2),
-	description: z.string().trim().default(""),
-	longDescription: z.string().trim().default(""),
+	title: z.string().trim().min(2).max(200),
+	description: z.string().trim().max(500).default(""),
+	longDescription: z.string().trim().max(10000).default(""),
 	coverUrl: z.string().trim().default(""),
 	filePath: z.string().trim().default(""),
 	price: z.coerce.number().nonnegative().default(0),

@@ -10,12 +10,12 @@ export const communityStatuses = ["none", "active", "cancelled", "manual"] as co
 
 export const schemaUser = z.object({
   uuid: z.string().uuid().optional(),
-  email: z.string().email().transform((email) => email.toLowerCase()),
-  firstName: z.string().trim().default(""),
-  lastName: z.string().trim().default(""),
-  country: z.string().trim().default(""),
-  state: z.string().trim().default(""),
-  city: z.string().trim().default(""),
+  email: z.string().email().max(320).transform((email) => email.toLowerCase()),
+  firstName: z.string().trim().max(100).default(""),
+  lastName: z.string().trim().max(100).default(""),
+  country: z.string().trim().max(100).default(""),
+  state: z.string().trim().max(100).default(""),
+  city: z.string().trim().max(100).default(""),
 	password: z.string().default(""),
   role: z.string().trim().default("student"),
   status: z.enum(userStatuses).default("active"),
@@ -28,6 +28,10 @@ export const schemaUser = z.object({
   passwordResetAttempts: z.coerce.number().int().min(0).default(0),
   passwordResetAttemptsWindowStart: z.string().trim().default(""),
   passwordResetLockedUntil: z.string().trim().default(""),
+  passwordChangedAt: z.string().trim().default("").optional(),
+  loginAttempts: z.coerce.number().int().min(0).default(0).optional(),
+  loginLockedUntil: z.string().trim().default("").optional(),
+  emailNotifications: z.coerce.boolean().default(true).optional(),
 });
 
 export const schemaUserSignup = z.object({
@@ -61,7 +65,10 @@ export type TypeSafeUser = Omit<
     "passwordResetExpiresAt" |
     "passwordResetAttempts" |
     "passwordResetAttemptsWindowStart" |
-    "passwordResetLockedUntil"
+    "passwordResetLockedUntil" |
+    "passwordChangedAt" |
+    "loginAttempts" |
+    "loginLockedUntil"
 > & {
   uuid: string;
 };
@@ -103,10 +110,11 @@ export class UserModel {
       lastName: this.userData.lastName,
       country: this.userData.country,
       state: this.userData.state,
-      city: this.userData.city,
-      role: this.userData.role,
-      status: this.userData.status,
-      communityStatus: this.userData.communityStatus,
+    city: this.userData.city,
+    role: this.userData.role,
+    status: this.userData.status,
+    communityStatus: this.userData.communityStatus,
+    emailNotifications: this.userData.emailNotifications ?? true,
     };
   }
 }

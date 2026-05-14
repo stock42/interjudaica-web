@@ -4,6 +4,7 @@ import { UserStorage } from "@/services/users-storage";
 import { readJson } from "@/app/api/_lib/admin-api";
 import { sendVerificationEmail } from "@/lib/send-verification-email";
 import { createRateLimiter } from "@/services/rate-limiter";
+import { AuditLogStorage } from "@/services/audit-log-storage";
 
 export const runtime = "nodejs";
 
@@ -12,7 +13,7 @@ const registerLimiter = createRateLimiter("user-register");
 export async function POST(request: NextRequest) {
 	try {
 		const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
-		const rateCheck = registerLimiter.check(ip, 5, 300_000);
+		const rateCheck = await registerLimiter.check(ip, 5, 300_000);
 		if (!rateCheck.allowed) {
 			return NextResponse.json(
 				{ error: "Too many registration attempts" },
@@ -37,6 +38,13 @@ export async function POST(request: NextRequest) {
 		}
 
 		const { user, verificationCode } = await UserStorage.register(payload);
+
+		await AuditLogStorage.log({
+			action: "user.register",
+			email: payload.email,
+			ip,
+			details: "Registration successful",
+		});
 
 		await sendVerificationEmail({
 			email: payload.email,

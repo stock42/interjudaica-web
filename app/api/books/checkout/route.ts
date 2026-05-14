@@ -6,6 +6,7 @@ import { BookSaleStorage } from "@/services/book-sales-storage";
 import { getCurrentUser } from "@/services/user-auth";
 import { getStripe } from "@/lib/stripe";
 import { readJson } from "@/app/api/_lib/admin-api";
+import { sendBookPaymentConfirmation } from "@/lib/send-book-payment-confirmation";
 
 export const runtime = "nodejs";
 
@@ -54,6 +55,33 @@ export async function POST(request: NextRequest) {
 		const baseUrl = getBaseUrl();
 		const amount = Math.round(book.price * 100);
 		const accessToken = randomUUID();
+
+		if (amount === 0) {
+			await BookSaleStorage.create({
+				bookUuid: book.uuid ?? "",
+				bookTitle: book.title,
+				buyerFirstName: firstName,
+				buyerLastName: lastName,
+				buyerEmail: email,
+				amount: 0,
+				currency: "usd",
+				stripeSessionId: `free-${accessToken}`,
+				accessToken,
+				status: "paid",
+				paidAt: new Date().toISOString(),
+			} as Partial<import("@/models/book-sales").TypeBookSale>);
+
+			const downloadUrl = `${baseUrl}/api/books/download?token=${accessToken}`;
+			await sendBookPaymentConfirmation({
+				email,
+				firstName,
+				bookTitle: book.title,
+				priceLabel: "Free",
+				downloadUrl,
+			});
+
+			return NextResponse.json({ url: downloadUrl });
+		}
 
 		const description = (book.description || "").trim();
 

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { TooltipProvider } from "@/components/ui/tooltip"
 import { SiteFooter, SiteHeader } from "@/app/components/portal-ui";
+import { BackToTop } from "@/app/components/back-to-top";
 import { Geist } from "next/font/google";
 import { cn } from "@/lib/utils";
 
@@ -39,6 +40,7 @@ export default function RootLayout({
           <SiteHeader />
           {children}
           <SiteFooter />
+          <BackToTop />
         </TooltipProvider>
       </body>
     </html>

@@ -5,13 +5,19 @@ import { cookies } from "next/headers";
 import type { NextRequest } from "next/server";
 import type { TypeSafeUser } from "@/models/users";
 import { UserStorage } from "@/services/users-storage";
+import { ConfigStorage } from "@/services/config-storage";
 
 export const USER_SESSION_COOKIE_NAME = "__Host-interjudaica_user_session";
-const USER_SESSION_MAX_AGE = 60 * 60 * 24 * 7;
+const USER_SESSION_MAX_AGE_DEFAULT = 60 * 60 * 24 * 7;
+
+async function getUserSessionMaxAge() {
+	return (await ConfigStorage.getNumber("user_session_max_age_seconds")) || USER_SESSION_MAX_AGE_DEFAULT;
+}
 
 type UserSessionPayload = {
   sub: string;
   email: string;
+  iat: number;
   exp: number;
 };
 
@@ -46,15 +52,18 @@ export function userSessionCookieOptions() {
     sameSite: "lax" as const,
     secure: true,
     path: "/",
-    maxAge: USER_SESSION_MAX_AGE,
+    maxAge: USER_SESSION_MAX_AGE_DEFAULT,
   };
 }
 
-export function createUserSessionToken(user: TypeSafeUser) {
+export async function createUserSessionToken(user: TypeSafeUser) {
+  const maxAge = await getUserSessionMaxAge();
+  const now = Math.floor(Date.now() / 1000);
   const payload: UserSessionPayload = {
     sub: user.uuid,
     email: user.email,
-    exp: Math.floor(Date.now() / 1000) + USER_SESSION_MAX_AGE,
+    iat: now,
+    exp: now + maxAge,
   };
   const body = encode(payload);
   return `${body}.${sign(body)}`;
@@ -87,6 +96,13 @@ export async function getUserFromToken(token?: string) {
 
   if (!user || user.data.status !== "active") {
     return null;
+  }
+
+  if (user.data.passwordChangedAt && payload.iat) {
+    const changedAt = new Date(user.data.passwordChangedAt).getTime() / 1000;
+    if (payload.iat < changedAt) {
+      return null;
+    }
   }
 
   return UserStorage.toSafeUser(user);

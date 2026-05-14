@@ -594,6 +594,8 @@ export function AdminShell({
     { href: "/admin/books", label: "Books" },
     { href: "/admin/book-sales", label: "Book sales" },
     { href: "/admin/pages", label: "Pages" },
+    { href: "/admin/config", label: "Configuration" },
+    { href: "/admin/translations", label: "Translations" },
   ];
 
   return (

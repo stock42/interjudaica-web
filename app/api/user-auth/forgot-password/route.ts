@@ -17,7 +17,7 @@ const forgotLimiter = createRateLimiter("forgot-password");
 export async function POST(request: NextRequest) {
 	try {
 		const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
-		const rateCheck = forgotLimiter.check(ip, 5, 300_000);
+		const rateCheck = await forgotLimiter.check(ip, 5, 300_000);
 		if (!rateCheck.allowed) {
 			return NextResponse.json(
 				{ ok: true },

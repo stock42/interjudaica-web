@@ -1,7 +1,11 @@
-import { randomUUID } from "crypto";
+import { randomUUID, randomInt } from "crypto";
 
 export function createUuid() {
   return randomUUID();
+}
+
+export function generateVerificationCode(): string {
+  return randomInt(100000, 999999).toString();
 }
 
 export function slugify(value: string) {

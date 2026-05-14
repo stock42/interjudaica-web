@@ -9,10 +9,12 @@ export default function BookPaymentConfirmationEmail({
 	firstName,
 	bookTitle,
 	priceLabel,
+	downloadUrl,
 }: {
 	firstName: string;
 	bookTitle: string;
 	priceLabel: string;
+	downloadUrl?: string;
 }) {
 	return (
 		<div style={base}>
@@ -62,10 +64,32 @@ export default function BookPaymentConfirmationEmail({
 					<p style={{ margin: "10px 0 0" }}>
 						Amount: <strong>{priceLabel}</strong>
 					</p>
-					<p style={{ margin: "10px 0 0" }}>
-						You will receive a separate email with your download link
-						shortly. If you have any questions, please contact us.
-					</p>
+					{downloadUrl ? (
+						<div style={{ margin: "14px 0 0" }}>
+							<a
+								href={downloadUrl}
+								style={{
+									display: "inline-block",
+									padding: "10px 22px",
+									backgroundColor: palette.gold,
+									color: "#050608",
+									fontWeight: 700,
+									borderRadius: 8,
+									textDecoration: "none",
+									fontSize: 14,
+								}}
+							>
+								Download your book
+							</a>
+							<p style={{ margin: "8px 0 0", ...small }}>
+								Or copy this link: {downloadUrl}
+							</p>
+						</div>
+					) : (
+						<p style={{ margin: "10px 0 0" }}>
+							Your download will be available in your dashboard.
+						</p>
+					)}
 				</div>
 
 				<p style={{ marginTop: 18, ...small }}>

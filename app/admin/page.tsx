@@ -13,6 +13,7 @@ import { PaperCategoryStorage } from "@/services/paper-categories-storage";
 import { PaperStorage } from "@/services/papers-storage";
 import { PageStorage } from "@/services/pages-storage";
 import { UserStorage } from "@/services/users-storage";
+import { AdminSearchBar } from "@/app/admin/components/admin-search-bar";
 
 export const metadata: Metadata = {
   title: "Admin",
@@ -59,6 +60,7 @@ export default async function AdminPage() {
       description="Monitor catalog content, community writing, forum moderation, and student records."
     >
       <div className="grid gap-6">
+        <AdminSearchBar />
         <AdminStatGrid
           stats={[
             {

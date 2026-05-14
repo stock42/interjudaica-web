@@ -42,6 +42,7 @@ export type Course = {
 export const navItems = [
   { href: "/", label: "Home" },
   { href: "/courses", label: "Courses" },
+  { href: "/books", label: "Books" },
   { href: "/community", label: "Community" },
   { href: "/forum", label: "Forum" },
   { href: "/#about-rabbi", label: "About Rabbi" },

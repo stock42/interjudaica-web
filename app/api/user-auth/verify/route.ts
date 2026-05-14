@@ -10,6 +10,7 @@ import { UserStorage } from "@/services/users-storage";
 import { readJson } from "@/app/api/_lib/admin-api";
 import { sendWelcomeEmail } from "@/lib/send-welcome-email";
 import { createRateLimiter } from "@/services/rate-limiter";
+import { AuditLogStorage } from "@/services/audit-log-storage";
 
 export const runtime = "nodejs";
 
@@ -23,7 +24,7 @@ const verifyLimiter = createRateLimiter("user-verify");
 export async function POST(request: NextRequest) {
 	try {
 		const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
-		const rateCheck = verifyLimiter.check(ip, 10, 60_000);
+		const rateCheck = await verifyLimiter.check(ip, 10, 60_000);
 		if (!rateCheck.allowed) {
 			return NextResponse.json(
 				{ error: "Too many attempts" },
@@ -47,12 +48,19 @@ export async function POST(request: NextRequest) {
 			return NextResponse.json({ error: result.error }, { status: 400 });
 		}
 
-		verifyLimiter.reset(ip);
+		await verifyLimiter.reset(ip);
+
+		await AuditLogStorage.log({
+			action: "user.verifyEmail.success",
+			email: result.user.email,
+			ip,
+			details: "Email verified",
+		});
 
 		const response = NextResponse.json({ user: result.user });
 		response.cookies.set(
 			USER_SESSION_COOKIE_NAME,
-			createUserSessionToken(result.user),
+			await createUserSessionToken(result.user),
 			userSessionCookieOptions(),
 		);
 

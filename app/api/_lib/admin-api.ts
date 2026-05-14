@@ -1,6 +1,7 @@
 import { ZodError } from "zod";
 import { NextResponse, type NextRequest } from "next/server";
 import { authenticateApiRequest } from "@/services/auth";
+import { verifyCsrfToken, CSRF_HEADER } from "@/services/csrf";
 
 export async function requireAdminApi(request: NextRequest) {
   const operator = await authenticateApiRequest(request);
@@ -9,6 +10,15 @@ export async function requireAdminApi(request: NextRequest) {
     return {
       response: NextResponse.json({ error: "Unauthorized" }, { status: 401 }),
     };
+  }
+
+  if (request.method !== "GET") {
+    const csrf = request.headers.get(CSRF_HEADER);
+    if (!csrf || !verifyCsrfToken(csrf)) {
+      return {
+        response: NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 }),
+      };
+    }
   }
 
   return { operator };

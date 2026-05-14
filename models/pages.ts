@@ -5,9 +5,9 @@ import { publishingStatuses } from "@/models/courses";
 export const schemaPage = z.object({
 	uuid: z.string().uuid().optional(),
 	slug: z.string().trim().optional(),
-	title: z.string().trim().min(2),
-	description: z.string().trim().default(""),
-	content: z.string().trim().default(""),
+	title: z.string().trim().min(2).max(200),
+	description: z.string().trim().max(500).default(""),
+	content: z.string().trim().max(100000).default(""),
 	status: z.enum(publishingStatuses).default("draft"),
 });
 

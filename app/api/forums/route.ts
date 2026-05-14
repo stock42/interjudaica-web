@@ -6,6 +6,8 @@ import { getCurrentUser } from "@/services/user-auth";
 import { CourseStorage } from "@/services/courses-storage";
 import { CourseEnrollmentStorage } from "@/services/course-enrollments-storage";
 import { readJson, routeError } from "@/app/api/_lib/admin-api";
+import { sendForumReplyNotification } from "@/lib/send-forum-reply-notification";
+import { getBaseUrl } from "@/lib/base-url";
 
 export const runtime = "nodejs";
 
@@ -123,6 +125,21 @@ export async function POST(request: NextRequest) {
 			imageUrls: payload.imageUrls,
 			status: "open",
 		});
+
+		if (payload.scope === "course" && payload.courseSlug) {
+			const course = await CourseStorage.findPublishedBySlug(payload.courseSlug);
+			if (course) {
+				const baseUrl = getBaseUrl();
+				sendForumReplyNotification({
+					email: course.instructor === "Rabbi Yattah" ? "info@interjudaica.com" : `${course.instructorSlug}@interjudaica.com`,
+					firstName: course.instructor,
+					threadTitle: payload.title,
+					replyAuthor: `${user.firstName} ${user.lastName}`.trim(),
+					replyPreview: payload.content.slice(0, 200),
+					forumUrl: `${baseUrl}/course/${payload.courseSlug}/foro`,
+				}).catch(() => {});
+			}
+		}
 
 		return NextResponse.json({ item }, { status: 201 });
 	} catch (error) {

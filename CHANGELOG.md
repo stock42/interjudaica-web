@@ -1,13 +1,22 @@
 # Changelog
 
 ## 2026-05-13
-- **Security audit and hardening**: Fixed path traversal in forum-asset and class-file upload routes; fixed Host header poisoning in all checkout routes (now uses NEXT_PUBLIC_SITE_URL); replaced Math.random() with crypto.randomInt() for verification/reset codes; added rate limiting to login, register, verify, forgot-password, and reset-password endpoints; replaced Zod parse() with safeParse() in all user-facing endpoints to prevent schema exposure; hardened session cookies with __Host- prefix, Secure flag enforced, and SameSite:Strict for operators; reduced user session maxAge from 30 to 7 days; added password max length (128 chars); sanitized 'kind' parameter in course-image upload; added file type/size validation to forum-asset, class-image, and forum student upload routes; fixed forum PATCH no longer overwrites createdBy; added attachment validation to contact reply endpoint; normalized email to lowercase in contacts, book-sales, and password-reset-attempts models.
-- Rename all Spanish route directories to English (cursos→courses, usuarios→users, foro→forum, comunidad→community, libro→book, etc.) across admin and public pages.
-- Add full books module: admin CRUD for books (`/admin/books`), book sales list (`/admin/book-sales`), public book landing page (`/book/[slug]`), Stripe checkout for books (no login required), book cover image upload, and purchase confirmation email template.
-- Add CMS dynamic pages module: admin CRUD for pages (`/admin/pages`), markdown content editor, public route at `/page/[slug]` with react-markdown rendering, "More content" dropdown in header, and page links in footer.
-- Extend Stripe webhook to handle book purchases and send thank-you emails via Resend.
-- Add `BookSaleStorage.get()` and `BookSaleStorage.markFailed()` methods.
-- Add `PageStorage` service and `createRateLimiter` utility.
+- **Complete security hardening (9 items)**:
+  - Session invalidation on password reset (passwordChangedAt + iat in tokens)
+  - Coupon race condition fix (atomic claimCoupon with findOneAndUpdate)
+  - Stripe webhook idempotency (webhook_events collection dedup)
+  - MIME magic byte validation on all 6 upload routes
+  - CSRF protection (token cookie + header validation in requireAdminApi)
+  - Account lockout after 5 failed login attempts (15-min lock)
+  - Audit logging (audit_logs collection: login, register, verify, reset events)
+  - Security headers: CSP, HSTS, X-Content-Type-Options, X-Frame-Options, Referrer-Policy, Permissions-Policy
+- **Configuration system**: Admin-configurable settings in MongoDB `config` collection. Moved upload size limits, community price, attachment limits to config. `/admin/config` page with grouped form.
+- **Security audit and hardening**: Fixed path traversal, host header poisoning, Math.random→crypto.randomInt, rate limiting on all auth endpoints, safeParse in user endpoints, cookie hardening (__Host- prefix, Secure, SameSite strict/lax), password max length, kind sanitization, file validation, forum createdBy fix, attachment validation, email normalization
+- Rename all Spanish route directories to English across admin and public pages
+- Books module: admin CRUD, sales list, public landing, Stripe checkout (no login), email confirmation
+- CMS dynamic pages: admin CRUD with markdown editor, /page/[slug] routes, More content dropdown in header, footer link list
+- Extend Stripe webhook for book purchases
+- New services: BookSaleStorage, ConfigStorage, PageStorage, createRateLimiter, WebhookEventStorage, AuditLogStorage, CSRF service, magic-bytes validator
 
 ## 2026-05-05
 - Read MONGODB_URI/MONGODB_DATABASE env vars as fallbacks for MongoDB connection.

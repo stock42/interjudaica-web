@@ -9,9 +9,9 @@ const lineArray = z.preprocess(linesToArray, z.array(z.string()));
 export const schemaCourse = z.object({
   uuid: z.string().uuid().optional(),
   slug: z.string().trim().optional(),
-  title: z.string().trim().min(2),
+  title: z.string().trim().min(2).max(200),
   categoryUuid: z.string().uuid().optional().or(z.literal("")),
-  category: z.string().trim().min(2),
+  category: z.string().trim().min(2).max(100),
   categorySlug: z.string().trim().default(""),
   level: z.enum(courseLevels).default("Beginner"),
   price: z.coerce.number().nonnegative().default(0),

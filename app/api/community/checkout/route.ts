@@ -7,6 +7,7 @@ import { CommunityUserStorage } from "@/services/community-users-storage";
 import { CouponStorage } from "@/services/coupons-storage";
 import { getStripe } from "@/lib/stripe";
 import { readJson, routeError } from "@/app/api/_lib/admin-api";
+import { ConfigStorage } from "@/services/config-storage";
 
 export const runtime = "nodejs";
 
@@ -30,20 +31,20 @@ export async function POST(request: NextRequest) {
 		const payload = schemaCheckout.parse(await readJson(request));
 		const stripe = getStripe();
 		const baseUrl = getBaseUrl();
-		const baseAmount = 1900;
+		const baseAmount = await ConfigStorage.getNumber("community_membership_price_cents");
+		const currency = await ConfigStorage.get("currency");
 
 		const couponCode = payload.couponCode?.trim().toUpperCase() ?? "";
 		let percentOff = 0;
 		if (couponCode) {
-			const coupon = await CouponStorage.findValid({
+			const claimed = await CouponStorage.claimCoupon({
 				code: couponCode,
 				scope: "community",
 			});
-			if (!coupon) {
+			if (!claimed) {
 				return NextResponse.json({ error: "Invalid coupon" }, { status: 400 });
 			}
-			percentOff = coupon.coupon.percentOff;
-			await CouponStorage.incrementUsage(coupon.uuid);
+			percentOff = claimed.coupon.percentOff;
 		}
 
 		const discountedAmount = Math.max(
@@ -64,7 +65,7 @@ export async function POST(request: NextRequest) {
 		line_items: [
 			{
 				price_data: {
-					currency: "usd",
+					currency,
 					product_data: {
 						name: "InterJudaica Community",
 						description: "Community membership subscription",

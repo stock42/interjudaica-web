@@ -6,14 +6,20 @@ import { redirect } from "next/navigation";
 import type { NextRequest } from "next/server";
 import type { TypeSafeOperator } from "@/models/operators";
 import { OperatorStorage } from "@/services/operators-storage";
+import { ConfigStorage } from "@/services/config-storage";
 
 export const SESSION_COOKIE_NAME = "__Host-interjudaica_operator_session";
-const SESSION_MAX_AGE = 60 * 60 * 8;
+const SESSION_MAX_AGE_DEFAULT = 60 * 60 * 8;
+
+async function getSessionMaxAge() {
+	return (await ConfigStorage.getNumber("operator_session_max_age_seconds")) || SESSION_MAX_AGE_DEFAULT;
+}
 
 type SessionPayload = {
   sub: string;
   email: string;
   level: number;
+  iat: number;
   exp: number;
 };
 
@@ -48,16 +54,19 @@ export function sessionCookieOptions() {
     sameSite: "strict" as const,
     secure: true,
     path: "/",
-    maxAge: SESSION_MAX_AGE,
+    maxAge: SESSION_MAX_AGE_DEFAULT,
   };
 }
 
-export function createOperatorSessionToken(operator: TypeSafeOperator) {
+export async function createOperatorSessionToken(operator: TypeSafeOperator) {
+  const maxAge = await getSessionMaxAge();
+  const now = Math.floor(Date.now() / 1000);
   const payload: SessionPayload = {
     sub: operator.uuid,
     email: operator.email,
     level: operator.level,
-    exp: Math.floor(Date.now() / 1000) + SESSION_MAX_AGE,
+    iat: now,
+    exp: now + maxAge,
   };
   const body = encode(payload);
   return `${body}.${sign(body)}`;
@@ -91,6 +100,13 @@ export async function getOperatorFromToken(token?: string) {
 
   if (!operator || !operator.data.enabled) {
     return null;
+  }
+
+  if (operator.data.passwordChangedAt && payload.iat) {
+    const changedAt = new Date(operator.data.passwordChangedAt).getTime() / 1000;
+    if (payload.iat < changedAt) {
+      return null;
+    }
   }
 
   return OperatorStorage.toSafeOperator(operator);

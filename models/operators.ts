@@ -1,6 +1,5 @@
 import { z } from "zod";
-import { randomInt } from "crypto";
-import { createUuid } from "@/models/model-utils";
+import { createUuid, generateVerificationCode } from "@/models/model-utils";
 import {
   hashPassword,
   verifyPassword as verifyStoredPassword,
@@ -18,6 +17,9 @@ export const schemaOperator = z.object({
   password: z.string(),
   uuid: z.string().uuid().optional(),
   level: z.number().int().min(1).max(50).default(50),
+  passwordChangedAt: z.string().trim().default("").optional(),
+  loginAttempts: z.coerce.number().int().min(0).default(0).optional(),
+  loginLockedUntil: z.string().trim().default("").optional(),
 });
 
 export const schemaOperatorCreate = z.object({
@@ -41,7 +43,7 @@ export const schemaOperatorUpdate = schemaOperatorCreate
 export type TypeOperator = z.infer<typeof schemaOperator>;
 export type TypeSafeOperator = Omit<
   TypeOperator,
-  "password" | "verifyCode" | "uuid"
+  "password" | "verifyCode" | "uuid" | "passwordChangedAt" | "loginAttempts" | "loginLockedUntil"
 > & {
   uuid: string;
 };
@@ -129,6 +131,6 @@ export class OperatorModel {
   }
 
   static generateOTP(): string {
-    return randomInt(100000, 999999).toString();
+    return generateVerificationCode();
   }
 }

@@ -1,6 +1,6 @@
 import "server-only";
 
-import { randomInt } from "crypto";
+import { generateVerificationCode } from "@/models/model-utils";
 import {
   UserModel,
   type TypeSafeUser,
@@ -102,7 +102,7 @@ export class UserStorage extends MongoDBStorage<TypeUser> {
   }
 
   static async register(input: TypeUserSignup) {
-    const verificationCode = UserStorage.generateVerificationCode();
+    const verificationCode = generateVerificationCode();
     const verificationExpiresAt = UserStorage.getVerificationExpiry();
     const user = new UserModel({
       ...input,
@@ -220,7 +220,7 @@ export class UserStorage extends MongoDBStorage<TypeUser> {
       return { ok: false, error: "Email already verified" } as const;
     }
 
-    const verificationCode = UserStorage.generateVerificationCode();
+    const verificationCode = generateVerificationCode();
     const verificationExpiresAt = UserStorage.getVerificationExpiry();
 
     await UserStorage.update(document.uuid, {
@@ -261,7 +261,7 @@ export class UserStorage extends MongoDBStorage<TypeUser> {
       return { ok: false } as const;
     }
 
-    const resetCode = UserStorage.generateVerificationCode();
+    const resetCode = generateVerificationCode();
     const resetExpiresAt = UserStorage.getResetExpiry();
 
     await UserStorage.update(document.uuid, {
@@ -355,6 +355,7 @@ export class UserStorage extends MongoDBStorage<TypeUser> {
 
     await UserStorage.update(result.user.uuid, {
       password: userModel.getData().password,
+      passwordChangedAt: new Date().toISOString(),
       passwordResetCode: "",
       passwordResetExpiresAt: "",
       passwordResetAttempts: 0,
@@ -363,10 +364,6 @@ export class UserStorage extends MongoDBStorage<TypeUser> {
     });
 
     return { ok: true, user: UserStorage.toSafeUser(result.user) } as const;
-  }
-
-  private static generateVerificationCode() {
-    return randomInt(100000, 999999).toString();
   }
 
   private static getVerificationExpiry() {

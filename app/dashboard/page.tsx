@@ -11,6 +11,8 @@ import {
 import { getCurrentUser } from "@/services/user-auth";
 import { CourseEnrollmentStorage } from "@/services/course-enrollments-storage";
 import { CourseStorage } from "@/services/courses-storage";
+import { BookSaleStorage } from "@/services/book-sales-storage";
+import { EmailPreferencesToggle } from "@/app/dashboard/email-preferences-toggle";
 import { listForumThreads } from "@/app/lib/forums";
 
 export const runtime = "nodejs";
@@ -40,6 +42,9 @@ export default async function DashboardPage({
   const dashboardCourses = courses.filter(
     (course): course is NonNullable<typeof course> => Boolean(course),
   );
+
+  const myBooks = await BookSaleStorage.listByEmail(user.email);
+  const paidBooks = myBooks.filter((sale) => sale.status === "paid");
   const forumResult = await listForumThreads({
     area: "Announcements",
     page: 1,
@@ -113,6 +118,39 @@ export default async function DashboardPage({
             )}
           </section>
 
+          {paidBooks.length > 0 ? (
+            <section className="rounded-lg border border-[var(--line)] bg-white p-5 sm:p-6">
+              <h2 className="font-display text-3xl font-semibold">My books</h2>
+              <div className="mt-5 grid gap-3">
+                {paidBooks.map((sale) => (
+                  <article
+                    key={sale.uuid}
+                    className="rounded-lg border border-[var(--line)] bg-[var(--paper)] p-4"
+                  >
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                      <div>
+                        <p className="text-xs font-bold uppercase text-[var(--sapphire)]">
+                          Book
+                        </p>
+                        <h3 className="mt-1 font-semibold text-[var(--ink)]">
+                          {sale.bookTitle}
+                        </h3>
+                      </div>
+                      {sale.accessToken ? (
+                        <Link
+                          href={`/api/books/download?token=${sale.accessToken}`}
+                          className="inline-flex min-h-10 items-center justify-center rounded-full border border-[var(--sapphire)] px-4 text-sm font-semibold text-[var(--sapphire)] transition hover:bg-[var(--sapphire)] hover:text-white"
+                        >
+                          Download
+                        </Link>
+                      ) : null}
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </section>
+          ) : null}
+
           <aside className="grid gap-5">
             <section className="rounded-lg border border-[var(--line)] bg-[#050608] p-5 text-white sm:p-6">
               <p className="text-xs font-bold uppercase text-white/60">
@@ -182,6 +220,11 @@ export default async function DashboardPage({
                   ))
                 )}
               </div>
+            </section>
+
+            <section className="rounded-lg border border-[var(--line)] bg-white p-5 sm:p-6">
+              <h2 className="font-display text-3xl font-semibold">Preferences</h2>
+              <EmailPreferencesToggle enabled={user.emailNotifications ?? true} />
             </section>
           </aside>
         </div>

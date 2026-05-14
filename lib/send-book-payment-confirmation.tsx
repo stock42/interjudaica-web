@@ -8,11 +8,13 @@ export async function sendBookPaymentConfirmation({
 	firstName,
 	bookTitle,
 	priceLabel,
+	downloadUrl,
 }: {
 	email: string;
 	firstName: string;
 	bookTitle: string;
 	priceLabel: string;
+	downloadUrl?: string;
 }) {
 	const resend = getResend();
 	const from = getEmailFrom();
@@ -26,6 +28,7 @@ export async function sendBookPaymentConfirmation({
 				firstName={firstName}
 				bookTitle={bookTitle}
 				priceLabel={priceLabel}
+				downloadUrl={downloadUrl}
 			/>
 		),
 	});

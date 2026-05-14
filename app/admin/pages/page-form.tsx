@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useRouter } from "next/navigation";
+import { MarkdownEditor } from "@/app/admin/components/markdown-editor";
 import type { TypePage } from "@/models/pages";
 
 type PageFormState = {
@@ -148,18 +149,11 @@ export function PageForm({ page }: { page?: TypePage }) {
 					/>
 				</div>
 
-				<div className="grid gap-2 text-sm font-semibold text-[var(--ink)] md:col-span-2">
-					<Label>Content (Markdown)</Label>
-					<Textarea
-						className="min-h-96 font-mono text-sm"
-						placeholder="# Your markdown content here...&#10;&#10;Supports headings, lists, links, images, and more."
-						value={form.content}
-						onChange={(event) => setField("content", event.target.value)}
-					/>
-					<p className="text-xs text-[var(--muted)]">
-						Write content using Markdown. Supports headings, bold, italic, links, images, lists, and code blocks.
-					</p>
-				</div>
+				<MarkdownEditor
+					label="Content (Markdown)"
+					value={form.content}
+					onChange={(value) => setField("content", value)}
+				/>
 
 				{error ? (
 					<p className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700 md:col-span-2">

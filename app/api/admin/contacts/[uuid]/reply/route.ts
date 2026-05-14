@@ -4,6 +4,7 @@ import { z } from "zod";
 import { ContactStorage } from "@/services/contacts-storage";
 import { sendContactReply } from "@/lib/send-contact-reply";
 import { requireAdminApi } from "@/app/api/_lib/admin-api";
+import { ConfigStorage } from "@/services/config-storage";
 
 export const runtime = "nodejs";
 
@@ -11,9 +12,6 @@ const schemaReply = z.object({
 	subject: z.string().trim().min(1),
 	message: z.string().trim().min(1).max(5000),
 });
-
-const maxAttachmentSize = 5 * 1024 * 1024;
-const maxAttachmentCount = 5;
 
 async function parseForm(request: NextRequest) {
 	const formData = await request.formData();
@@ -51,6 +49,10 @@ export async function POST(
 			return NextResponse.json({ error: "Not found" }, { status: 404 });
 		}
 
+		const maxAttachmentSizeMb = await ConfigStorage.getNumber("upload_attachment_max_size_mb");
+		const maxAttachmentSize = maxAttachmentSizeMb * 1024 * 1024;
+		const maxAttachmentCount = await ConfigStorage.getNumber("upload_attachment_max_count");
+
 		const attachments = [] as { filename: string; content: string; type?: string }[];
 		for (const file of form.files) {
 			if (!(file instanceof File)) {
@@ -61,7 +63,7 @@ export async function POST(
 			}
 			if (file.size > maxAttachmentSize) {
 				return NextResponse.json(
-					{ error: "Attachment must be smaller than 5 MB" },
+					{ error: `Attachment must be smaller than ${maxAttachmentSizeMb} MB` },
 					{ status: 400 },
 				);
 			}

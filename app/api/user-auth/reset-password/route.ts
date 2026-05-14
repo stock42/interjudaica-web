@@ -6,6 +6,7 @@ import { sendPasswordResetConfirmation } from "@/lib/send-password-reset-confirm
 import { PasswordResetAttemptStorage } from "@/services/password-reset-attempts-storage";
 import { readJson } from "@/app/api/_lib/admin-api";
 import { createRateLimiter } from "@/services/rate-limiter";
+import { AuditLogStorage } from "@/services/audit-log-storage";
 
 export const runtime = "nodejs";
 
@@ -21,7 +22,7 @@ export async function POST(request: NextRequest) {
 	try {
 		const ip =
 			request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
-		const rateCheck = resetLimiter.check(ip, 10, 60_000);
+		const rateCheck = await resetLimiter.check(ip, 10, 60_000);
 		if (!rateCheck.allowed) {
 			return NextResponse.json(
 				{ error: "Too many attempts" },
@@ -52,7 +53,14 @@ export async function POST(request: NextRequest) {
 			return NextResponse.json({ error: result.error }, { status: 400 });
 		}
 
-		resetLimiter.reset(ip);
+		await resetLimiter.reset(ip);
+
+		await AuditLogStorage.log({
+			action: "user.resetPassword.success",
+			email: payload.email,
+			ip,
+			details: "Password reset successfully",
+		});
 
 		await PasswordResetAttemptStorage.create({
 			email: payload.email,

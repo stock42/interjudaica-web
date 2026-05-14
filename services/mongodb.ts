@@ -22,7 +22,11 @@ const mongoGlobal = globalThis as MongoGlobal;
 
 export async function getMongoClient() {
   if (!mongoGlobal.__interjudaicaMongoClientPromise) {
-    const client = new MongoClient(MONGODB_URL);
+    const client = new MongoClient(MONGODB_URL, {
+      maxPoolSize: 10,
+      minPoolSize: 2,
+      maxIdleTimeMS: 60000,
+    });
     mongoGlobal.__interjudaicaMongoClientPromise = client.connect();
   }
 

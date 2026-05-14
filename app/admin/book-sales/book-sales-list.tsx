@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { adminTextControlClass } from "@/app/admin/components/admin-controls";
 import { AdminStatPill } from "@/app/admin/components/admin-stat-pill";
+import { CSVExportButton } from "@/app/admin/components/csv-export-button";
 
 import type { TypeBookSale } from "@/models/book-sales";
 import { Input } from "@/components/ui/input";
@@ -52,7 +53,7 @@ export function BookSalesList({ sales }: { sales: TypeBookSale[] }) {
 	return (
 		<div className="grid gap-5">
 			<section className="rounded-lg border border-[var(--line)] bg-white p-4 sm:p-5">
-				<div className="flex flex-col gap-4">
+				<div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
 					<label className="grid gap-2 text-sm font-semibold text-[var(--ink)] max-w-md">
 						Search sales
 						<Input
@@ -63,13 +64,25 @@ export function BookSalesList({ sales }: { sales: TypeBookSale[] }) {
 							onChange={(event) => setQuery(event.target.value)}
 						/>
 					</label>
-					<div className="flex flex-wrap gap-2 text-xs font-bold uppercase text-[var(--muted)]">
-						<AdminStatPill>{filteredSales.length} visible</AdminStatPill>
-						<AdminStatPill>{sales.length} total</AdminStatPill>
-						<AdminStatPill>
-							{formatUsd.format(totalRevenue)} in paid revenue
-						</AdminStatPill>
-					</div>
+					<CSVExportButton
+						data={sales}
+						columns={[
+							{ key: "bookTitle", label: "Book" },
+							{ key: "buyerFirstName", label: "First Name" },
+							{ key: "buyerLastName", label: "Last Name" },
+							{ key: "buyerEmail", label: "Email" },
+							{ key: "amount", label: "Amount" },
+							{ key: "status", label: "Status" },
+						]}
+						filename="book-sales"
+					/>
+				</div>
+				<div className="mt-4 flex flex-wrap gap-2 text-xs font-bold uppercase text-[var(--muted)]">
+					<AdminStatPill>{filteredSales.length} visible</AdminStatPill>
+					<AdminStatPill>{sales.length} total</AdminStatPill>
+					<AdminStatPill>
+						{formatUsd.format(totalRevenue)} in paid revenue
+					</AdminStatPill>
 				</div>
 			</section>
 

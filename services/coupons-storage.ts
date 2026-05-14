@@ -89,6 +89,58 @@ export class CouponStorage extends MongoDBStorage<TypeCoupon> {
 		return MongoDBStorage._delete(CouponStorage.COLLECTION, uuid);
 	}
 
+	static async claimCoupon({
+		code,
+		scope,
+		courseUuid,
+	}: {
+		code: string;
+		scope: "course" | "community";
+		courseUuid?: string;
+	}) {
+		await CouponStorage.ensureIndexes();
+		const collection = await MongoDBStorage.getCollection<TypeCoupon>(
+			CouponStorage.COLLECTION,
+		);
+
+		const normalizedCode = code.toUpperCase();
+		const now = new Date();
+
+		const filter: Record<string, unknown> = {
+			"data.code": normalizedCode,
+			"data.active": true,
+			$expr: {
+				$gt: [{ $ifNull: ["$data.usageLimit", 1] }, "$data.usageCount"],
+			},
+		};
+
+		if (scope === "course") {
+			filter["data.scope"] = "course";
+			if (courseUuid) {
+				filter["data.courseUuid"] = courseUuid;
+			}
+		} else {
+			filter["data.scope"] = "community";
+		}
+
+		const result = await collection.findOneAndUpdate(
+			filter,
+			{ $inc: { "data.usageCount": 1 } },
+			{ returnDocument: "after" },
+		);
+
+		if (!result) {
+			return null;
+		}
+
+		const coupon = result.data;
+		if (coupon.expiresAt && new Date(coupon.expiresAt) < now) {
+			return null;
+		}
+
+		return { coupon, uuid: result.uuid };
+	}
+
 	static async findValid({
 		code,
 		scope,
