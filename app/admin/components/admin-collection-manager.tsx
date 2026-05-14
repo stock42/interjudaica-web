@@ -41,6 +41,7 @@ type EntityConfig = {
   plural: string;
   fields: FieldConfig[];
   columns: ColumnConfig[];
+  noCreate?: boolean;
 };
 
 
@@ -186,6 +187,7 @@ const configs: Record<AdminKind, EntityConfig> = {
     api: "/api/admin/users",
     singular: "user",
     plural: "users",
+    noCreate: true,
     fields: [
       { name: "firstName", label: "First name" },
       { name: "lastName", label: "Last name" },
@@ -378,6 +380,7 @@ export function AdminCollectionManager({
 
   return (
     <div className="grid gap-5">
+      {config.noCreate ? null : (
       <section className="rounded-lg border border-[var(--line)] bg-white p-4 sm:p-5">
         <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div>
@@ -481,6 +484,7 @@ export function AdminCollectionManager({
           </div>
         </form>
       </section>
+      )}
 
       <section className="overflow-hidden rounded-lg border border-[var(--line)] bg-white">
         <div className="overflow-x-auto">

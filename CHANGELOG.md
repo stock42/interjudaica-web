@@ -1,5 +1,17 @@
 # Changelog
 
+## 2026-05-14
+- Remove CSRF token validation from admin API (was causing constant auth failures on all admin forms)
+- Fix logout redirect: both student and operator logout now redirect to `/` (home) instead of `/login` and `/operator-login`
+- Fix Stripe checkout redirect: use request host header instead of hardcoded localhost for success/cancel URLs
+- Home carousel: add course price badge and start date to featured course cards
+- `/courses` page: replace inert filter form with real client-side filtering by price, level, start date, and search
+- Course landing page: redesign with cover image as full-width header, thumbnail as avatar, centered text layout
+- Admin `/admin/users`: remove user creation form (students register via public flow)
+- Prevent duplicate email on admin user creation via explicit lookup before insert
+- Admin `/admin/subscriptions`: wire to live CommunityUserStorage and UserStorage instead of static placeholder
+- Admin `/admin/payments`: wire to live CoursePaymentStorage, UserStorage, and CourseStorage instead of static placeholder
+
 ## 2026-05-13
 - **Complete security hardening (9 items)**:
   - Session invalidation on password reset (passwordChangedAt + iat in tokens)

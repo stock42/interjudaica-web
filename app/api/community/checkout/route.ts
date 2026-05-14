@@ -15,9 +15,12 @@ const schemaCheckout = z.object({
 	couponCode: z.string().trim().optional(),
 });
 
-function getBaseUrl() {
+function getBaseUrl(request: NextRequest) {
 	const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
 	if (siteUrl) return siteUrl;
+	const proto = request.headers.get("x-forwarded-proto") ?? "https";
+	const host = request.headers.get("host");
+	if (host) return `${proto}://${host}`;
 	return "http://localhost:3025";
 }
 
@@ -30,7 +33,7 @@ export async function POST(request: NextRequest) {
 
 		const payload = schemaCheckout.parse(await readJson(request));
 		const stripe = getStripe();
-		const baseUrl = getBaseUrl();
+		const baseUrl = getBaseUrl(request);
 		const baseAmount = await ConfigStorage.getNumber("community_membership_price_cents");
 		const currency = await ConfigStorage.get("currency");
 

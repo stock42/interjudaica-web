@@ -7,7 +7,7 @@ import {
 export const runtime = "nodejs";
 
 export async function POST(request: NextRequest) {
-  const response = NextResponse.redirect(new URL("/login", request.url), {
+  const response = NextResponse.redirect(new URL("/", request.url), {
     status: 303,
   });
 

@@ -30,7 +30,18 @@ export class CoursePaymentStorage extends MongoDBStorage<TypeCoursePayment> {
 		CoursePaymentStorage.indexesReady = true;
 	}
 
-	static async createPending(input: Partial<TypeCoursePayment>) {
+  static async list() {
+    await CoursePaymentStorage.ensureIndexes();
+    const docs = await MongoDBStorage._find<TypeCoursePayment>(
+      CoursePaymentStorage.COLLECTION,
+      {},
+      undefined,
+      { "data.createdAt": -1 },
+    );
+    return docs.map((doc) => doc.data);
+  }
+
+  static async createPending(input: Partial<TypeCoursePayment>) {
 		await CoursePaymentStorage.ensureIndexes();
 		const payment = new CoursePaymentModel({
 			amount: 0,

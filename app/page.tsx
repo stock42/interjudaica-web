@@ -2,6 +2,7 @@ import Image from "next/image";
 import { ButtonLink, PageShell } from "@/app/components/portal-ui";
 import { listPublicCourses } from "@/app/lib/public-courses";
 import { listSocialProof } from "@/app/lib/social-proof";
+import { formatUsd } from "@/app/lib/content";
 import type { TypePublicCourse } from "@/models/courses";
 
 export const runtime = "nodejs";
@@ -108,7 +109,7 @@ function HomeIcon({ kind, className = "" }: { kind: HomeIconKind; className?: st
 
 type FeaturedCourse = Pick<
   TypePublicCourse,
-  "slug" | "title" | "summary" | "coverImageUrl" | "thumbnailImageUrl"
+  "slug" | "title" | "summary" | "coverImageUrl" | "thumbnailImageUrl" | "price" | "startDate"
 >
 
 function CourseFeatureCard({
@@ -145,6 +146,16 @@ function CourseFeatureCard({
         <p className="mt-4 line-clamp-3 max-w-md text-sm leading-6 text-white/78">
           {course.summary || "Course details coming soon."}
         </p>
+        <div className="mt-4 flex flex-wrap items-center gap-4 text-sm">
+          <span className="rounded-full border border-[var(--gold)] px-3 py-1 text-xs font-semibold text-[var(--gold)]">
+            {formatUsd(course.price)}
+          </span>
+          {course.startDate ? (
+            <span className="text-xs text-white/60">
+              Starts {new Date(course.startDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+            </span>
+          ) : null}
+        </div>
         <div className="mt-5">
           <ButtonLink href={`/course/${course.slug}`} tone="secondary">
             More information <span aria-hidden="true">&gt;</span>

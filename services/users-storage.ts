@@ -96,6 +96,12 @@ export class UserStorage extends MongoDBStorage<TypeUser> {
 
   static async create(input: Partial<TypeUser>) {
     await UserStorage.ensureIndexes();
+    if (input.email) {
+      const existing = await UserStorage.findByEmail(input.email);
+      if (existing) {
+        throw Object.assign(new Error("A user with this email already exists"), { code: 11000 });
+      }
+    }
     const user = new UserModel(input as TypeUser);
     await MongoDBStorage._insert<TypeUser>(UserStorage.COLLECTION, user);
     return user.toSafeData();
