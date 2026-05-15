@@ -1,12 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import {
-	CourseGrid,
-	PageShell,
-	Section,
-	SectionIntro,
-} from "@/app/components/portal-ui";
+import { CourseGrid } from "@/app/components/portal-ui-client";
 import type { TypePublicCourse } from "@/models/courses";
 
 export function CoursesPageClient({
@@ -62,79 +57,71 @@ export function CoursesPageClient({
 	}, [courses, price, level, start, search]);
 
 	return (
-		<PageShell>
-			<Section tone="transparent">
-				<SectionIntro
-					eyebrow="All courses"
-					title="Live and self-paced Jewish learning"
-					text="Filter by price, level, and start date, then open a course page for editions, samples, pricing, and the private forum path."
-				/>
+		<>
+			<div className="mb-8 grid gap-3 rounded-lg border border-[var(--line)] bg-white p-4 sm:grid-cols-2 lg:grid-cols-4">
+				<label className="grid gap-2 text-sm font-semibold">
+					Price
+					<select
+						className="min-h-11 rounded-md border border-[var(--line)] bg-[var(--paper)] px-3"
+						value={price}
+						onChange={(e) => setPrice(e.target.value)}
+					>
+						<option value="any">Any price</option>
+						<option value="free">Free</option>
+						<option value="under200">Under $200 USD</option>
+						<option value="over200">$200 USD and above</option>
+					</select>
+				</label>
+				<label className="grid gap-2 text-sm font-semibold">
+					Level
+					<select
+						className="min-h-11 rounded-md border border-[var(--line)] bg-[var(--paper)] px-3"
+						value={level}
+						onChange={(e) => setLevel(e.target.value)}
+					>
+						<option value="any">Any level</option>
+						<option value="Beginner">Beginner</option>
+						<option value="Intermediate">Intermediate</option>
+						<option value="Advanced">Advanced</option>
+					</select>
+				</label>
+				<label className="grid gap-2 text-sm font-semibold">
+					Start date
+					<select
+						className="min-h-11 rounded-md border border-[var(--line)] bg-[var(--paper)] px-3"
+						value={start}
+						onChange={(e) => setStart(e.target.value)}
+					>
+						<option value="any">All cohorts</option>
+						{startOptions.map((date) => (
+							<option key={date} value={date}>
+								{new Date(date).toLocaleDateString("en-US", {
+									month: "short",
+									day: "numeric",
+									year: "numeric",
+								})}
+							</option>
+						))}
+					</select>
+				</label>
+				<label className="grid gap-2 text-sm font-semibold">
+					Search
+					<input
+						className="min-h-11 rounded-md border border-[var(--line)] bg-[var(--paper)] px-3"
+						placeholder="Talmud, Hebrew, prayer"
+						type="search"
+						value={search}
+						onChange={(e) => setSearch(e.target.value)}
+					/>
+				</label>
+			</div>
 
-				<div className="mb-8 grid gap-3 rounded-lg border border-[var(--line)] bg-white p-4 sm:grid-cols-2 lg:grid-cols-4">
-					<label className="grid gap-2 text-sm font-semibold">
-						Price
-						<select
-							className="min-h-11 rounded-md border border-[var(--line)] bg-[var(--paper)] px-3"
-							value={price}
-							onChange={(e) => setPrice(e.target.value)}
-						>
-							<option value="any">Any price</option>
-							<option value="free">Free</option>
-							<option value="under200">Under $200 USD</option>
-							<option value="over200">$200 USD and above</option>
-						</select>
-					</label>
-					<label className="grid gap-2 text-sm font-semibold">
-						Level
-						<select
-							className="min-h-11 rounded-md border border-[var(--line)] bg-[var(--paper)] px-3"
-							value={level}
-							onChange={(e) => setLevel(e.target.value)}
-						>
-							<option value="any">Any level</option>
-							<option value="Beginner">Beginner</option>
-							<option value="Intermediate">Intermediate</option>
-							<option value="Advanced">Advanced</option>
-						</select>
-					</label>
-					<label className="grid gap-2 text-sm font-semibold">
-						Start date
-						<select
-							className="min-h-11 rounded-md border border-[var(--line)] bg-[var(--paper)] px-3"
-							value={start}
-							onChange={(e) => setStart(e.target.value)}
-						>
-							<option value="any">All cohorts</option>
-							{startOptions.map((date) => (
-								<option key={date} value={date}>
-									{new Date(date).toLocaleDateString("en-US", {
-										month: "short",
-										day: "numeric",
-										year: "numeric",
-									})}
-								</option>
-							))}
-						</select>
-					</label>
-					<label className="grid gap-2 text-sm font-semibold">
-						Search
-						<input
-							className="min-h-11 rounded-md border border-[var(--line)] bg-[var(--paper)] px-3"
-							placeholder="Talmud, Hebrew, prayer"
-							type="search"
-							value={search}
-							onChange={(e) => setSearch(e.target.value)}
-						/>
-					</label>
-				</div>
-
-				<CourseGrid items={filtered} />
-				{filtered.length === 0 && (
-					<p className="mt-4 text-sm text-[var(--muted)]">
-						No courses match your filters. Try adjusting the criteria.
-					</p>
-				)}
-			</Section>
-		</PageShell>
+			<CourseGrid items={filtered} />
+			{filtered.length === 0 && (
+				<p className="mt-4 text-sm text-[var(--muted)]">
+					No courses match your filters. Try adjusting the criteria.
+				</p>
+			)}
+		</>
 	);
 }
