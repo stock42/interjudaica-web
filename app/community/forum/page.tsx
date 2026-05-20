@@ -25,7 +25,7 @@ export default async function CommunityForumPage({
   const user = await getCurrentUser();
 
   if (!user) {
-    redirect("/login?next=/community/foro");
+    redirect("/login?next=/community/forum");
   }
 
   if (user.communityStatus !== "active") {
@@ -108,7 +108,7 @@ export default async function CommunityForumPage({
           <div className="mt-6 flex flex-wrap gap-3">
             {pageNumber > 1 ? (
               <ButtonLink
-                href={`/community/foro?page=${pageNumber - 1}`}
+                href={`/community/forum?page=${pageNumber - 1}`}
                 tone="secondary"
               >
                 Previous
@@ -116,7 +116,7 @@ export default async function CommunityForumPage({
             ) : null}
             {pageNumber < forumResult.totalPages ? (
               <ButtonLink
-                href={`/community/foro?page=${pageNumber + 1}`}
+                href={`/community/forum?page=${pageNumber + 1}`}
                 tone="secondary"
               >
                 Next

@@ -6,6 +6,7 @@ import { CoursePaymentStorage } from "@/services/course-payments-storage";
 import { CourseEnrollmentStorage } from "@/services/course-enrollments-storage";
 import { CouponStorage } from "@/services/coupons-storage";
 import { getCurrentUser } from "@/services/user-auth";
+import { getBaseUrl } from "@/lib/base-url";
 import { getStripe } from "@/lib/stripe";
 import { sendCoursePaymentConfirmation } from "@/lib/send-course-payment-confirmation";
 import { readJson, routeError } from "@/app/api/_lib/admin-api";
@@ -16,15 +17,6 @@ const schemaCheckout = z.object({
 	courseUuid: z.string().uuid(),
 	couponCode: z.string().trim().optional(),
 });
-
-function getBaseUrl(request: NextRequest) {
-	const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
-	if (siteUrl) return siteUrl;
-	const proto = request.headers.get("x-forwarded-proto") ?? "https";
-	const host = request.headers.get("host");
-	if (host) return `${proto}://${host}`;
-	return "http://localhost:3025";
-}
 
 export async function POST(request: NextRequest) {
 	try {
@@ -134,6 +126,10 @@ export async function POST(request: NextRequest) {
 
 		return NextResponse.json({ url: session.url });
 	} catch (error) {
-		return routeError(error);
+		return routeError(error, {
+			event: "course_checkout_failed",
+			route: "/api/checkout",
+			method: request.method,
+		});
 	}
 }

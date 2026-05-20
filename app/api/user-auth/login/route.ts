@@ -9,7 +9,6 @@ import { UserStorage } from "@/services/users-storage";
 import { readJson } from "@/app/api/_lib/admin-api";
 import { createRateLimiter } from "@/services/rate-limiter";
 import { AuditLogStorage } from "@/services/audit-log-storage";
-import { generateCsrfToken, csrfCookieOptions, CSRF_COOKIE } from "@/services/csrf";
 
 export const runtime = "nodejs";
 
@@ -103,11 +102,6 @@ export async function POST(request: NextRequest) {
 			USER_SESSION_COOKIE_NAME,
 			await createUserSessionToken(user),
 			userSessionCookieOptions(),
-		);
-		response.cookies.set(
-			CSRF_COOKIE,
-			generateCsrfToken(),
-			csrfCookieOptions(),
 		);
 
 		return response;

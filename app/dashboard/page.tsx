@@ -14,6 +14,7 @@ import { CourseStorage } from "@/services/courses-storage";
 import { BookSaleStorage } from "@/services/book-sales-storage";
 import { EmailPreferencesToggle } from "@/app/dashboard/email-preferences-toggle";
 import { listForumThreads } from "@/app/lib/forums";
+import { CommunityUserStorage } from "@/services/community-users-storage";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -26,9 +27,9 @@ export const metadata: Metadata = {
 export default async function DashboardPage({
   searchParams,
 }: {
-  searchParams: Promise<{ payment?: string; course?: string }>;
+  searchParams: Promise<{ payment?: string; course?: string; community?: string; billing?: string }>;
 }) {
-  const { payment } = await searchParams;
+  const { payment, community, billing } = await searchParams;
   const user = await getCurrentUser();
 
   if (!user) {
@@ -45,6 +46,7 @@ export default async function DashboardPage({
 
   const myBooks = await BookSaleStorage.listByEmail(user.email);
   const paidBooks = myBooks.filter((sale) => sale.status === "paid");
+  const communityUser = await CommunityUserStorage.getByUserUuid(user.uuid);
   const forumResult = await listForumThreads({
     area: "Announcements",
     page: 1,
@@ -63,6 +65,18 @@ export default async function DashboardPage({
         {payment === "success" ? (
           <div className="rounded-lg border border-[var(--line)] bg-[rgba(244,189,51,0.12)] p-4 text-sm font-semibold text-[var(--ink)]">
             Payment received. Your course enrollment is being activated.
+          </div>
+        ) : null}
+
+        {community === "success" ? (
+          <div className="rounded-lg border border-[var(--line)] bg-[rgba(22,74,159,0.08)] p-4 text-sm font-semibold text-[var(--ink)]">
+            Community membership activated.
+          </div>
+        ) : null}
+
+        {billing === "unavailable" ? (
+          <div className="rounded-lg border border-[var(--line)] bg-[rgba(244,189,51,0.12)] p-4 text-sm font-semibold text-[var(--ink)]">
+            Billing portal unavailable for this membership. If this access was granted manually, there is nothing to manage in Stripe.
           </div>
         ) : null}
 
@@ -99,13 +113,13 @@ export default async function DashboardPage({
                       </div>
                       <div className="flex flex-wrap gap-2">
                         <ButtonLink
-                          href={`/course/${course.slug}/clases`}
+                          href={`/course/${course.slug}/classes`}
                           tone="primary"
                         >
                           Classes
                         </ButtonLink>
                         <ButtonLink
-                          href={`/course/${course.slug}/foro`}
+                          href={`/course/${course.slug}/forum`}
                           tone="secondary"
                         >
                           Forum
@@ -166,7 +180,7 @@ export default async function DashboardPage({
               </p>
               <div className="mt-5 flex flex-col gap-2 sm:flex-row lg:flex-col">
                 {user.communityStatus === "active" ? (
-                  <ButtonLink href="/community/foro" tone="dark">
+                  <ButtonLink href="/community/forum" tone="dark">
                     Community forum
                   </ButtonLink>
                 ) : (
@@ -189,6 +203,16 @@ export default async function DashboardPage({
                   Technical support
                 </ButtonLink>
               </div>
+              {communityUser?.stripeCustomerId ? (
+                <form action="/api/community/customer-portal" method="get" className="mt-3">
+                  <button
+                    type="submit"
+                    className="inline-flex min-h-10 items-center justify-center rounded-full border border-white/20 px-4 text-sm font-semibold text-white transition hover:bg-white/10"
+                  >
+                    Manage billing
+                  </button>
+                </form>
+              ) : null}
             </section>
 
             <section className="rounded-lg border border-[var(--line)] bg-white p-5 sm:p-6">

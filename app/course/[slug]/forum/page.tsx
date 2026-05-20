@@ -46,7 +46,7 @@ export default async function CourseForumPage({
 
   const user = await getCurrentUser();
   if (!user) {
-    redirect(`/login?next=/course/${slug}/foro`);
+    redirect(`/login?next=/course/${slug}/forum`);
   }
 
   const isEnrolled = await CourseEnrollmentStorage.isEnrolled(
@@ -74,7 +74,7 @@ export default async function CourseForumPage({
           title={`${course.title} discussion`}
           text="A single course thread keeps student questions, nested replies, and instructor moderation in one place."
           actions={
-            <ButtonLink href={`/course/${course.slug}/clases`} tone="secondary">
+            <ButtonLink href={`/course/${course.slug}/classes`} tone="secondary">
               Classes
             </ButtonLink>
           }
@@ -123,7 +123,7 @@ export default async function CourseForumPage({
           <div className="mt-6 flex flex-wrap gap-3">
             {pageNumber > 1 ? (
               <ButtonLink
-                href={`/course/${slug}/foro?page=${pageNumber - 1}`}
+                href={`/course/${slug}/forum?page=${pageNumber - 1}`}
                 tone="secondary"
               >
                 Previous
@@ -131,7 +131,7 @@ export default async function CourseForumPage({
             ) : null}
             {pageNumber < forumResult.totalPages ? (
               <ButtonLink
-                href={`/course/${slug}/foro?page=${pageNumber + 1}`}
+                href={`/course/${slug}/forum?page=${pageNumber + 1}`}
                 tone="secondary"
               >
                 Next

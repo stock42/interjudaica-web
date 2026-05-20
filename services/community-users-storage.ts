@@ -41,6 +41,16 @@ export class CommunityUserStorage extends MongoDBStorage<TypeCommunityUser> {
 		return docs.map((doc) => doc.data);
 	}
 
+	static async getByUserUuid(userUuid: string) {
+		await CommunityUserStorage.ensureIndexes();
+		const doc = await MongoDBStorage._findOne<TypeCommunityUser>(
+			CommunityUserStorage.COLLECTION,
+			{ "data.userUuid": userUuid },
+		);
+
+		return doc?.data ?? null;
+	}
+
 	static async upsertActive(input: Partial<TypeCommunityUser>) {
 		await CommunityUserStorage.ensureIndexes();
 		const existing = await MongoDBStorage._findOne<TypeCommunityUser>(

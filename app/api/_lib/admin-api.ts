@@ -1,5 +1,6 @@
 import { ZodError } from "zod";
 import { NextResponse, type NextRequest } from "next/server";
+import { reportError } from "@/lib/logger";
 import { authenticateApiRequest } from "@/services/auth";
 
 export async function requireAdminApi(request: NextRequest) {
@@ -22,7 +23,16 @@ export async function readJson(request: NextRequest) {
   }
 }
 
-export function routeError(error: unknown) {
+export function routeError(
+  error: unknown,
+  details?: {
+    event?: string;
+    route?: string;
+    method?: string;
+    statusCode?: number;
+    context?: Record<string, unknown>;
+  },
+) {
   if (error instanceof ZodError) {
     return NextResponse.json(
       { error: "Invalid payload" },
@@ -46,7 +56,13 @@ export function routeError(error: unknown) {
     );
   }
 
-  console.error(error);
+  reportError({
+    event: details?.event ?? "route_error",
+    error,
+    route: details?.route,
+    method: details?.method,
+    statusCode: details?.statusCode,
+    context: details?.context,
+  });
   return NextResponse.json({ error: "Unexpected server error" }, { status: 500 });
 }
-

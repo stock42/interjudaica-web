@@ -1,28 +1,20 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
 
-import { getCurrentUser } from "@/services/user-auth";
-import { UserStorage } from "@/services/users-storage";
+import { readJson, routeError } from "@/app/api/_lib/admin-api";
+import { getBaseUrl } from "@/lib/base-url";
+import { getStripe } from "@/lib/stripe";
+import { ConfigStorage } from "@/services/config-storage";
 import { CommunityUserStorage } from "@/services/community-users-storage";
 import { CouponStorage } from "@/services/coupons-storage";
-import { getStripe } from "@/lib/stripe";
-import { readJson, routeError } from "@/app/api/_lib/admin-api";
-import { ConfigStorage } from "@/services/config-storage";
+import { getCurrentUser } from "@/services/user-auth";
+import { UserStorage } from "@/services/users-storage";
 
 export const runtime = "nodejs";
 
 const schemaCheckout = z.object({
 	couponCode: z.string().trim().optional(),
 });
-
-function getBaseUrl(request: NextRequest) {
-	const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
-	if (siteUrl) return siteUrl;
-	const proto = request.headers.get("x-forwarded-proto") ?? "https";
-	const host = request.headers.get("host");
-	if (host) return `${proto}://${host}`;
-	return "http://localhost:3025";
-}
 
 export async function POST(request: NextRequest) {
 	try {
@@ -34,6 +26,7 @@ export async function POST(request: NextRequest) {
 		const payload = schemaCheckout.parse(await readJson(request));
 		const stripe = getStripe();
 		const baseUrl = getBaseUrl(request);
+		const existingCommunityUser = await CommunityUserStorage.getByUserUuid(user.uuid);
 		const baseAmount = await ConfigStorage.getNumber("community_membership_price_cents");
 		const currency = await ConfigStorage.get("currency");
 
@@ -62,39 +55,45 @@ export async function POST(request: NextRequest) {
 		}
 
 		const session = await stripe.checkout.sessions.create({
-		mode: "subscription",
-		payment_method_types: ["card"],
-		customer_email: user.email,
-		line_items: [
-			{
-				price_data: {
-					currency,
-					product_data: {
-						name: "InterJudaica Community",
-						description: "Community membership subscription",
+			mode: "subscription",
+			payment_method_types: ["card"],
+			...(existingCommunityUser?.stripeCustomerId
+				? { customer: existingCommunityUser.stripeCustomerId }
+				: { customer_email: user.email }),
+			line_items: [
+				{
+					price_data: {
+						currency,
+						product_data: {
+							name: "InterJudaica Community",
+							description: "Community membership subscription",
+						},
+						unit_amount: discountedAmount,
+						recurring: { interval: "month" },
 					},
-					unit_amount: discountedAmount,
-					recurring: { interval: "month" },
+					quantity: 1,
 				},
-				quantity: 1,
-			},
-		],
-		success_url: `${baseUrl}/dashboard?community=success`,
-		cancel_url: `${baseUrl}/checkout-community?payment=cancelled`,
-		metadata: {
-			community: "true",
-			userUuid: user.uuid,
-		},
-		subscription_data: {
+			],
+			success_url: `${baseUrl}/dashboard?community=success`,
+			cancel_url: `${baseUrl}/checkout-community?payment=cancelled`,
 			metadata: {
 				community: "true",
 				userUuid: user.uuid,
 			},
-		},
-	});
+			subscription_data: {
+				metadata: {
+					community: "true",
+					userUuid: user.uuid,
+				},
+			},
+		});
 
 		return NextResponse.json({ url: session.url });
 	} catch (error) {
-		return routeError(error);
+		return routeError(error, {
+			event: "community_checkout_failed",
+			route: "/api/community/checkout",
+			method: request.method,
+		});
 	}
 }

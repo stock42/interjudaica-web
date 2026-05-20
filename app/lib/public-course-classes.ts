@@ -1,30 +1,23 @@
 import "server-only";
 
-import { headers } from "next/headers";
+import { unstable_cache } from "next/cache";
 import type { TypeCourseClass } from "@/models/course-classes";
-
-async function getBaseUrl() {
-	const headerList = await headers();
-	const host = headerList.get("host");
-
-	if (!host) {
-		return "http://localhost:3025";
-	}
-
-	const protocol = host.includes("localhost") ? "http" : "https";
-	return `${protocol}://${host}`;
-}
+import { CourseClassStorage } from "@/services/course-classes-storage";
+import { CourseStorage } from "@/services/courses-storage";
 
 export async function listCourseClasses(slug: string): Promise<TypeCourseClass[]> {
-	const baseUrl = await getBaseUrl();
-	const response = await fetch(`${baseUrl}/api/courses/${slug}/classes`, {
-		cache: "no-store",
-	});
+	const listCourseClassesCached = unstable_cache(
+		async () => {
+			const course = await CourseStorage.findPublishedBySlug(slug);
+			if (!course?.uuid) {
+				return [];
+			}
 
-	if (!response.ok) {
-		return [];
-	}
+			return CourseClassStorage.listByCourse(course.uuid);
+		},
+		["course-classes", slug],
+		{ revalidate: 60 },
+	);
 
-	const data = (await response.json()) as { items?: TypeCourseClass[] };
-	return data.items ?? [];
+	return listCourseClassesCached();
 }

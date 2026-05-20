@@ -43,7 +43,7 @@ export default async function CourseClassesPage({ params }: ClassesPageProps) {
           title={course.title}
           text="Class recordings, audio, downloadable materials, and the class forum are organized by module."
           actions={
-            <ButtonLink href={`/course/${course.slug}/foro`} tone="secondary">
+            <ButtonLink href={`/course/${course.slug}/forum`} tone="secondary">
               Course forum
             </ButtonLink>
           }

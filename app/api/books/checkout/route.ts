@@ -4,7 +4,9 @@ import { randomUUID } from "crypto";
 import { BookStorage } from "@/services/books-storage";
 import { BookSaleStorage } from "@/services/book-sales-storage";
 import { getCurrentUser } from "@/services/user-auth";
+import { getBaseUrl } from "@/lib/base-url";
 import { getStripe } from "@/lib/stripe";
+import { reportError } from "@/lib/logger";
 import { readJson } from "@/app/api/_lib/admin-api";
 import { sendBookPaymentConfirmation } from "@/lib/send-book-payment-confirmation";
 
@@ -16,15 +18,6 @@ const schemaBookCheckout = z.object({
 	lastName: z.string().trim().min(1).optional(),
 	email: z.string().email().optional(),
 });
-
-function getBaseUrl(request: NextRequest) {
-	const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
-	if (siteUrl) return siteUrl;
-	const proto = request.headers.get("x-forwarded-proto") ?? "https";
-	const host = request.headers.get("host");
-	if (host) return `${proto}://${host}`;
-	return "http://localhost:3025";
-}
 
 export async function POST(request: NextRequest) {
 	try {
@@ -129,7 +122,12 @@ export async function POST(request: NextRequest) {
 
 		return NextResponse.json({ url: session.url });
 	} catch (error) {
-		console.error("Book checkout error:", error instanceof Error ? error.message : error);
+		reportError({
+			event: "book_checkout_failed",
+			error,
+			route: "/api/books/checkout",
+			method: request.method,
+		});
 		return NextResponse.json({ error: "Unexpected server error" }, { status: 500 });
 	}
 }

@@ -5,7 +5,6 @@ import {
   sessionCookieOptions,
   SESSION_COOKIE_NAME,
 } from "@/services/auth";
-import { generateCsrfToken, csrfCookieOptions, CSRF_COOKIE } from "@/services/csrf";
 import { OperatorStorage } from "@/services/operators-storage";
 import { createRateLimiter } from "@/services/rate-limiter";
 import { AuditLogStorage } from "@/services/audit-log-storage";
@@ -106,11 +105,6 @@ export async function POST(request: NextRequest) {
     SESSION_COOKIE_NAME,
     await createOperatorSessionToken(authenticated),
     sessionCookieOptions(),
-  );
-  response.cookies.set(
-    CSRF_COOKIE,
-    generateCsrfToken(),
-    csrfCookieOptions(),
   );
 
   return response;

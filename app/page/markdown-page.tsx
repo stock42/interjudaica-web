@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
@@ -69,12 +70,18 @@ const components: Components = {
 		</a>
 	),
 	img: ({ src, alt }) => (
-		<img
-			src={src}
-			alt={alt ?? ""}
-			loading="lazy"
-			className="my-6 w-full max-w-full rounded-lg border border-[var(--line)]"
-		/>
+		typeof src === "string" && src ? (
+			<div className="relative my-6 aspect-[16/9] w-full overflow-hidden rounded-lg border border-[var(--line)] bg-[var(--surface-soft)]">
+				<Image
+					src={src}
+					alt={alt ?? ""}
+					fill
+					unoptimized
+					sizes="(min-width: 1024px) 768px, 100vw"
+					className="object-contain"
+				/>
+			</div>
+		) : null
 	),
 	hr: () => (
 		<hr className="my-8 border-t border-[var(--line)]" />

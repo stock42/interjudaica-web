@@ -1,44 +1,25 @@
 import "server-only";
 
-import { headers } from "next/headers";
+import { unstable_cache } from "next/cache";
 import type { TypePaper } from "@/models/papers";
-
-async function getBaseUrl() {
-	const headerList = await headers();
-	const host = headerList.get("host");
-
-	if (!host) {
-		return "http://localhost:3025";
-	}
-
-	const protocol = host.includes("localhost") ? "http" : "https";
-	return `${protocol}://${host}`;
-}
+import { PaperStorage } from "@/services/papers-storage";
 
 export async function listCommunityPapers(): Promise<TypePaper[]> {
-	const baseUrl = await getBaseUrl();
-	const response = await fetch(`${baseUrl}/api/papers?visibility=community`, {
-		cache: "no-store",
-	});
+	const listCommunityPapersCached = unstable_cache(
+		async () => PaperStorage.listPublishedByVisibility("community"),
+		["community-papers"],
+		{ revalidate: 60 },
+	);
 
-	if (!response.ok) {
-		return [];
-	}
-
-	const data = (await response.json()) as { items?: TypePaper[] };
-	return data.items ?? [];
+	return listCommunityPapersCached();
 }
 
 export async function getPaperBySlug(slug: string): Promise<TypePaper | null> {
-	const baseUrl = await getBaseUrl();
-	const response = await fetch(`${baseUrl}/api/papers/${slug}`, {
-		cache: "no-store",
-	});
+	const getPaperBySlugCached = unstable_cache(
+		async () => PaperStorage.findPublishedBySlug(slug),
+		["paper", slug],
+		{ revalidate: 60 },
+	);
 
-	if (!response.ok) {
-		return null;
-	}
-
-	const data = (await response.json()) as { item?: TypePaper };
-	return data.item ?? null;
+	return getPaperBySlugCached();
 }
