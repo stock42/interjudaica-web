@@ -3,7 +3,7 @@
 ## 2026-05-20
 - Add Stripe Customer Portal route at `/api/community/customer-portal` and dashboard CTA for self-service subscription management
 - Reuse existing Stripe customer IDs during community checkout to keep subscriptions attached to the same billing profile
-- Add Bun test script plus initial route/unit coverage for operator login, customer portal, base URL resolution, and error serialization
+- Add Bun test script plus broader route/unit coverage for operator login, customer portal, user registration, password reset, course/community/book checkout flows, webhook signature handling, base URL resolution, and error serialization
 - Add structured server-side error logging with Mongo-backed `error_events` storage and show recent errors in Admin Analytics
 - Expand `/api/health` with uptime, environment, and recent error count for basic operational monitoring
 - Remove CSRF cookie issuance from login routes after discarding CSRF enforcement server-side
