@@ -8,7 +8,11 @@
     "build": "next build",
     "start": "PORT=3025 next start",
     "lint": "eslint",
-    "test": "bun test"
+    "test": "bun test",
+    "test:e2e": "playwright test",
+    "test:e2e:install": "playwright install chromium",
+    "test:e2e:ui": "playwright test --ui",
+    "test:all": "bun test && bun run lint && bun run tsc --noEmit && bun run test:e2e"
   },
   "dependencies": {
     "@base-ui/react": "^1.4.1",
@@ -43,8 +47,9 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
-    "@types/bun": "latest",
+    "@playwright/test": "^1.60.0",
     "@tailwindcss/postcss": "^4",
+    "@types/bun": "latest",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

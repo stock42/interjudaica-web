@@ -46,11 +46,11 @@ export async function SiteHeader() {
           aria-label="InterJudaica home"
         >
           <Image
-            src="/logo-interjudaica-transparente.png"
+            src="/logo-interjudaica.png"
             alt="InterJudaica logo"
             width={1500}
             height={1500}
-            className="h-[4.5rem] w-[4.5rem] shrink-0 rounded-full"
+            className="h-[4.5rem] w-[4.5rem] shrink-0 rounded-full border border-[rgba(244,189,51,0.32)]"
             priority
           />
           <span className="grid min-w-0 leading-none">
@@ -136,11 +136,11 @@ export async function SiteFooter() {
         <div>
           <div className="flex items-center gap-3">
             <Image
-              src="/logo-interjudaica-transparente.png"
+              src="/logo-interjudaica.png"
               alt="InterJudaica logo"
               width={1500}
               height={1500}
-              className="h-14 w-14 rounded-full"
+              className="h-14 w-14 rounded-full border border-[rgba(244,189,51,0.32)]"
             />
             <span className="grid">
               <span className="font-display text-2xl font-semibold uppercase tracking-[0.16em] text-[var(--gold)]">

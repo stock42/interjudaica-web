@@ -42,7 +42,6 @@ export function LoginForm({ nextPath }: { nextPath?: string }) {
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unable to sign in.");
       setStatus("error");
-      setStatus("idle");
     }
   }
 

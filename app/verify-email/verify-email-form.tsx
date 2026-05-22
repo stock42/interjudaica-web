@@ -54,7 +54,6 @@ export function VerifyEmailForm() {
 		} catch (err) {
 			setError(err instanceof Error ? err.message : "Unable to verify email.");
 			setStatus("error");
-			setStatus("idle");
 		}
 	}
 
@@ -92,11 +91,10 @@ export function VerifyEmailForm() {
 			const cooldownSeconds =
 				Number(data.cooldownSeconds) || defaultCooldown || 30;
 			startCooldown(cooldownSeconds);
+			setTimeout(() => setStatus("idle"), 500);
 		} catch (err) {
 			setError(err instanceof Error ? err.message : "Unable to resend code.");
 			setStatus("error");
-		} finally {
-			setTimeout(() => setStatus("idle"), 500);
 		}
 	}
 

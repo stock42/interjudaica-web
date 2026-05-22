@@ -1,17 +1,14 @@
 import "server-only";
 
-import { randomInt, createHmac } from "crypto";
+import { createHmac, randomInt, timingSafeEqual } from "crypto";
+import { getAuthSecret } from "@/services/auth-secret";
 
 const CSRF_COOKIE = "__Host-interjudaica_csrf";
 const CSRF_HEADER = "x-csrf-token";
 const CSRF_MAX_AGE = 60 * 60 * 8;
 
 function getCsrfSecret() {
-	return (
-		process.env.AUTH_SECRET ??
-		process.env.NEXTAUTH_SECRET ??
-		"interjudaica-local-development-secret"
-	) + "-csrf";
+	return `${getAuthSecret()}-csrf`;
 }
 
 export function generateCsrfToken(): string {
@@ -24,7 +21,13 @@ export function verifyCsrfToken(token: string): boolean {
 	const [raw, signature] = token.split(".");
 	if (!raw || !signature) return false;
 	const expected = createHmac("sha256", getCsrfSecret()).update(raw).digest("base64url");
-	return expected === signature;
+	const expectedBuffer = Buffer.from(expected);
+	const signatureBuffer = Buffer.from(signature);
+
+	return (
+		expectedBuffer.length === signatureBuffer.length &&
+		timingSafeEqual(expectedBuffer, signatureBuffer)
+	);
 }
 
 export function csrfCookieOptions() {
