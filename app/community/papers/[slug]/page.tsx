@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeSanitize from "rehype-sanitize";
 
 import { ButtonLink, PageShell, Section } from "@/app/components/portal-ui";
 import { getPaperBySlug } from "@/app/lib/papers";
+import { hasActiveCommunityMembership } from "@/services/community-memberships";
+import { getCurrentUser } from "@/services/user-auth";
 
 export const runtime = "nodejs";
 
@@ -27,6 +30,16 @@ export default async function PaperDetailPage({
 	params: Promise<{ slug: string }>;
 }) {
 	const { slug } = await params;
+	const user = await getCurrentUser();
+
+	if (!user) {
+		redirect(`/login?next=/community/papers/${slug}`);
+	}
+
+	if (!(await hasActiveCommunityMembership(user))) {
+		redirect("/community");
+	}
+
 	const paper = await getPaperBySlug(slug);
 
 	if (!paper) {

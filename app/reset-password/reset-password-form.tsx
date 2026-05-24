@@ -5,10 +5,11 @@ import { useSearchParams } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { Label } from "@/components/ui/label";
 
 const COOLDOWN_FALLBACK = Number(
-	process.env.NEXT_PUBLIC_RESET_RESEND_COOLDOWN_SECONDS ?? "30",
+	process.env.NEXT_PUBLIC_RESET_RESEND_COOLDOWN_SECONDS ?? "60",
 );
 
 type Status = "idle" | "sending" | "sent" | "error";
@@ -25,12 +26,15 @@ export default function ResetPasswordForm() {
 		() => (searchParams.get("email") ?? "").toLowerCase(),
 		[searchParams],
 	);
+	const shouldStartCooldown = searchParams.get("sent") === "1";
 	const [status, setStatus] = useState<Status>("idle");
 	const [error, setError] = useState<string>("");
+	const [code, setCode] = useState("");
 	const [resendError, setResendError] = useState("");
+	const [resendMessage, setResendMessage] = useState("");
 	const [resend, setResend] = useState<ResendState>({
 		cooldown: COOLDOWN_FALLBACK,
-		remaining: 0,
+		remaining: email && shouldStartCooldown ? COOLDOWN_FALLBACK : 0,
 		status: "idle",
 	});
 
@@ -56,9 +60,14 @@ export default function ResetPasswordForm() {
 
 		const form = event.currentTarget;
 		const formData = new FormData(form);
-		const code = String(formData.get("code") ?? "");
 		const password = String(formData.get("password") ?? "");
 		const confirmPassword = String(formData.get("confirmPassword") ?? "");
+
+		if (code.length !== 6) {
+			setError("Enter the 6-digit code we emailed you.");
+			setStatus("idle");
+			return;
+		}
 
 		if (password !== confirmPassword) {
 			setError("Passwords do not match.");
@@ -79,6 +88,7 @@ export default function ResetPasswordForm() {
 			}
 
 			form.reset();
+			setCode("");
 			setStatus("sent");
 		} catch (err) {
 			setError(err instanceof Error ? err.message : "Unable to reset password.");
@@ -92,6 +102,7 @@ export default function ResetPasswordForm() {
 		}
 
 		setResendError("");
+		setResendMessage("");
 		setResend((current) => ({ ...current, status: "sending" }));
 
 		try {
@@ -118,11 +129,18 @@ export default function ResetPasswordForm() {
 			}
 
 			const data = await response.json().catch(() => ({}));
-			const cooldown = Number(data.cooldown ?? resend.cooldown);
+			if (!response.ok) {
+				throw new Error(data.error ?? "Unable to resend the code.");
+			}
+
+			const cooldown = Number(data.cooldownSeconds ?? data.cooldown ?? resend.cooldown);
 			setResend({ cooldown, remaining: cooldown, status: "idle" });
-		} catch {
+			setResendMessage("We sent a new code to your inbox.");
+		} catch (err) {
 			setResend((current) => ({ ...current, status: "idle" }));
-			setResendError("Unable to resend the code.");
+			setResendError(
+				err instanceof Error ? err.message : "Unable to resend the code.",
+			);
 		}
 	}
 
@@ -159,18 +177,28 @@ export default function ResetPasswordForm() {
 			</div>
 
 			<div className="grid gap-2">
-				<Label htmlFor="code">6-digit code</Label>
-				<Input
-					id="code"
-					name="code"
-					type="text"
-					inputMode="numeric"
-					pattern="\d{6}"
+				<Label>6-digit code</Label>
+				<InputOTP
 					maxLength={6}
-					required
-					autoComplete="one-time-code"
-					placeholder="123456"
-				/>
+					value={code}
+					onChange={(value) => setCode(value.replace(/\D/g, ""))}
+					containerClassName="justify-between"
+					inputMode="numeric"
+					pattern="^[0-9]+$"
+				>
+					<InputOTPGroup>
+						{Array.from({ length: 6 }).map((_, index) => (
+							<InputOTPSlot
+								key={index}
+								index={index}
+								className="size-10 text-base sm:size-11"
+							/>
+						))}
+					</InputOTPGroup>
+				</InputOTP>
+				<p className="text-xs text-[var(--muted)]">
+					Codes expire after 15 minutes.
+				</p>
 			</div>
 
 			<div className="grid gap-2">
@@ -202,7 +230,10 @@ export default function ResetPasswordForm() {
 			) : null}
 
 			<div className="flex flex-wrap items-center gap-3">
-				<Button type="submit" disabled={status === "sending" || !email}>
+				<Button
+					type="submit"
+					disabled={status === "sending" || !email || code.length !== 6}
+				>
 					{status === "sending" ? "Saving…" : "Save password"}
 				</Button>
 				<button
@@ -219,15 +250,15 @@ export default function ResetPasswordForm() {
 				</button>
 			</div>
 
-			{status === "error" ? (
-				<p className="text-sm font-semibold text-[var(--sumac)]">
-					{error || "Unable to reset password."}
-				</p>
-			) : null}
-
 			{resendError ? (
 				<p className="text-sm font-semibold text-[var(--sumac)]">
 					{resendError}
+				</p>
+			) : null}
+
+			{resendMessage ? (
+				<p className="text-sm font-semibold text-[var(--jade)]">
+					{resendMessage}
 				</p>
 			) : null}
 

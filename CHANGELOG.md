@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-05-24
+- Confirm community membership immediately on Stripe return by passing the checkout session ID back to the dashboard, validating it server-side, and activating the student before rendering membership status.
+- Use the community membership registry as the canonical access check for community pages, papers, downloads, and forum APIs.
+- Complete the student password recovery UX with a 6-digit OTP input, visible email confirmation, 15-minute code messaging, and 60-second reset-code resend cooldown.
+
 ## 2026-05-22
 - Refine the home page for production: cap the desktop content width, replace the desktop course carousel with a responsive featured grid, hide empty testimonial publishing states, add compact hero proof points, and link the Rabbi CTA to `/ernesto-yattah`.
 - Use the official `public/logo-interjudaica.png` in public brand chrome and contact surfaces.

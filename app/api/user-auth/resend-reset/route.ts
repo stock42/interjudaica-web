@@ -12,7 +12,7 @@ const schemaResend = z.object({
 });
 
 const RESEND_COOLDOWN_SECONDS = Number(
-	process.env.RESET_RESEND_COOLDOWN_SECONDS ?? "30",
+	process.env.RESET_RESEND_COOLDOWN_SECONDS ?? "60",
 );
 const RESEND_WINDOW_SECONDS = Number(
 	process.env.RESET_RESEND_WINDOW_SECONDS ?? "600",
@@ -78,7 +78,11 @@ export async function POST(request: NextRequest) {
 			});
 		}
 
-		return NextResponse.json({ ok: true, cooldown: RESEND_COOLDOWN_SECONDS });
+		return NextResponse.json({
+			ok: true,
+			cooldown: RESEND_COOLDOWN_SECONDS,
+			cooldownSeconds: RESEND_COOLDOWN_SECONDS,
+		});
 	} catch (error) {
 		console.error("Resend reset error:", error instanceof Error ? error.message : error);
 		return NextResponse.json({ error: "Unexpected server error" }, { status: 500 });

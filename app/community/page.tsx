@@ -9,6 +9,7 @@ import {
 import { communityBenefits } from "@/app/lib/content";
 import { listCommunityPapers } from "@/app/lib/papers";
 import { getCurrentUser } from "@/services/user-auth";
+import { hasActiveCommunityMembership } from "@/services/community-memberships";
 
 export const metadata: Metadata = {
   title: "Community",
@@ -18,7 +19,7 @@ export const metadata: Metadata = {
 
 export default async function CommunityPage() {
   const user = await getCurrentUser();
-  const isMember = user?.communityStatus === "active";
+  const isMember = user ? await hasActiveCommunityMembership(user) : false;
   const papers = isMember ? await listCommunityPapers() : [];
 
   return (
@@ -37,8 +38,11 @@ export default async function CommunityPage() {
               course discounts, and early access to new cohorts.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <ButtonLink href="/checkout-community" tone="dark">
-                Subscribe
+              <ButtonLink
+                href={isMember ? "/community/forum" : "/checkout-community"}
+                tone="dark"
+              >
+                {isMember ? "Community forum" : "Subscribe"}
               </ButtonLink>
               <ButtonLink
                 href="/community/papers"

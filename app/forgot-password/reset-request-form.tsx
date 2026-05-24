@@ -35,7 +35,9 @@ export default function ForgotPasswordForm() {
 
       form.reset();
       setStatus("sent");
-      window.location.assign(`/reset-password?email=${encodeURIComponent(payload.email)}`);
+      window.location.assign(
+        `/reset-password?email=${encodeURIComponent(payload.email)}&sent=1`,
+      );
     } catch {
       setStatus("error");
     }

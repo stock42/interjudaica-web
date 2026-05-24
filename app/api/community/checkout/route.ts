@@ -6,9 +6,9 @@ import { getBaseUrl } from "@/lib/base-url";
 import { getStripe } from "@/lib/stripe";
 import { ConfigStorage } from "@/services/config-storage";
 import { CommunityUserStorage } from "@/services/community-users-storage";
+import { activateCommunityMembership } from "@/services/community-memberships";
 import { CouponStorage } from "@/services/coupons-storage";
 import { getCurrentUser } from "@/services/user-auth";
-import { UserStorage } from "@/services/users-storage";
 
 export const runtime = "nodejs";
 
@@ -49,8 +49,7 @@ export async function POST(request: NextRequest) {
 		);
 
 		if (percentOff === 100 || discountedAmount === 0) {
-			await CommunityUserStorage.upsertActive({ userUuid: user.uuid });
-			await UserStorage.update(user.uuid, { communityStatus: "active" });
+			await activateCommunityMembership({ userUuid: user.uuid });
 			return NextResponse.json({ url: `${baseUrl}/dashboard?community=success` });
 		}
 
@@ -74,7 +73,7 @@ export async function POST(request: NextRequest) {
 					quantity: 1,
 				},
 			],
-			success_url: `${baseUrl}/dashboard?community=success`,
+			success_url: `${baseUrl}/dashboard?community=success&session_id={CHECKOUT_SESSION_ID}`,
 			cancel_url: `${baseUrl}/checkout-community?payment=cancelled`,
 			metadata: {
 				community: "true",
