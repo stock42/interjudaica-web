@@ -38,7 +38,6 @@ export function OperatorLoginForm({ nextPath }: { nextPath?: string }) {
       window.location.href = next;
     } catch {
       setStatus("error");
-      setStatus("idle");
     }
   }
 

@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-05-22
+- Refine the home page for production: cap the desktop content width, replace the desktop course carousel with a responsive featured grid, hide empty testimonial publishing states, add compact hero proof points, and link the Rabbi CTA to `/ernesto-yattah`.
+- Use the official `public/logo-interjudaica.png` in public brand chrome and contact surfaces.
+- Add Playwright E2E coverage for public route smoke tests, protected-route redirects, home responsiveness/overflow, contact and login form states, security headers, and unauthenticated API behavior.
+- Add `@playwright/test`, Playwright scripts, report ignores, and a Chromium install script.
+- Harden session signing by centralizing auth secret lookup and failing closed in production when `AUTH_SECRET`/`NEXTAUTH_SECRET` is missing; use timing-safe CSRF signature comparison.
+- Keep student/operator login and email verification errors visible instead of immediately resetting the UI state.
+- Tighten security headers with production-only removal of CSP `unsafe-eval`, worker/manifest directives, DNS prefetch, cross-domain policy, and COOP headers.
+
 ## 2026-05-20
 - Add Stripe Customer Portal route at `/api/community/customer-portal` and dashboard CTA for self-service subscription management
 - Reuse existing Stripe customer IDs during community checkout to keep subscriptions attached to the same billing profile

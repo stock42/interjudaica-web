@@ -33,11 +33,11 @@ export default function ContactPage() {
             <div className="relative">
               <div className="flex items-center gap-4">
                 <Image
-                  src="/logo-interjudaica-transparente.png"
+                  src="/logo-interjudaica.png"
                   alt="InterJudaica logo"
                   width={256}
                   height={256}
-                  className="h-16 w-16 rounded-full"
+                  className="h-16 w-16 rounded-full border border-[rgba(244,189,51,0.32)]"
                 />
                 <div>
                   <p className="text-xs font-bold uppercase tracking-[0.22em] text-[var(--gold)]">

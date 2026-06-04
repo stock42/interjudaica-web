@@ -9,7 +9,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 const homeFrame =
-  "mx-auto w-full px-6 sm:px-10 lg:px-16 xl:px-20 2xl:px-24";
+  "mx-auto w-full max-w-[1480px] px-6 sm:px-10 lg:px-16 xl:px-20";
 type HomeIconKind = "book" | "pin" | "screen" | "menorah" | "globe";
 
 
@@ -121,21 +121,21 @@ function CourseFeatureCard({
 }) {
   const image = course.coverImageUrl || course.thumbnailImageUrl || "/hero-image.png";
   return (
-    <article className="grid overflow-hidden rounded-lg border border-[rgba(244,189,51,0.62)] bg-[linear-gradient(120deg,#11161a_0%,#070a0c_58%,#050608_100%)] shadow-[0_30px_90px_rgba(0,0,0,0.42)] md:h-[21rem] md:grid-cols-[47%_53%]">
-      <div className="relative min-h-[18rem] overflow-hidden md:min-h-0">
+    <article className="group flex h-full min-h-[35rem] flex-col overflow-hidden rounded-lg border border-[rgba(244,189,51,0.52)] bg-[linear-gradient(145deg,#11161a_0%,#070a0c_58%,#050608_100%)] shadow-[0_30px_90px_rgba(0,0,0,0.42)] transition duration-300 hover:-translate-y-1 hover:border-[rgba(244,189,51,0.86)] hover:shadow-[0_34px_100px_rgba(0,0,0,0.5)]">
+      <div className="relative min-h-[17rem] overflow-hidden">
         <Image
           src={image}
           alt=""
           fill
-          sizes="(min-width: 1024px) 45vw, 100vw"
-          className="object-cover"
+          sizes="(min-width: 1280px) 30vw, (min-width: 640px) 50vw, 100vw"
+          className="object-cover transition duration-500 group-hover:scale-[1.03]"
         />
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.02),rgba(0,0,0,0.3))]" />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.02),rgba(0,0,0,0.38))]" />
         <div className="absolute left-6 top-6 flex h-16 w-16 items-center justify-center rounded-full border border-[var(--gold)] bg-[#050608]/92 text-[var(--gold)] shadow-[0_16px_36px_rgba(0,0,0,0.4)]">
           <HomeIcon kind={icon} className="h-9 w-9" />
         </div>
       </div>
-      <div className="flex min-h-[18rem] flex-col justify-center overflow-hidden p-6 lg:p-7 md:min-h-0">
+      <div className="flex flex-1 flex-col overflow-hidden p-6 lg:p-7">
         <p className="text-sm font-bold uppercase tracking-[0.18em] text-[var(--gold)]">
           Course
         </p>
@@ -143,10 +143,10 @@ function CourseFeatureCard({
           {course.title}
         </h3>
         <span className="mt-3 h-px w-20 bg-[var(--gold)]" />
-        <p className="mt-4 line-clamp-3 max-w-md text-sm leading-6 text-white/78">
+        <p className="mt-4 line-clamp-4 max-w-md flex-1 text-sm leading-6 text-white/78">
           {course.summary || "Course details coming soon."}
         </p>
-        <div className="mt-4 flex flex-wrap items-center gap-4 text-sm">
+        <div className="mt-5 flex flex-wrap items-center gap-4 text-sm">
           <span className="rounded-full border border-[var(--gold)] px-3 py-1 text-xs font-semibold text-[var(--gold)]">
             {formatUsd(course.price)}
           </span>
@@ -176,9 +176,9 @@ function SectionTitle({
   const lineClass = lineTone === "gold" ? "bg-[var(--gold)]" : "bg-[var(--line)]";
 
   return (
-    <div className="mb-7 flex items-center justify-center gap-6">
+    <div className="mb-8 flex items-center justify-center gap-5 sm:gap-6">
       <span className={`hidden h-px max-w-[18rem] flex-1 sm:block ${lineClass}`} />
-      <h2 className="text-center font-display text-2xl font-semibold uppercase tracking-[0.32em] text-[var(--gold)]">
+      <h2 className="text-center font-display text-xl font-semibold uppercase tracking-[0.16em] text-[var(--gold)] sm:text-2xl sm:tracking-[0.32em]">
         {children}
       </h2>
       <span className={`hidden h-px max-w-[18rem] flex-1 sm:block ${lineClass}`} />
@@ -191,6 +191,7 @@ export default async function Home() {
     listPublicCourses(),
     listSocialProof(),
   ]);
+  const featuredCourses = homeCourses.slice(0, 3);
   const whyChoose = [
     {
       icon: "screen" as const,
@@ -212,6 +213,11 @@ export default async function Home() {
       title: "Access from anywhere",
       text: "Courses and community wherever you are.",
     },
+  ];
+  const heroStats = [
+    ["Live", "guided cohorts"],
+    ["$19 USD", "community access"],
+    ["Online", "from anywhere"],
   ];
 
   return (
@@ -237,7 +243,7 @@ export default async function Home() {
           priority
         />
 
-        <div className={`${homeFrame} relative grid min-h-[560px] items-center py-12`}>
+        <div className={`${homeFrame} relative grid min-h-[min(680px,calc(100svh-5rem))] items-center py-14`}>
           <div className="max-w-[42rem]">
             <h1 className="font-display text-5xl font-semibold leading-[0.98] text-[#f8f2e8] sm:text-6xl xl:text-7xl">
               Learn Judaism
@@ -255,6 +261,21 @@ export default async function Home() {
               Online Jewish courses and community learning led by Rabbi Ernesto
               Yattah.
             </p>
+            <div className="mt-8 grid max-w-[38rem] gap-px overflow-hidden rounded-lg border border-[rgba(244,189,51,0.28)] bg-[rgba(244,189,51,0.22)] sm:grid-cols-3">
+              {heroStats.map(([value, label]) => (
+                <div
+                  key={label}
+                  className="bg-[#050608]/70 px-4 py-3 backdrop-blur-sm"
+                >
+                  <p className="font-display text-2xl font-semibold leading-tight text-[var(--gold)]">
+                    {value}
+                  </p>
+                  <p className="mt-1 text-xs font-semibold uppercase tracking-[0.12em] text-white/66">
+                    {label}
+                  </p>
+                </div>
+              ))}
+            </div>
             <div className="mt-9 flex flex-col gap-4 sm:flex-row">
               <ButtonLink href="/courses">
                 View courses <span aria-hidden="true">&gt;</span>
@@ -267,36 +288,37 @@ export default async function Home() {
         </div>
       </section>
 
-      <section className="bg-[#080b0d] py-8 text-[#f8f2e8]">
+      <section className="bg-[#080b0d] py-14 text-[#f8f2e8]">
         <div className={homeFrame}>
           <SectionTitle>Featured Courses</SectionTitle>
-          {homeCourses.length === 0 ? (
+          {featuredCourses.length === 0 ? (
             <div className="rounded-lg border border-[rgba(244,189,51,0.4)] bg-[#050608] p-6 text-sm text-white/70">
               No public courses are available yet.
             </div>
           ) : (
-            <div className="-mx-6 overflow-x-auto px-6 pb-2">
-              <div className="flex snap-x snap-mandatory gap-6">
-                {homeCourses.map((course, index) => (
-                  <div
-                    key={course.slug}
-                    className="w-[22rem] snap-start sm:w-[26rem] lg:w-[30rem]"
-                  >
-                    <CourseFeatureCard
-                      course={course}
-                      icon={index % 2 === 0 ? "book" : "pin"}
-                    />
-                  </div>
-                ))}
-              </div>
+            <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+              {featuredCourses.map((course, index) => (
+                <CourseFeatureCard
+                  key={course.slug}
+                  course={course}
+                  icon={index % 2 === 0 ? "book" : "pin"}
+                />
+              ))}
             </div>
           )}
+          {homeCourses.length > featuredCourses.length ? (
+            <div className="mt-8 flex justify-center">
+              <ButtonLink href="/courses" tone="secondary">
+                View all courses <span aria-hidden="true">&gt;</span>
+              </ButtonLink>
+            </div>
+          ) : null}
         </div>
       </section>
 
       <section
         id="about-rabbi"
-        className="bg-[#080b0d] py-6 text-[#f8f2e8]"
+        className="scroll-mt-28 bg-[#080b0d] py-12 text-[#f8f2e8]"
       >
         <div
           className={`${homeFrame} grid gap-12 lg:grid-cols-[38%_1fr] lg:items-center`}
@@ -339,7 +361,7 @@ export default async function Home() {
               </p>
             </div>
             <div className="mt-6">
-              <ButtonLink href="/courses" tone="secondary">
+              <ButtonLink href="/ernesto-yattah" tone="secondary">
                 Learn more about the Rabbi <span aria-hidden="true">&gt;</span>
               </ButtonLink>
             </div>
@@ -347,14 +369,14 @@ export default async function Home() {
         </div>
       </section>
 
-      <section className="bg-[#080b0d] py-7 text-[#f8f2e8]">
+      <section className="bg-[#080b0d] py-12 text-[#f8f2e8]">
         <div className={homeFrame}>
           <SectionTitle lineTone="gold">Why Choose InterJudaica?</SectionTitle>
-          <div className="grid gap-8 md:grid-cols-4">
+          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
             {whyChoose.map((item) => (
               <article
                 key={item.title}
-                className="px-6 text-center md:border-r md:border-[rgba(244,189,51,0.55)] md:last:border-r-0"
+                className="px-6 text-center lg:border-r lg:border-[rgba(244,189,51,0.55)] lg:last:border-r-0"
               >
                 <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full border border-[var(--gold)] text-[var(--gold)]">
                   <HomeIcon kind={item.icon} className="h-10 w-10" />
@@ -371,16 +393,12 @@ export default async function Home() {
         </div>
       </section>
 
-      <section className="bg-[#080b0d] py-7 text-[#f8f2e8]">
-        <div className={homeFrame}>
-          <SectionTitle>What Our Students Say</SectionTitle>
-          <div className="grid gap-7 md:grid-cols-3">
-            {testimonials.length === 0 ? (
-              <p className="text-sm text-white/70">
-                No testimonials have been published yet.
-              </p>
-            ) : (
-              testimonials.map((testimonial) => (
+      {testimonials.length > 0 ? (
+        <section className="bg-[#080b0d] py-12 text-[#f8f2e8]">
+          <div className={homeFrame}>
+            <SectionTitle>What Our Students Say</SectionTitle>
+            <div className="grid gap-7 md:grid-cols-3">
+              {testimonials.map((testimonial) => (
                 <figure
                   key={testimonial.name}
                   className="rounded-lg border border-[rgba(244,189,51,0.58)] bg-[#080b0d] p-6"
@@ -401,13 +419,13 @@ export default async function Home() {
                     <span className="text-base tracking-[0.18em] text-[var(--gold)]">*****</span>
                   </figcaption>
                 </figure>
-              ))
-            )}
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      ) : null}
 
-      <section className="bg-[#080b0d] pb-8 pt-2 text-[#f8f2e8]">
+      <section className="bg-[#080b0d] py-12 text-[#f8f2e8]">
         <div className={homeFrame}>
           <div className="relative overflow-hidden rounded-lg border border-[rgba(244,189,51,0.62)] bg-[linear-gradient(90deg,rgba(244,189,51,0.16),rgba(244,189,51,0.04))] p-8">
             <Image

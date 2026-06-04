@@ -7,6 +7,7 @@ import type { NextRequest } from "next/server";
 import type { TypeSafeOperator } from "@/models/operators";
 import { OperatorStorage } from "@/services/operators-storage";
 import { ConfigStorage } from "@/services/config-storage";
+import { getAuthSecret } from "@/services/auth-secret";
 
 export const SESSION_COOKIE_NAME = "__Host-interjudaica_operator_session";
 const SESSION_MAX_AGE_DEFAULT = 60 * 60 * 8;
@@ -22,14 +23,6 @@ type SessionPayload = {
   iat: number;
   exp: number;
 };
-
-function getAuthSecret() {
-  return (
-    process.env.AUTH_SECRET ??
-    process.env.NEXTAUTH_SECRET ??
-    "interjudaica-local-development-secret"
-  );
-}
 
 function encode(value: object) {
   return Buffer.from(JSON.stringify(value)).toString("base64url");
