@@ -10,6 +10,7 @@ export const schemaCommunityUser = z.object({
 	subscribedAt: z.string().trim().default(""),
 	stripeCustomerId: z.string().trim().default(""),
 	stripeSubscriptionId: z.string().trim().default(""),
+	planUuid: z.string().trim().default(""),
 });
 
 export type TypeCommunityUser = z.infer<typeof schemaCommunityUser>;

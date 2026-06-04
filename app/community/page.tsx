@@ -1,3 +1,4 @@
+import { Fragment } from "react";
 import type { Metadata } from "next";
 import {
   ButtonLink,
@@ -9,6 +10,18 @@ import {
 import { communityBenefits } from "@/app/lib/content";
 import { listCommunityPapers } from "@/app/lib/papers";
 import { getCurrentUser } from "@/services/user-auth";
+import { hasActiveCommunityMembership } from "@/services/community-memberships";
+import { SubscriptionPlanStorage } from "@/services/subscription-plans-storage";
+import { CommunityUserStorage } from "@/services/community-users-storage";
+
+function formatDescription(text: string) {
+  return text.split("\n").map((line, i) => (
+    <Fragment key={i}>
+      {i > 0 && <br />}
+      {line}
+    </Fragment>
+  ))
+}
 
 export const metadata: Metadata = {
   title: "Community",
@@ -18,8 +31,14 @@ export const metadata: Metadata = {
 
 export default async function CommunityPage() {
   const user = await getCurrentUser();
-  const isMember = user?.communityStatus === "active";
+  const isMember = user ? await hasActiveCommunityMembership(user) : false;
   const papers = isMember ? await listCommunityPapers() : [];
+  const plans = await SubscriptionPlanStorage.list();
+  const mostExpensivePlan =
+    plans.length > 0
+      ? plans.reduce((max, plan) => (plan.price > max.price ? plan : max), plans[0])
+      : null
+  const communityUser = user ? await CommunityUserStorage.getByUserUuid(user.uuid) : null;
 
   return (
     <PageShell>
@@ -30,16 +49,25 @@ export default async function CommunityPage() {
               Community membership
             </p>
             <h1 className="font-display text-4xl font-semibold leading-tight sm:text-6xl">
-              Study between courses for $19 USD/month
+              Study between courses
             </h1>
             <p className="mt-5 max-w-2xl text-lg leading-8 text-white/75">
               Members get a private forum, monthly papers from Rabbi Yattah,
               course discounts, and early access to new cohorts.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <ButtonLink href="/checkout-community" tone="dark">
-                Subscribe
-              </ButtonLink>
+              {isMember ? (
+                <ButtonLink href="/community/forum" tone="dark">
+                  Community forum
+                </ButtonLink>
+              ) : mostExpensivePlan ? (
+                <ButtonLink
+                  href={`/checkout-community?planUuid=${mostExpensivePlan.uuid}`}
+                  tone="dark"
+                >
+                  Subscribe
+                </ButtonLink>
+              ) : null}
               <ButtonLink
                 href="/community/papers"
                 tone="quiet"
@@ -53,16 +81,79 @@ export default async function CommunityPage() {
             <p className="text-sm font-bold uppercase text-white/60">
               Membership
             </p>
-            <p className="mt-4 font-display text-6xl font-semibold">$19</p>
-            <p className="mt-2 text-white/65">USD per month</p>
-            <div className="mt-6 h-px bg-white/15" />
-            <p className="mt-6 text-sm leading-6 text-white/70">
-              Membership unlocks the private forum, papers, and course
-              discounts for as long as the subscription remains active.
-            </p>
+            {isMember ? (
+              <>
+                <p className="mt-2 text-white/65">You are a member</p>
+                <div className="mt-6 h-px bg-white/15" />
+                <p className="mt-6 text-sm leading-6 text-white/70">
+                  Your subscription is active. Cancel anytime from your account.
+                </p>
+              </>
+            ) : plans.length > 0 ? (
+              <>
+                <p className="mt-4 font-display text-6xl font-semibold">
+                  ${plans[0].price / 100}
+                </p>
+                <p className="mt-2 text-white/65">
+                  USD per {plans[0].billingInterval}
+                </p>
+                <div className="mt-6 h-px bg-white/15" />
+                <p className="mt-6 text-sm leading-6 text-white/70">
+                  {plans[0].description
+                    ? formatDescription(plans[0].description)
+                    : "Membership unlocks the private forum, papers, and course discounts."}
+                </p>
+              </>
+            ) : (
+              <>
+                <div className="mt-6 h-px bg-white/15" />
+                <p className="mt-6 text-sm leading-6 text-white/70">
+                  No subscription plans available yet.
+                </p>
+              </>
+            )}
           </div>
         </div>
       </Section>
+
+      {!isMember && plans.length > 0 && (
+        <Section tone="paper">
+          <SectionIntro
+            eyebrow="Plans"
+            title="Choose your plan"
+            text="Select the subscription plan that best fits your study."
+          />
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {plans.map((plan) => (
+              <div
+                key={plan.uuid}
+                className="flex flex-col rounded-lg border border-[var(--line)] bg-white p-6 shadow-sm"
+              >
+                <h3 className="font-display text-xl font-semibold">{plan.name}</h3>
+                {plan.description && (
+                  <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
+                    {formatDescription(plan.description)}
+                  </p>
+                )}
+                <p className="mt-4 font-display text-4xl font-semibold">
+                  ${plan.price / 100}
+                  <span className="text-base font-normal text-[var(--muted)]">
+                    /{plan.billingInterval === "year" ? "year" : "month"}
+                  </span>
+                </p>
+                <div className="mt-6 flex-1" />
+                <ButtonLink
+                  href={`/checkout-community?planUuid=${plan.uuid}`}
+                  tone="dark"
+                  className="w-full text-center"
+                >
+                  Subscribe
+                </ButtonLink>
+              </div>
+            ))}
+          </div>
+        </Section>
+      )}
 
       <Section tone="paper">
         <div className="grid gap-10 lg:grid-cols-2">

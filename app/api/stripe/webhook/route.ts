@@ -5,6 +5,10 @@ import { CourseEnrollmentStorage } from "@/services/course-enrollments-storage";
 import { CoursePaymentStorage } from "@/services/course-payments-storage";
 import { CourseStorage } from "@/services/courses-storage";
 import { CommunityUserStorage } from "@/services/community-users-storage";
+import {
+	activateCommunityMembership,
+	getStripeResourceId,
+} from "@/services/community-memberships";
 import { UserStorage } from "@/services/users-storage";
 import { BookSaleStorage } from "@/services/book-sales-storage";
 import { WebhookEventStorage } from "@/services/webhook-event-storage";
@@ -57,19 +61,12 @@ export async function POST(request: Request) {
 		const bookUuid = session.metadata?.bookUuid;
 
 		if (isCommunity && userUuid) {
-			const user = await UserStorage.get(userUuid);
-
-			if (user) {
-				await CommunityUserStorage.upsertActive({
-					userUuid: user.uuid,
-					stripeCustomerId: String(session.customer ?? ""),
-					stripeSubscriptionId: String(session.subscription ?? ""),
-				});
-
-				await UserStorage.update(user.uuid, {
-					communityStatus: "active",
-				});
-			}
+			await activateCommunityMembership({
+				userUuid,
+				stripeCustomerId: getStripeResourceId(session.customer),
+				stripeSubscriptionId: getStripeResourceId(session.subscription),
+				planUuid: session.metadata?.planUuid ?? "",
+			});
 		}
 
 		if (courseUuid && userUuid) {

@@ -8,6 +8,7 @@ import { CourseEnrollmentStorage } from "@/services/course-enrollments-storage";
 import { readJson, routeError } from "@/app/api/_lib/admin-api";
 import { sendForumReplyNotification } from "@/lib/send-forum-reply-notification";
 import { getBaseUrl } from "@/lib/base-url";
+import { hasActiveCommunityMembership } from "@/services/community-memberships";
 
 export const runtime = "nodejs";
 
@@ -36,7 +37,7 @@ export async function GET(request: NextRequest) {
 	}
 
 	if (area === "Community Forum") {
-		if (user.communityStatus !== "active") {
+		if (!(await hasActiveCommunityMembership(user))) {
 			return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 		}
 	}
@@ -80,7 +81,7 @@ export async function POST(request: NextRequest) {
 		const payload = schemaCreate.parse(await readJson(request));
 
 		if (payload.scope === "community") {
-			if (user.communityStatus !== "active") {
+			if (!(await hasActiveCommunityMembership(user))) {
 				return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 			}
 		}

@@ -1,0 +1,131 @@
+# Plan: Módulo de Email Marketing
+
+## Descripción
+Módulo completo de email marketing dentro del admin de InterJudaica: templates, grupos de contactos con query LLM, campañas con spooler de emails, envío vía Resend, y reintentos.
+
+## Stack
+- Bun, Next.js 16 App Router, React 19, Tailwind v4
+- MongoDB (driver nativo)
+- Zod (validación)
+- DeepSeek (LLM via OpenAI SDK)
+- Resend (envío de emails)
+- `cron` (procesamiento de spooler)
+
+## Infraestructura existente a reutilizar
+- `lib/resend.ts` → `getResend()` + `getEmailFrom()`
+- `.env` con `RESEND_API_KEY` + `EMAIL_FROM=info@jbatours.com`
+- Patrón: `resend.emails.send({ from, to, subject, html })`
+- Patrones del proyecto: Zod models, MongoDBStorage wrapper (`{ uuid, data: TData, _added, _updated?, _v, _n }`), requireOperator/requireAdminApi, runtime = "nodejs"
+- Directorios existentes: `models/`, `services/`, `app/api/admin/`, `app/admin/`
+
+## Colecciones
+
+### `email_templates`
+- name: string (único)
+- subject: string
+- html: string (generado por LLM vía prompting)
+
+### `email_groups`
+- name: string (único)
+- promoting: string (texto libre para el LLM)
+- query: string (MongoDB query generada por LLM, guardada como JSON string)
+
+### `email_campaigns`
+- name: string
+- templateUuid: string (ref a email_templates)
+- groupUuid: string (ref a email_groups)
+- deliveryTime: string | null (ISO timestamp, null = inmediato)
+- status: "draft" | "running" | "done"
+
+### `email_spooler`
+- from: string
+- to: string (email del contacto)
+- body: string (HTML ya renderizado con metavars reemplazadas)
+- campaignUuid: string (ref a email_campaigns)
+- deliveryTime: string | null (ISO timestamp)
+- status: "new" | "sent" | "error"
+- error: string | null (mensaje de error si status = "error")
+
+### `email_campaign_stats`
+No es colección independiente — los stats se derivan del spooler (counts por status por campaignUuid).
+
+## Metavariables en templates
+- `{{firstname}}` → firstname del contacto
+- `{{lastname}}` → lastname del contacto
+- `{{email}}` → email del contacto
+
+## API Routes
+
+### LLM Agents (`app/api/agentes/`)
+- `POST /api/agentes/generate-query` — recibe `{ promoting }`, envía a DeepSeek, devuelve MongoDB query como JSON
+- `POST /api/agentes/generate-template` — recibe `{ promoting }`, envía a DeepSeek, devuelve HTML del email
+
+### Email Templates (`/api/admin/email/templates`)
+- `GET /api/admin/email/templates` — listar templates (paginated)
+- `POST /api/admin/email/templates` — crear template
+- `GET /api/admin/email/templates/[uuid]` — obtener template
+- `PATCH /api/admin/email/templates/[uuid]` — actualizar template
+- `DELETE /api/admin/email/templates/[uuid]` — borrar template
+
+### Email Groups (`/api/admin/email/groups`)
+- `GET /api/admin/email/groups` — listar grupos
+- `POST /api/admin/email/groups` — crear grupo
+- `GET /api/admin/email/groups/[uuid]` — obtener grupo (incluye query)
+- `PATCH /api/admin/email/groups/[uuid]` — actualizar grupo (regenera query si cambia promoting)
+- `DELETE /api/admin/email/groups/[uuid]` — borrar grupo
+
+### Email Campaigns (`/api/admin/email/campaigns`)
+- `GET /api/admin/email/campaigns` — listar campañas con stats (total, sent, error counts)
+- `POST /api/admin/email/campaigns` — crear campaña
+- `GET /api/admin/email/campaigns/[uuid]` — obtener campaña
+- `PATCH /api/admin/email/campaigns/[uuid]` — actualizar campaña
+- `DELETE /api/admin/email/campaigns/[uuid]` — borrar campaña (cascade spooler)
+- `POST /api/admin/email/campaigns/[uuid]/run` — inicializar: ejecutar query del grupo, renderizar emails, guardar en spooler
+- `POST /api/admin/email/campaigns/[uuid]/retry` — reintentar todos los emails con status "error"
+
+### Email Spooler (`/api/admin/email/campaigns/[uuid]/spooler`)
+- `GET /api/admin/email/campaigns/[uuid]/spooler` — listar emails de una campaña (paginated, filterable por status)
+- `GET /api/admin/email/campaigns/[uuid]/spooler/[spoolerUuid]` — obtener email individual (para preview)
+- `POST /api/admin/email/campaigns/[uuid]/spooler/[spoolerUuid]/retry` — reintentar un email específico
+
+## Admin UI Pages
+
+### Email Marketing Shell (`app/admin/email/`)
+- Layout compartido con navegación interna (Templates | Groups | Campaigns)
+
+### Templates
+- `app/admin/email/templates/page.tsx` — listar templates (AdminShell)
+- `app/admin/email/templates/new/page.tsx` — crear template (name, subject + botón "Generate with AI" que abre modal/text area para prompt)
+- `app/admin/email/templates/[uuid]/page.tsx` — editar template (con preview de HTML)
+
+### Groups
+- `app/admin/email/groups/page.tsx` — listar grupos
+- `app/admin/email/groups/new/page.tsx` — crear grupo (name + textarea con micrófono para STT + botón "Generate query with AI")
+- `app/admin/email/groups/[uuid]/page.tsx` — editar grupo (ver la query generada, re-generar si cambia promoting)
+
+### Campaigns
+- `app/admin/email/campaigns/page.tsx` — listar campañas con stats (total/sent/error por campaña)
+- `app/admin/email/campaigns/new/page.tsx` — crear campaña (name, select template, select group, deliveryTime opcional)
+- `app/admin/email/campaigns/[uuid]/page.tsx` — detalle de campaña (stats, spooler list, botón "Run", botón "Retry All")
+- `app/admin/email/campaigns/[uuid]/spooler/[spoolerUuid]/page.tsx` — preview de email individual
+
+### Componentes compartidos
+- LLM PromptModal (textarea + "Generate" button, usado tanto para templates como groups)
+- SpoolerList (tabla de emails con status badges + retry buttons)
+
+## Flujo completo
+
+1. **Crear template**: name + subject → botón "Generate HTML with AI" → modal con textarea para prompt → LLM genera HTML
+2. **Crear grupo**: name + promoting (textarea con micrófono STT) → botón "Generate query with AI" → LLM genera MongoDB query → se guarda como string JSON
+3. **Crear campaña**: name + select template + select group + deliveryTime (opcional) → status "draft"
+4. **Inicializar**: botón "Run" → ejecuta query del grupo contra MongoDB → obtiene contactos → por cada contacto renderiza template (reemplaza metavars) → guarda email en spooler con status "new" → campaña pasa a "done"
+5. **Cron job**: cada minuto revisa spooler por emails con status "new" donde deliveryTime <= ahora → envía vía Resend → marca "sent" o "error"
+6. **Retry**: desde campaña → botón "Retry All" o retry individual → cambia status de "error" a "new" para que el cron lo procese de nuevo
+
+## Reglas del proyecto (obligatorio)
+- Todos los route handlers: `export const runtime = "nodejs"`
+- Todos los endpoints: `requireAdminApi()` o `requireOperator()` según corresponda
+- Todos los Zod schemas: validar con `.parse()`
+- Patrón MongoDBStorage: `{ uuid, data: TData, _added, _updated?, _v, _n }`
+- UI: lo más simple posible, seguir patrones existentes
+- No crear colecciones innecesarias — stats derivados del spooler con aggregation pipeline

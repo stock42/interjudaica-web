@@ -8,6 +8,7 @@ import {
 } from "@/app/components/portal-ui";
 import { listCommunityPapers } from "@/app/lib/papers";
 import { getCurrentUser } from "@/services/user-auth";
+import { hasActiveCommunityMembership } from "@/services/community-memberships";
 
 export const metadata: Metadata = {
   title: "Community Papers",
@@ -22,7 +23,7 @@ export default async function CommunityPapersPage() {
     redirect("/login?next=/community/papers");
   }
 
-  if (user.communityStatus !== "active") {
+  if (!(await hasActiveCommunityMembership(user))) {
     redirect("/community");
   }
 

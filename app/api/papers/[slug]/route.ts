@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 
 import { PaperStorage } from "@/services/papers-storage";
 import { getCurrentUser } from "@/services/user-auth";
+import { hasActiveCommunityMembership } from "@/services/community-memberships";
 
 export const runtime = "nodejs";
 
@@ -18,7 +19,7 @@ export async function GET(
 
 	if (paper.visibility === "community") {
 		const user = await getCurrentUser();
-		if (!user || user.communityStatus !== "active") {
+		if (!user || !(await hasActiveCommunityMembership(user))) {
 			return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 		}
 	}

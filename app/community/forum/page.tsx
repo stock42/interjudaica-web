@@ -10,6 +10,7 @@ import {
 import { listForumThreads } from "@/app/lib/forums";
 import { getCurrentUser } from "@/services/user-auth";
 import { CommunityThreadForm } from "@/app/community/forum/forum-form";
+import { hasActiveCommunityMembership } from "@/services/community-memberships";
 
 export const metadata: Metadata = {
   title: "Community Forum",
@@ -28,7 +29,7 @@ export default async function CommunityForumPage({
     redirect("/login?next=/community/forum");
   }
 
-  if (user.communityStatus !== "active") {
+  if (!(await hasActiveCommunityMembership(user))) {
     redirect("/community");
   }
 

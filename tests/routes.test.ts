@@ -78,6 +78,15 @@ const state = {
 	checkoutSessionId: "cs_test_123",
 	checkoutSessionUrl: "https://checkout.stripe.com/pay/cs_test_123",
 	checkoutCalls: [] as Array<Record<string, unknown>>,
+	retrievedCheckoutSession: {
+		mode: "subscription",
+		metadata: { community: "true", userUuid: "user-1" },
+		status: "complete",
+		payment_status: "paid",
+		customer: "cus_return",
+		subscription: "sub_return",
+	} as Record<string, unknown>,
+	retrievedSessionIds: [] as string[],
 	configNumbers: {
 		community_membership_price_cents: 1900,
 	},
@@ -315,6 +324,10 @@ mock.module("@/lib/stripe", () => ({
 						url: state.checkoutSessionUrl,
 					};
 				},
+				retrieve: async (sessionId: string) => {
+					state.retrievedSessionIds.push(sessionId);
+					return state.retrievedCheckoutSession;
+				},
 			},
 		},
 		webhooks: {
@@ -343,6 +356,9 @@ const { POST: communityCheckout } = await import("@/app/api/community/checkout/r
 const { POST: bookCheckout } = await import("@/app/api/books/checkout/route");
 const { POST: stripeWebhook } = await import("@/app/api/stripe/webhook/route");
 const { routeError } = await import("@/app/api/_lib/admin-api");
+const { activateCommunityMembershipFromCheckoutSession } = await import(
+	"@/services/community-memberships"
+);
 
 describe("route behaviors", () => {
 	beforeEach(() => {
@@ -386,6 +402,15 @@ describe("route behaviors", () => {
 		state.checkoutSessionId = "cs_test_123";
 		state.checkoutSessionUrl = "https://checkout.stripe.com/pay/cs_test_123";
 		state.checkoutCalls = [];
+		state.retrievedCheckoutSession = {
+			mode: "subscription",
+			metadata: { community: "true", userUuid: "user-1" },
+			status: "complete",
+			payment_status: "paid",
+			customer: "cus_return",
+			subscription: "sub_return",
+		};
+		state.retrievedSessionIds = [];
 		state.configNumbers.community_membership_price_cents = 1900;
 		state.configValues.currency = "usd";
 		state.communityUpserts = [];
@@ -616,6 +641,60 @@ describe("route behaviors", () => {
 		expect(body).toEqual({ url: state.checkoutSessionUrl });
 		expect(checkoutCall?.customer).toBe("cus_existing");
 		expect(checkoutCall?.customer_email).toBeUndefined();
+		expect(checkoutCall?.success_url).toBe(
+			"https://interjudaica.example/dashboard?community=success&session_id={CHECKOUT_SESSION_ID}",
+		);
+	});
+
+	test("community checkout return activates a completed Stripe session", async () => {
+		state.currentUser = {
+			uuid: "user-1",
+			email: "user@example.com",
+			firstName: "Cesar",
+		};
+
+		const result = await activateCommunityMembershipFromCheckoutSession(
+			"cs_test_123",
+			"user-1",
+		);
+
+		expect(result.ok).toBe(true);
+		expect(state.retrievedSessionIds).toEqual(["cs_test_123"]);
+		expect(state.communityUpserts).toEqual([
+			{
+				userUuid: "user-1",
+				stripeCustomerId: "cus_return",
+				stripeSubscriptionId: "sub_return",
+			},
+		]);
+		expect(state.userUpdates).toEqual([
+			{ uuid: "user-1", payload: { communityStatus: "active" } },
+		]);
+	});
+
+	test("community checkout return rejects sessions for another user", async () => {
+		state.currentUser = {
+			uuid: "user-1",
+			email: "user@example.com",
+			firstName: "Cesar",
+		};
+		state.retrievedCheckoutSession = {
+			mode: "subscription",
+			metadata: { community: "true", userUuid: "other-user" },
+			status: "complete",
+			payment_status: "paid",
+			customer: "cus_return",
+			subscription: "sub_return",
+		};
+
+		const result = await activateCommunityMembershipFromCheckoutSession(
+			"cs_test_123",
+			"user-1",
+		);
+
+		expect(result.ok).toBe(false);
+		expect(state.communityUpserts).toEqual([]);
+		expect(state.userUpdates).toEqual([]);
 	});
 
 	test("community checkout activates membership immediately for a 100 percent coupon", async () => {

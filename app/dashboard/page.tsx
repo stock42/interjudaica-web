@@ -15,6 +15,11 @@ import { BookSaleStorage } from "@/services/book-sales-storage";
 import { EmailPreferencesToggle } from "@/app/dashboard/email-preferences-toggle";
 import { listForumThreads } from "@/app/lib/forums";
 import { CommunityUserStorage } from "@/services/community-users-storage";
+import {
+  activateCommunityMembershipFromCheckoutSession,
+  isActiveCommunityStatus,
+} from "@/services/community-memberships";
+import { reportError } from "@/lib/logger";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -27,13 +32,46 @@ export const metadata: Metadata = {
 export default async function DashboardPage({
   searchParams,
 }: {
-  searchParams: Promise<{ payment?: string; course?: string; community?: string; billing?: string }>;
+  searchParams: Promise<{
+    payment?: string;
+    course?: string;
+    community?: string;
+    billing?: string;
+    session_id?: string;
+  }>;
 }) {
-  const { payment, community, billing } = await searchParams;
-  const user = await getCurrentUser();
+  const { payment, community, billing, session_id: sessionId } = await searchParams;
+  let user = await getCurrentUser();
 
   if (!user) {
     redirect("/login?next=/dashboard");
+  }
+
+  let communityActivationPending = false;
+  if (community === "success" && sessionId) {
+    try {
+      const activation = await activateCommunityMembershipFromCheckoutSession(
+        sessionId,
+        user.uuid,
+      );
+      if (activation.ok) {
+        user = activation.user;
+      } else {
+        communityActivationPending = activation.reason === "pending";
+      }
+    } catch (error) {
+      communityActivationPending = true;
+      reportError({
+        event: "community_checkout_return_activation_failed",
+        error,
+        route: "/dashboard",
+        context: {
+          sessionId,
+          userUuid: user.uuid,
+        },
+        level: "warn",
+      });
+    }
   }
 
   const enrollments = await CourseEnrollmentStorage.listByUser(user.uuid);
@@ -47,6 +85,7 @@ export default async function DashboardPage({
   const myBooks = await BookSaleStorage.listByEmail(user.email);
   const paidBooks = myBooks.filter((sale) => sale.status === "paid");
   const communityUser = await CommunityUserStorage.getByUserUuid(user.uuid);
+  const hasActiveCommunity = isActiveCommunityStatus(user, communityUser);
   const forumResult = await listForumThreads({
     area: "Announcements",
     page: 1,
@@ -70,7 +109,11 @@ export default async function DashboardPage({
 
         {community === "success" ? (
           <div className="rounded-lg border border-[var(--line)] bg-[rgba(22,74,159,0.08)] p-4 text-sm font-semibold text-[var(--ink)]">
-            Community membership activated.
+            {hasActiveCommunity
+              ? "Community membership activated."
+              : communityActivationPending
+                ? "Payment received. We are confirming your membership now."
+                : "Payment received. Your membership will unlock as soon as Stripe confirms it."}
           </div>
         ) : null}
 
@@ -171,15 +214,17 @@ export default async function DashboardPage({
                 Community subscription
               </p>
               <h2 className="mt-3 font-display text-3xl font-semibold">
-                {user.communityStatus === "active" ? "Active" : "Not subscribed"}
+                {hasActiveCommunity ? "Active" : "Not subscribed"}
               </h2>
               <p className="mt-3 text-sm leading-6 text-white/70">
-                {user.communityStatus === "active"
-                  ? "Renews at $19 USD/month."
+                {hasActiveCommunity
+                  ? communityUser?.stripeSubscriptionId
+                    ? "Renews at $19 USD/month."
+                    : "Community access is active."
                   : "Subscribe to unlock the community forum and papers."}
               </p>
               <div className="mt-5 flex flex-col gap-2 sm:flex-row lg:flex-col">
-                {user.communityStatus === "active" ? (
+                {hasActiveCommunity ? (
                   <ButtonLink href="/community/forum" tone="dark">
                     Community forum
                   </ButtonLink>

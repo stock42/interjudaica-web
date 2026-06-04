@@ -6,7 +6,7 @@ import ForgotPasswordForm from "@/app/forgot-password/reset-request-form";
 
 export const metadata: Metadata = {
   title: "Forgot password",
-  description: "Request an InterJudaica password reset link.",
+  description: "Request an InterJudaica password reset code.",
 };
 
 export default function ForgotPasswordPage() {
