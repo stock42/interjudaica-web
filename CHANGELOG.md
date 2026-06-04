@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-06-04
+- Translate Spanish copy on `/community` plans section to English ("Planes" → "Plans", "Elegí tu plan" → "Choose your plan").
+- Replace `\n` with `<br />` elements in subscription plan descriptions on `/community` and add `whitespace-pre-line` to the checkout form description.
+- Route the `/community` hero Subscribe button to the most expensive active plan and hide it when no plans exist.
+- Replace the Country text input on `/register` with a Radix Select dropdown of the top 50 countries, defaulting to United States.
+- Show a US states dropdown (all 50) on `/register` when United States is selected; fall back to a text input for other countries.
+
 ## 2026-05-24
 - Confirm community membership immediately on Stripe return by passing the checkout session ID back to the dashboard, validating it server-side, and activating the student before rendering membership status.
 - Use the community membership registry as the canonical access check for community pages, papers, downloads, and forum APIs.

@@ -5,10 +5,21 @@ import { useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-export function CheckoutCommunityForm() {
+type Props = {
+	planUuid: string;
+	planName: string;
+	planPriceCents: number;
+	planInterval: string;
+	planDescription: string;
+};
+
+export function CheckoutCommunityForm({ planUuid, planName, planPriceCents, planInterval, planDescription }: Props) {
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState("");
 	const [couponCode, setCouponCode] = useState("");
+
+	const priceDisplay = (planPriceCents / 100).toFixed(2);
+	const intervalLabel = planInterval === "year" ? "year" : "month";
 
 	async function handleSubmit(event: FormEvent<HTMLFormElement>) {
 		event.preventDefault();
@@ -19,7 +30,10 @@ export function CheckoutCommunityForm() {
 			const response = await fetch("/api/community/checkout", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ couponCode: couponCode.trim() || undefined }),
+				body: JSON.stringify({
+					planUuid,
+					couponCode: couponCode.trim() || undefined,
+				}),
 			});
 
 			const data = await response.json().catch(() => ({}));
@@ -38,11 +52,11 @@ export function CheckoutCommunityForm() {
 		<form className="grid gap-4" onSubmit={handleSubmit}>
 			<div className="rounded-lg border border-[var(--line)] bg-white p-4">
 				<p className="text-xs font-bold uppercase text-[var(--muted)]">
-					Community membership
+					{planName}
 				</p>
-				<p className="mt-3 text-2xl font-semibold">$19 USD / month</p>
-				<p className="mt-2 text-sm text-[var(--muted)]">
-					Private forum, Rabbi papers, and member-only discounts.
+				<p className="mt-3 text-2xl font-semibold">${priceDisplay} USD / {intervalLabel}</p>
+				<p className="mt-2 text-sm whitespace-pre-line text-[var(--muted)]">
+					{planDescription || "Private forum, Rabbi papers, and member-only discounts."}
 				</p>
 			</div>
 
