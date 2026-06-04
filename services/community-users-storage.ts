@@ -24,6 +24,7 @@ export class CommunityUserStorage extends MongoDBStorage<TypeCommunityUser> {
 			collection.createIndex({ uuid: 1 }, { unique: true }),
 			collection.createIndex({ "data.userUuid": 1 }, { unique: true }),
 			collection.createIndex({ "data.status": 1 }),
+			collection.createIndex({ "data.planUuid": 1 }),
 		]);
 
 		CommunityUserStorage.indexesReady = true;

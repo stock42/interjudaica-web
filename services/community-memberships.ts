@@ -10,6 +10,7 @@ type CommunityActivationInput = {
 	userUuid: string;
 	stripeCustomerId?: string;
 	stripeSubscriptionId?: string;
+	planUuid?: string;
 };
 
 type CommunityActivationResult =
@@ -63,6 +64,7 @@ export async function activateCommunityMembership({
 	userUuid,
 	stripeCustomerId = "",
 	stripeSubscriptionId = "",
+	planUuid = "",
 }: CommunityActivationInput): Promise<CommunityActivationResult> {
 	const user = await UserStorage.get(userUuid);
 	if (!user) {
@@ -79,6 +81,9 @@ export async function activateCommunityMembership({
 	}
 	if (stripeSubscriptionId) {
 		communityPayload.stripeSubscriptionId = stripeSubscriptionId;
+	}
+	if (planUuid) {
+		communityPayload.planUuid = planUuid;
 	}
 
 	const communityUser = await CommunityUserStorage.upsertActive(communityPayload);

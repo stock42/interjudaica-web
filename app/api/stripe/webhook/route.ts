@@ -65,6 +65,7 @@ export async function POST(request: Request) {
 				userUuid,
 				stripeCustomerId: getStripeResourceId(session.customer),
 				stripeSubscriptionId: getStripeResourceId(session.subscription),
+				planUuid: session.metadata?.planUuid ?? "",
 			});
 		}
 

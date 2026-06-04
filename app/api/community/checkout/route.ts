@@ -4,6 +4,7 @@ import { z } from "zod";
 import { readJson, routeError } from "@/app/api/_lib/admin-api";
 import { getBaseUrl } from "@/lib/base-url";
 import { getStripe } from "@/lib/stripe";
+import { SubscriptionPlanStorage } from "@/services/subscription-plans-storage";
 import { ConfigStorage } from "@/services/config-storage";
 import { CommunityUserStorage } from "@/services/community-users-storage";
 import { activateCommunityMembership } from "@/services/community-memberships";
@@ -13,6 +14,7 @@ import { getCurrentUser } from "@/services/user-auth";
 export const runtime = "nodejs";
 
 const schemaCheckout = z.object({
+	planUuid: z.string().uuid(),
 	couponCode: z.string().trim().optional(),
 });
 
@@ -24,17 +26,23 @@ export async function POST(request: NextRequest) {
 		}
 
 		const payload = schemaCheckout.parse(await readJson(request));
+		const { planUuid, couponCode } = payload;
+
+		const plan = await SubscriptionPlanStorage.get(planUuid);
+		if (!plan) {
+			return NextResponse.json({ error: "Plan not found" }, { status: 404 });
+		}
+
 		const stripe = getStripe();
 		const baseUrl = getBaseUrl(request);
 		const existingCommunityUser = await CommunityUserStorage.getByUserUuid(user.uuid);
-		const baseAmount = await ConfigStorage.getNumber("community_membership_price_cents");
-		const currency = await ConfigStorage.get("currency");
+		const currency = (await ConfigStorage.get("currency")) || "usd";
 
-		const couponCode = payload.couponCode?.trim().toUpperCase() ?? "";
+		const code = couponCode?.trim().toUpperCase() ?? "";
 		let percentOff = 0;
-		if (couponCode) {
+		if (code) {
 			const claimed = await CouponStorage.claimCoupon({
-				code: couponCode,
+				code,
 				scope: "community",
 			});
 			if (!claimed) {
@@ -45,13 +53,19 @@ export async function POST(request: NextRequest) {
 
 		const discountedAmount = Math.max(
 			0,
-			Math.round(baseAmount - baseAmount * (percentOff / 100)),
+			Math.round(plan.price - plan.price * (percentOff / 100)),
 		);
 
 		if (percentOff === 100 || discountedAmount === 0) {
-			await activateCommunityMembership({ userUuid: user.uuid });
+			await activateCommunityMembership({ userUuid: user.uuid, planUuid });
 			return NextResponse.json({ url: `${baseUrl}/dashboard?community=success` });
 		}
+
+		const metadata: Record<string, string> = {
+			community: "true",
+			userUuid: user.uuid,
+			planUuid,
+		};
 
 		const session = await stripe.checkout.sessions.create({
 			mode: "subscription",
@@ -64,27 +78,19 @@ export async function POST(request: NextRequest) {
 					price_data: {
 						currency,
 						product_data: {
-							name: "InterJudaica Community",
-							description: "Community membership subscription",
+							name: plan.name,
+							description: plan.description || `${plan.name} subscription`,
 						},
 						unit_amount: discountedAmount,
-						recurring: { interval: "month" },
+						recurring: { interval: plan.billingInterval },
 					},
 					quantity: 1,
 				},
 			],
 			success_url: `${baseUrl}/dashboard?community=success&session_id={CHECKOUT_SESSION_ID}`,
-			cancel_url: `${baseUrl}/checkout-community?payment=cancelled`,
-			metadata: {
-				community: "true",
-				userUuid: user.uuid,
-			},
-			subscription_data: {
-				metadata: {
-					community: "true",
-					userUuid: user.uuid,
-				},
-			},
+			cancel_url: `${baseUrl}/checkout-community?payment=cancelled&planUuid=${planUuid}`,
+			metadata,
+			subscription_data: { metadata },
 		});
 
 		return NextResponse.json({ url: session.url });

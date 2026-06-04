@@ -350,6 +350,7 @@ export function AdminShell({
     { href: "/admin/courses", label: "Courses" },
     { href: "/admin/course-categories", label: "Course categories" },
     { href: "/admin/instructors", label: "Instructors" },
+    { href: "/admin/subscription-plans", label: "Subscription plans" },
     { href: "/admin/subscriptions", label: "Subscriptions" },
     { href: "/admin/payments", label: "Payments" },
     { href: "/admin/papers", label: "Papers" },
