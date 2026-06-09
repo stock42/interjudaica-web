@@ -82,6 +82,16 @@ export class CommunityUserStorage extends MongoDBStorage<TypeCommunityUser> {
 		return user.getData();
 	}
 
+	static async getBySubscription(subscriptionId: string) {
+		await CommunityUserStorage.ensureIndexes();
+		const doc = await MongoDBStorage._findOne<TypeCommunityUser>(
+			CommunityUserStorage.COLLECTION,
+			{ "data.stripeSubscriptionId": subscriptionId },
+		);
+
+		return doc?.data ?? null;
+	}
+
 	static async markCancelledBySubscription(subscriptionId: string) {
 		await CommunityUserStorage.ensureIndexes();
 		return MongoDBStorage._update<TypeCommunityUser>(

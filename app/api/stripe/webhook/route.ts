@@ -140,6 +140,51 @@ export async function POST(request: Request) {
 		await BookSaleStorage.markFailed(session.id);
 	}
 
+	if (event.type === "customer.subscription.created") {
+		const subscription = event.data.object as Stripe.Subscription;
+		const userUuid = subscription.metadata?.userUuid;
+
+		// Subscription was created (possibly before checkout.session.completed)
+		// Already handled by checkout.session.completed, but catch orphan subscriptions
+		if (userUuid && subscription.status === "active") {
+			const user = await UserStorage.get(userUuid);
+			if (user && user.communityStatus !== "active") {
+				await UserStorage.update(userUuid, { communityStatus: "active" });
+			}
+		}
+	}
+
+	if (event.type === "customer.subscription.updated") {
+		const subscription = event.data.object as Stripe.Subscription;
+		const userUuid = subscription.metadata?.userUuid;
+
+		switch (subscription.status) {
+			case "past_due":
+			case "unpaid": {
+				// Payment failed — mark as inactive but don't cancel yet
+				await CommunityUserStorage.markCancelledBySubscription(subscription.id);
+				if (userUuid) {
+					await UserStorage.update(userUuid, { communityStatus: "cancelled" });
+				}
+				break;
+			}
+			case "canceled": {
+				await CommunityUserStorage.markCancelledBySubscription(subscription.id);
+				if (userUuid) {
+					await UserStorage.update(userUuid, { communityStatus: "cancelled" });
+				}
+				break;
+			}
+			case "active": {
+				// Subscription reactivated or renewed
+				if (userUuid) {
+					await UserStorage.update(userUuid, { communityStatus: "active" });
+				}
+				break;
+			}
+		}
+	}
+
 	if (event.type === "customer.subscription.deleted") {
 		const subscription = event.data.object as Stripe.Subscription;
 		const userUuid = subscription.metadata?.userUuid;
@@ -149,6 +194,33 @@ export async function POST(request: Request) {
 		if (userUuid) {
 			await UserStorage.update(userUuid, { communityStatus: "cancelled" });
 		}
+	}
+
+	if (event.type === "invoice.payment_succeeded") {
+		const invoice = event.data.object as Stripe.Invoice;
+
+		// For subscription renewals, ensure the user stays active
+		// Get subscription from the first line item
+		const subscriptionId = invoice.lines?.data?.[0]?.subscription;
+		if (subscriptionId && typeof subscriptionId === "string") {
+			const communityUser = await CommunityUserStorage.getBySubscription(subscriptionId);
+			if (communityUser) {
+				await UserStorage.update(communityUser.userUuid, { communityStatus: "active" });
+			}
+		}
+	}
+
+	if (event.type === "invoice.payment_failed") {
+		const invoice = event.data.object as Stripe.Invoice;
+
+		// Log the failure — user will be handled by customer.subscription.updated → past_due
+		const subscriptionId = invoice.lines?.data?.[0]?.subscription;
+		console.error(
+			"Invoice payment failed:",
+			invoice.id,
+			"subscription:",
+			subscriptionId && typeof subscriptionId === "string" ? subscriptionId : "N/A",
+		);
 	}
 
 	await WebhookEventStorage.markProcessed(event.id);
