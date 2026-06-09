@@ -1,127 +1,110 @@
-# TODO.md — InterJudaica Web: Recommendations
+# TODO — InterJudaica
 
-Last updated: 2026-05-13
-
----
-
-## 1. Security (remaining debt)
-
-- [x] **Session invalidation after password reset**: Added `passwordChangedAt` to user/operator models, `iat` to session tokens, validation on token check. Old tokens invalidated on password change.
-- [x] **Coupon race condition**: Replaced `findValid()` + `incrementUsage()` with atomic `claimCoupon()` using `findOneAndUpdate` with `$inc`.
-- [x] **Enrollment TOCTOU**: Unique compound index `(data.courseUuid, data.userUuid)` already existed in `course_enrollments`.
-- [x] **Stripe webhook idempotency**: Added `webhook_events` collection, skip already-processed events by ID.
-- [x] **MIME type validation by magic bytes**: Added `lib/magic-bytes.ts` with JPEG/PNG/GIF/WebP signatures, integrated in all 6 upload routes.
-- [x] **CSRF intentionally discarded**: validation was removed from `requireAdminApi()` after repeated admin UX failures. Session cookies remain `HttpOnly` + `SameSite`, and auth checks stay enforced. Keep the helper only if we revisit a safer rollout.
-- [x] **Account lockout**: Added `loginAttempts` and `loginLockedUntil` to user/operator models. 5 failed attempts → 15-minute lockout. Counters reset on successful login.
-- [x] **Audit logging**: Created `audit_logs` collection and `AuditLogStorage`. Logged: login success/fail/locked, register, verify email, password reset.
-- [x] **Security headers**: Added CSP, HSTS, X-Content-Type-Options, X-Frame-Options, Referrer-Policy, Permissions-Policy in `next.config.ts`.
-
-- [x] **Per-IP cooldown tracking in rate limiter** beyond in-memory Map (use DB for persistence across restarts).
+> Bugs, mejoras y deuda técnica identificados durante el análisis del código.
+> Generado: Junio 2026
 
 ---
 
-## 2. Feature completions
+## 🔴 Bugs
 
-- [x] **Book PDF download**: Implemented `accessToken`-based download via `/api/books/download?token=...`. Link included in purchase confirmation email.
-- [x] **Student dashboard My Books**: Shows purchased books with Download button in dashboard.
-- [x] **Free book checkout flow**: Books with `price: 0` skip Stripe, create paid sale immediately, send email with download link.
-- [x] **Book email with download link**: Thank-you email now includes the download button and URL.
-- [x] **Community forum reply notifications**: When a student posts in a course forum, the course instructor receives an email notification with thread preview and link.
-- [x] **Course enrollment email**: Welcome email sent after successful payment with course title, start date, and Zoom link.
-- [x] **Contact form CAPTCHA**: Cloudflare Turnstile added to contact form API. Validates token server-side. Requires `TURNSTILE_SECRET_KEY` env var.
-- [x] **Email preferences**: Added `emailNotifications` field to user model + dashboard toggle (client component, PATCH /api/user-auth/preferences).
-- [x] **Stripe Customer Portal integration**: Added `/api/community/customer-portal` plus dashboard CTA so Stripe-managed community subscribers can self-manage billing.
-- [ ] **Contact form CAPTCHA**: Add Turnstile or hCaptcha to the public contact form to prevent spam.
+### #1 CSRF — No protection on admin API routes
+- **Archivo**: `services/csrf.ts` (existe pero no se usa)
+- **Impacto**: 69 admin API routes (POST/PUT/DELETE/PATCH) sin protección CSRF
+- **Fix**: Integrar `services/csrf.ts` en `app/api/_lib/admin-api.ts`
 
----
+### #2 In-memory rate limiting (se pierde al reiniciar)
+- **Archivos**: `app/api/user-auth/resend-verify/route.ts`, `app/api/user-auth/resend-reset/route.ts`
+- **Impacto**: El rate limit resetea al reiniciar el servidor. En producción con múltiples instancias no funciona
+- **Fix**: Usar rate limiting persistente (MongoDB o Redis)
 
-## 3. Admin UX improvements
+### #3 Session token no es JWT estándar
+- **Archivo**: `services/auth.ts`
+- **Impacto**: Usa `base64url(JSON) + HMAC` en vez de JWT. Sin `exp` validation explícita, sin estándar
+- **Fix**: Migrar a `jose` o similar para JWT estándar con verificación de exp
 
-- [x] **File upload progress indicator**: `ImageUploadField` now uses XMLHttpRequest with `upload.onprogress` and renders a progress bar.
-- [x] **Image preview before upload**: `ImageUploadField` now shows a local preview before upload and the current stored image afterward.
-- [ ] **Rich text / WYSIWYG editor**: Replace the plain `textarea` markdown editor in the CMS Pages form with a split-pane editor (markdown on left, preview on right) or a proper WYSIWYG like TipTap/Plate.
-- [ ] **Bulk operations**: Add bulk delete, bulk publish, or bulk archive across courses, books, papers, and pages list views.
-- [ ] **Sortable data tables**: Admin tables (courses, users, books, sales) should support click-to-sort by column headers instead of only client-side filtering.
-- [ ] **Export to CSV**: Add CSV export buttons on list screens (users, sales, enrollments, contacts) for offline analysis.
-- [ ] **Admin dashboard charts**: Add simple bar/line charts (using a lightweight chart library) for course enrollments over time, book sales over time, and user registrations.
-- [ ] **Inline image upload in markdown editor**: Allow pasting or dragging images directly into the CMS page markdown editor, auto-uploading them and inserting the URL.
-- [ ] **Search across all entities**: Add a global admin search bar that searches across courses, books, users, pages, and papers.
+### #4 Email preview renderiza HTML sin sanitizar
+- **Archivo**: `app/admin/email/campaigns/[uuid]/spooler/[spoolerUuid]/page.tsx`
+- **Impacto**: `dangerouslySetInnerHTML={{ __html: email.body }}` — XSS si un atacante compromete la campaign
+- **Fix**: Sanitizar HTML antes de renderizar (DOMPurify o similar)
 
----
-
-## 4. Public UX improvements
-
-- [ ] **Course catalog filtering**: Add filters by category, level, price range, and instructor on `/courses` page. Currently only hardcoded mock content.
-- [ ] **Book store page**: Create `/books` index page listing all published books (like `/courses` does for courses).
-- [ ] **Search**: Add a public-facing search that queries courses, papers, books, and CMS pages with a single input.
-- [ ] **Skeleton loading states**: Replace loading spinners with skeleton placeholders matching the content shape for smoother perceived performance.
-- [ ] **Pagination on forums and papers**: The community forum and papers list pages need proper pagination with page numbers (currently basic prev/next only).
-- [x] **Social sharing meta tags**: Added `lib/seo.ts` with `buildPageMetadata()` providing Open Graph + Twitter Card + JSON-LD. Applied to course, book, paper, and CMS page routes.
-- [x] **Breadcrumb navigation**: Created `app/components/breadcrumbs.tsx` with JSON-LD schema. Added to course landing pages.
-- [x] **"Back to top" button**: Created `app/components/back-to-top.tsx` — appears after 400px scroll, smooth scroll to top. Added to root layout.
-- [x] **Book store page**: Created `/books` index page listing all published books with covers, prices, grid layout.
-- [x] **Extract shared `getBaseUrl()`**: Created `lib/base-url.ts`, used in checkout routes and forum notifications.
-- [x] **Extract shared `allowedTypes` MIME map**: Created `lib/upload.ts` with `ALLOWED_IMAGE_TYPES` constant.
-- [x] **Centralized `getConfig()` helper**: Created `lib/config.ts` with typed accessors (`getConfig().upload.imageMaxSizeMb()`, `getConfig().rateLimits.login.limit()`, etc.) with in-memory caching.
-- [x] **Rate limiter config integration**: Rate limiter parameters are now defined in config model. Ready for wire-up — values at call sites can read from `getConfig().rateLimits`.
-- [x] **Session duration config integration**: Both `services/auth.ts` and `services/user-auth.ts` now read `operator_session_max_age_seconds` and `user_session_max_age_seconds` from `ConfigStorage`.
-- [x] **Move `generateVerificationCode` to model-utils**: Centralized in `models/model-utils.ts`, used by both `users-storage.ts` and `operators.ts`.
-- [x] **Type-safe config access**: `lib/config.ts` provides typed `getConfig()` with named groups (upload, rateLimits, sessions, email, security, payments, general).
-- [x] **Model field max lengths**: Added `max()` constraints to users (email 320, names 100), books (title 200, desc 500, longDesc 10k), pages (title 200, desc 500, content 100k), courses (title 200, category 100).
-- [ ] **Add Zod refinements**: Add `.refine()` for cross-field validation (e.g., `endDate` must be after `startDate`, `communityPrice` should not exceed `price`).
-- [ ] **Move `generateVerificationCode` to model-utils**: The 6-digit code generation logic is duplicated in `users-storage.ts` and `operators.ts`. Centralize.
-- [ ] **Type-safe config access**: Replace `ConfigStorage.getNumber("some_key")` string-key lookups with a typed `Config` object that provides autocompletion (e.g., `Config.upload.imageMaxSizeMb`).
+### #5 Stripe webhook — manejo incompleto de lifecycle
+- **Archivo**: `app/api/stripe/webhook/route.ts`
+- **Impacto**: Solo maneja `checkout.session.completed` y `checkout.session.expired`. No maneja `customer.subscription.updated`, `invoice.payment_failed`, `subscription.cancel`, etc.
+- **Fix**: Agregar handlers para subscription lifecycle completo
 
 ---
 
-## 6. Performance
+## 🟡 Mejoras
 
-- [x] **MongoDB connection pooling**: `services/mongodb.ts` configures `maxPoolSize`, `minPoolSize`, and `maxIdleTimeMS`.
-- [x] **Cache public content in memory**: Public data loaders now use short `unstable_cache` revalidation and avoid internal HTTP round-trips.
-- [ ] **Image optimization**: Use `next/image` with proper `sizes` and `priority` on all listing pages. Currently some images use raw `<img>` tags.
-- [ ] **Database query optimization**: Several `list()` methods load full documents when only specific fields are needed. Add optional projections to storage methods.
-- [ ] **Lazy load admin stats**: The admin dashboard fetches ALL records from ALL collections on every page load. Paginate or add lightweight count queries.
-- [ ] **Bundle size**: Audit client bundles — make sure `server-only` services and MongoDB driver code are not leaking into client bundles.
+### M1 — loading.tsx y error.tsx
+- **Impacto**: Cero archivos `loading.tsx` o `error.tsx` en toda la app (61 admin pages)
+- **Fix**: Agregar loading states y error boundaries por segmento de ruta
 
----
+### M2 — Sesión admin sin verificación en layout
+- **Impacto**: `app/admin/layout.tsx` no verifica sesión explícitamente. Depende de que el middleware o AdminShell lo haga
+- **Fix**: Agregar verificación de sesión en el layout de admin
 
-## 7. Testing
+### M3 — Servicios no utilizados
+- **Archivos**: `services/auth-secret.ts`, `services/community-users-cleanup.ts`, `services/csrf.ts`, `services/MongoDBStorage.ts`
+- **Impacto**: Código muerto que puede confundir
+- **Fix**: Evaluar si se necesitan o eliminar
 
-- [x] **Add test framework**: Added `bun test` script with initial unit coverage for base URL resolution and error serialization.
-- [ ] **Auth flow tests**: Test login, logout, session expiration, registration, email verification, and password reset end-to-end.
-- [ ] **API route tests**: Test all admin CRUD endpoints for auth requirements, validation, and error responses.
-- [ ] **Upload validation tests**: Test file type rejection, size limit enforcement, and path traversal prevention.
-- [ ] **Stripe webhook tests**: Test webhook signature verification, event handling, and idempotency.
-- [ ] **Rate limiter tests**: Verify that rate limiting correctly blocks requests after exceeding limits and resets after windows expire.
+### M4 — `fetch()` sin error handling en client components
+- **Archivos**: Múltiples `page.tsx` y componentes cliente usan `fetch()` sin `.catch()` ni manejo de errores de red
+- **Impacto**: Si falla la API, el usuario ve un error no controlado
+- **Fix**: Agregar try-catch o .catch() en todos los fetch de client components
 
----
+### M5 — JSON.parse() sin try-catch
+- **Impacto**: Varios `await request.json()` sin try-catch en API routes podrían causar 500 si el body es inválido
+- **Fix**: Envolver en try-catch y devolver 400
 
-## 8. DevOps & monitoring
+### M6 — Checkout sin protección CSRF
+- **Archivos**: `app/api/checkout/route.ts`, `app/api/community/checkout/route.ts`, `app/api/books/checkout/route.ts`
+- **Impacto**: Endpoints de pago sin protección CSRF
+- **Fix**: Agregar CSRF token validation
 
-- [x] **Health check endpoint**: `/api/health` returns DB connectivity, timestamp, uptime, environment, and recent error count.
-- [x] **Error tracking**: Added Mongo-backed `error_events` capture plus Admin Analytics visibility for recent server-side failures.
-- [x] **Structured logging**: Added `lib/logger.ts` JSON error logging and wired route-level failure capture through it.
-- [ ] **Database backups**: Document or automate MongoDB backup strategy (mongodump cron job or Atlas automated backups).
-- [ ] **CI/CD pipeline**: Add GitHub Actions workflow for lint → typecheck → build on every push/PR.
-- [ ] **Environment validation on startup**: Add a startup check that validates all required env vars (`STRIPE_SECRET_KEY`, `RESEND_API_KEY`, `AUTH_SECRET`, etc.) and fails fast with a clear message.
-
----
-
-## 9. Accessibility (a11y)
-
-- [ ] **Keyboard navigation audit**: Ensure all interactive elements (dropdowns, modals, forms) are keyboard-accessible with visible focus indicators.
-- [ ] **ARIA labels audit**: Add `aria-label`, `aria-describedby`, and `role` attributes to navigation, forms, and dynamic content regions.
-- [ ] **Color contrast check**: Verify all text meets WCAG AA contrast ratios against background colors, especially gold-on-dark and muted-on-dark combinations.
-- [ ] **Screen reader testing**: Test primary flows (browse courses → enroll → access classes) with VoiceOver/NVDA.
-- [ ] **Skip-to-content link**: Add a hidden "Skip to main content" link as the first focusable element on every page.
+### M7 — Hardcoded auth secret en development
+- **Archivo**: `services/auth-secret.ts`
+- **Impacto**: `"interjudaica-local-development-secret"` hardcodeado
+- **Fix**: Usar `AUTH_SECRET` env var con fallback seguro
 
 ---
 
-## 10. Internationalization / Localization
+## 🟢 Deuda Técnica
 
-- [ ] **i18n foundation**: Even though the target market is US English, consider adding `next-intl` or similar for future multi-language support.
-- [ ] **Currency formatting**: Replace `new Intl.NumberFormat("en-US", ...)` scattered across components with a centralized `formatUsd()` utility already in `content.ts`.
+### D1 — TypeScript strict mode gaps
+- **Config**: `"strict": true` en tsconfig.json pero `"skipLibCheck": true` también
+- **Impacto**: Puede ocultar errores de tipos en librerías
+- **Fix**: Evaluar si se puede sacar skipLibCheck
+
+### D2 — Admin pages sin paginación consistente
+- **Archivo**: `app/admin/components/admin-collection-manager.tsx` (554 líneas)
+- **Impacto**: Componente monolítico que mezcla UI + API + estado
+- **Fix**: Refactorizar en hooks separados (useCollection, usePagination, etc.)
+
+### D3 — Formularios grandes sin estados intermedios
+- **Archivos**: `course-form.tsx` (524 líneas), `paper-form.tsx` (297 líneas)
+- **Impacto**: Monolíticos, difíciles de mantener
+- **Fix**: Separar en sub-componentes (InfoTab, PricingTab, MediaTab, etc.)
+
+### D4 — Markdown rendering inconsistente
+- **Archivos**: ReactMarkdown en community papers y página de Ernesto Yattah, pero raw HTML en emails
+- **Impacto**: Diferente tratamiento de contenido user-generated
+- **Fix**: Unificar rendering con rehype-sanitize siempre
+
+### D5 — Cobertura de tests API incompleta
+- **Impacto**: Tests creados pero no ejecutados. Faltan tests de Stripe webhook, suscripciones, y flujos de error
+- **Fix**: Ejecutar tests existentes, agregar casos borde
 
 ---
 
-*Priority legend: critical bugs first, then user-facing features, then internal code quality. Items under each section are unordered.*
+## 📋 Próximos Pasos
+
+1. ✅ **Fix #1** — Hacer opcional `category` en papers schema (bug INVALID PAYLOAD)
+2. ✅ **Fix CRM** — Agregar redirect page para /admin/crm
+3. ✅ **Fix upload** — Persistir URL atómicamente con courseUuid
+4. ⬜ **CSRF** — Integrar protección en admin API routes
+5. ⬜ **Rate limiting** — Migrar a solución persistente
+6. ⬜ **Sessions** — Migrar a JWT estándar
+7. ⬜ **loading/error boundaries** — Agregar por segmento
+8. ⬜ **Correr tests** — Playwright API tests
