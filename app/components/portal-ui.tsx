@@ -16,6 +16,7 @@ import {
 	Eyebrow,
 	Section,
 } from "@/app/components/portal-ui-client";
+import AdminNav from "@/app/admin/components/admin-nav";
 
 export {
 	ButtonLink,
@@ -343,34 +344,6 @@ export function AdminShell({
   description: string;
   children: ReactNode;
 }) {
-  const adminLinks = [
-    { href: "/admin", label: "Overview" },
-    { href: "/admin/users", label: "Users" },
-    { href: "/admin/operators", label: "Operators" },
-    { href: "/admin/courses", label: "Courses" },
-    { href: "/admin/course-categories", label: "Course categories" },
-    { href: "/admin/instructors", label: "Instructors" },
-    { href: "/admin/subscription-plans", label: "Subscription plans" },
-    { href: "/admin/subscriptions", label: "Subscriptions" },
-    { href: "/admin/payments", label: "Payments" },
-    { href: "/admin/papers", label: "Papers" },
-    { href: "/admin/password-resets", label: "Password resets" },
-    { href: "/admin/contacts", label: "Contacts" },
-    { href: "/admin/paper-categories", label: "Paper categories" },
-    { href: "/admin/social-proof", label: "Social proof" },
-    { href: "/admin/forum", label: "Forum" },
-    { href: "/admin/analytics", label: "Analytics" },
-    { href: "/admin/rabbi-bio", label: "Rabbi bio" },
-    { href: "/admin/enrollments", label: "Enrollments" },
-    { href: "/admin/community-users", label: "Community access" },
-    { href: "/admin/coupons", label: "Coupons" },
-    { href: "/admin/books", label: "Books" },
-    { href: "/admin/book-sales", label: "Book sales" },
-    { href: "/admin/pages", label: "Pages" },
-    { href: "/admin/config", label: "Configuration" },
-    { href: "/admin/translations", label: "Translations" },
-  ];
-
   return (
     <PageShell>
       <Section tone="transparent">
@@ -390,17 +363,7 @@ export function AdminShell({
                   </button>
                 </form>
               </div>
-              <nav className="grid gap-1" aria-label="Admin navigation">
-                {adminLinks.map((item) => (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className="rounded-md px-3 py-2 text-sm font-semibold text-[var(--muted)] transition hover:bg-[rgba(244,189,51,0.1)] hover:text-[var(--gold)]"
-                  >
-                    {item.label}
-                  </Link>
-                ))}
-              </nav>
+              <AdminNav />
             </div>
           </aside>
           <div className="min-w-0">

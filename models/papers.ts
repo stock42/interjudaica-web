@@ -9,7 +9,7 @@ export const schemaPaper = z.object({
   slug: z.string().trim().optional(),
   title: z.string().trim().min(2),
   categoryUuid: z.string().uuid().optional().or(z.literal("")),
-  category: z.string().trim().min(2),
+  category: z.string().trim().default(""),
   categorySlug: z.string().trim().default(""),
   date: z.string().trim().default(""),
   summary: z.string().trim().default(""),

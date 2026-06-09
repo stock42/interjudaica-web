@@ -8,7 +8,7 @@ const shouldStartServer =
 	process.env.PLAYWRIGHT_SKIP_WEB_SERVER !== "1";
 
 export default defineConfig({
-	testDir: "./tests/e2e",
+	testDir: "./tests",
 	testMatch: "**/*.e2e.ts",
 	fullyParallel: true,
 	forbidOnly: Boolean(process.env.CI),

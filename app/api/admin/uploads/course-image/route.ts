@@ -4,6 +4,7 @@ import path from "path";
 import { NextResponse, type NextRequest } from "next/server";
 import { requireAdminApi } from "@/app/api/_lib/admin-api";
 import { ConfigStorage } from "@/services/config-storage";
+import { CourseStorage } from "@/services/courses-storage";
 import { verifyMagicBytes } from "@/lib/magic-bytes";
 
 export const runtime = "nodejs";
@@ -28,6 +29,7 @@ export async function POST(request: NextRequest) {
   const formData = await request.formData();
   const file = formData.get("file");
   const kind = String(formData.get("kind") ?? "course").replace(/[^a-zA-Z0-9_-]/g, "").slice(0, 32) || "course";
+  const courseUuid = formData.get("courseUuid") as string | null;
 
   if (!(file instanceof File)) {
     return NextResponse.json({ error: "Missing image file" }, { status: 400 });
@@ -65,6 +67,21 @@ export async function POST(request: NextRequest) {
   await mkdir(uploadDir, { recursive: true });
   await writeFile(filepath, buffer);
 
-  return NextResponse.json({ url: `/uploads/courses/${filename}` });
+  const url = `/uploads/courses/${filename}`;
+
+  // If a courseUuid is provided, atomically update the course with the image URL
+  if (courseUuid?.trim()) {
+    try {
+      const imageField = kind === "thumbnail" ? "thumbnailImageUrl" : "coverImageUrl";
+      const course = await CourseStorage.get(courseUuid);
+      if (course) {
+        await CourseStorage.update(courseUuid, { [imageField]: url } as Partial<import("@/models/courses").TypeCourse>);
+      }
+    } catch {
+      // If the course update fails, still return the URL — the client can retry the PATCH
+    }
+  }
+
+  return NextResponse.json({ url });
 }
 

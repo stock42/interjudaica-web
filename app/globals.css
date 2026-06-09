@@ -125,6 +125,18 @@ textarea::placeholder {
   color: #fecaca !important;
 }
 
+@utility animate-collapsible-down {
+  height: var(--radix-collapsible-content-height);
+  transition: height 0.2s ease;
+  overflow: hidden;
+}
+
+@utility animate-collapsible-up {
+  height: 0;
+  transition: height 0.2s ease;
+  overflow: hidden;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

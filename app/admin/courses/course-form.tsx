@@ -123,6 +123,9 @@ export function CourseForm({
     const formData = new FormData();
     formData.set("file", file);
     formData.set("kind", kind);
+    if (course?.uuid) {
+      formData.set("courseUuid", course.uuid);
+    }
 
     const response = await fetch("/api/admin/uploads/course-image", {
       method: "POST",

@@ -156,6 +156,24 @@ export default async function AdminPage() {
               String(publishedPages.length),
               "/admin/pages",
             ],
+            [
+              "CRM Contacts",
+              "—",
+              "—",
+              "/admin/crm/contacts",
+            ],
+            [
+              "CRM Campaigns",
+              "—",
+              "—",
+              "/admin/crm/campaigns",
+            ],
+            [
+              "Email Templates",
+              "—",
+              "—",
+              "/admin/email/templates",
+            ],
           ]}
         />
       </div>
