@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
-import rehypeSanitize from "rehype-sanitize";
 
 import { PageShell, Section, SectionIntro } from "@/app/components/portal-ui";
+import { MarkdownRenderer } from "@/app/components/markdown-renderer";
 import { getRabbiBio } from "@/app/lib/rabbi-bio";
 
 export const runtime = "nodejs";
@@ -26,15 +24,10 @@ export default async function RabbiBioPage() {
 				/>
 				<div className="rounded-lg border border-[var(--line)] bg-white p-6 text-[var(--ink)]">
 					{bio?.markdown ? (
-						<div className="prose max-w-none text-[var(--ink)]">
-							<ReactMarkdown
-								remarkPlugins={[remarkGfm]}
-								rehypePlugins={[rehypeSanitize]}
-							>
-								{bio.markdown}
-							</ReactMarkdown>
-						</div>
-					) : (
+					<div className="prose max-w-none text-[var(--ink)]">
+						<MarkdownRenderer content={bio.markdown} />
+					</div>
+				) : (
 						<p className="text-sm text-[var(--muted)]">
 							Bio content will be available soon.
 						</p>

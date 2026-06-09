@@ -1,20 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
-import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
 import type { Components } from "react-markdown";
 import type { TypePage } from "@/models/pages";
-
-const schema = {
-	...defaultSchema,
-	tagNames: [...(defaultSchema.tagNames ?? []), "img"],
-	attributes: {
-		...defaultSchema.attributes,
-		img: ["src", "alt", "title", "width", "height", "loading"],
-	},
-};
+import { MarkdownRenderer } from "@/app/components/markdown-renderer";
 
 const components: Components = {
 	h1: ({ children }) => (
@@ -141,13 +130,10 @@ export function MarkdownPage({ page }: { page: TypePage }) {
 					</p>
 				) : null}
 				<div className="mt-10">
-					<ReactMarkdown
-						remarkPlugins={[remarkGfm]}
-						rehypePlugins={[[rehypeSanitize, schema]]}
+					<MarkdownRenderer
+						content={page.content}
 						components={components}
-					>
-						{page.content}
-					</ReactMarkdown>
+					/>
 				</div>
 			</article>
 		</main>

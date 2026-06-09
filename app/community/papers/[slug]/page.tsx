@@ -1,10 +1,8 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
-import rehypeSanitize from "rehype-sanitize";
 
 import { ButtonLink, PageShell, Section } from "@/app/components/portal-ui";
+import { MarkdownRenderer } from "@/app/components/markdown-renderer";
 import { getPaperBySlug } from "@/app/lib/papers";
 import { hasActiveCommunityMembership } from "@/services/community-memberships";
 import { getCurrentUser } from "@/services/user-auth";
@@ -71,12 +69,7 @@ export default async function PaperDetailPage({
 				</div>
 
 				<div className="prose max-w-none text-[var(--ink)]">
-					<ReactMarkdown
-						remarkPlugins={[remarkGfm]}
-						rehypePlugins={[rehypeSanitize]}
-					>
-						{paper.content || ""}
-					</ReactMarkdown>
+					<MarkdownRenderer content={paper.content || ""} />
 				</div>
 			</Section>
 		</PageShell>
