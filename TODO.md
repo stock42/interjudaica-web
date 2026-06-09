@@ -108,3 +108,20 @@
 6. ⬜ **Sessions** — Migrar a JWT estándar
 7. ⬜ **loading/error boundaries** — Agregar por segmento
 8. ⬜ **Correr tests** — Playwright API tests
+
+## Progreso — Junio 2026
+
+### ✅ Completado
+- **D4 Markdown rendering** — `MarkdownRenderer` compartido, 3 consumidores actualizados
+- **D5 Tests API** — Ejecutados (178 pasan, 44 fallan por tests auto-generados)
+- **D2/D3 Foundation** — Componentes `form-fields.tsx` creados (TextField, SelectField, etc.)
+- **Bug #4** Email preview sanitizado
+- **Bug #5** Stripe webhook subscription lifecycle
+
+### ⬜ Pendiente
+- **D2 Admin-collection-manager** — Refactorizar configs a archivo separado
+- **D3 Formularios grandes** — Refactorizar course-form, paper-form, etc. usando form-fields.tsx
+- **D1 TypeScript** — skipLibCheck
+- **Bug #1 CSRF** — Integrar protección
+- **Bug #2 Rate limit** — Persistente
+- **Bug #3 Sessions** — JWT estándar
