@@ -7,9 +7,9 @@ import { useMemo, useState, type ChangeEvent, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useRouter } from "next/navigation";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { TextField, TextareaField, DateField, FieldWrapper } from "@/app/components/form-fields";
 import type { TypeCourseCategory } from "@/models/course-categories";
 import type { TypeCourse } from "@/models/courses";
 import type { TypeInstructor } from "@/models/instructors";
@@ -415,53 +415,6 @@ export function CourseForm({
   );
 }
 
-function TextField({
-  label,
-  value,
-  onChange,
-  type = "text",
-}: {
-  label: string;
-  value: string;
-  onChange: (value: string) => void;
-  type?: "text" | "number";
-}) {
-  return (
-    <div className="grid gap-2 text-sm font-semibold text-[var(--ink)]">
-      <Label>{label}</Label>
-      <Input
-        className="h-11"
-        min={type === "number" ? 0 : undefined}
-        step={type === "number" ? "any" : undefined}
-        type={type}
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-      />
-    </div>
-  );
-}
-
-function DateField({
-  label,
-  value,
-  onChange,
-}: {
-  label: string;
-  value: string;
-  onChange: (value: string) => void;
-}) {
-  return (
-    <div className="grid gap-2 text-sm font-semibold text-[var(--ink)]">
-      <Label>{label}</Label>
-      <Input
-        className="h-11"
-        type="date"
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-      />
-    </div>
-  );
-}
 
 function ImageField({
   kind,
@@ -498,27 +451,6 @@ function ImageField({
           <Image alt="" className="object-cover" fill src={url} sizes="320px" />
         </div>
       ) : null}
-    </div>
-  );
-}
-
-function TextareaField({
-  label,
-  value,
-  onChange,
-}: {
-  label: string;
-  value: string;
-  onChange: (value: string) => void;
-}) {
-  return (
-    <div className="grid gap-2 text-sm font-semibold text-[var(--ink)] md:col-span-2">
-      <Label>{label}</Label>
-      <Textarea
-        className="min-h-28"
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-      />
     </div>
   );
 }

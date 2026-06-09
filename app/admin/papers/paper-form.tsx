@@ -6,9 +6,9 @@ import { useMemo, useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useRouter } from "next/navigation";
+import { TextField, TextareaField, DateField, FieldWrapper } from "@/app/components/form-fields";
 import type { TypePaperCategory } from "@/models/paper-categories";
 import type { TypePaper } from "@/models/papers";
 
@@ -262,36 +262,3 @@ export function PaperForm({
   );
 }
 
-function TextField({
-  label,
-  value,
-  onChange,
-}: {
-  label: string;
-  value: string;
-  onChange: (value: string) => void;
-}) {
-  return (
-    <div className="grid gap-2 text-sm font-semibold text-[var(--ink)]">
-      <Label>{label}</Label>
-      <Input className="h-11" type="text" value={value} onChange={(event) => onChange(event.target.value)} />
-    </div>
-  );
-}
-
-function TextareaField({
-  label,
-  value,
-  onChange,
-}: {
-  label: string;
-  value: string;
-  onChange: (value: string) => void;
-}) {
-  return (
-    <div className="grid gap-2 text-sm font-semibold text-[var(--ink)] md:col-span-2">
-      <Label>{label}</Label>
-      <Textarea className="min-h-32" value={value} onChange={(event) => onChange(event.target.value)} />
-    </div>
-  );
-}

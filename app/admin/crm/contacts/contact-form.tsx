@@ -7,8 +7,8 @@ import type { TypeCrmContact } from '@/models/crm-contacts'
 import type { TypeCrmTag } from '@/models/crm-tags'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
+import { TextField, TextareaField, FieldWrapper } from '@/app/components/form-fields'
 
 type FormState = {
 	firstname: string
@@ -177,34 +177,22 @@ export function ContactForm({
 				className="grid gap-4 md:grid-cols-2"
 				onSubmit={handleSubmit}
 			>
-				<div className="grid gap-2 text-sm font-semibold text-[var(--ink)]">
-					<Label>First name</Label>
-					<Input
-						className="h-11"
-						value={form.firstname}
-						onChange={(e) => setField('firstname', e.target.value)}
-						required
-					/>
-				</div>
-				<div className="grid gap-2 text-sm font-semibold text-[var(--ink)]">
-					<Label>Last name</Label>
-					<Input
-						className="h-11"
-						value={form.lastname}
-						onChange={(e) => setField('lastname', e.target.value)}
-						required
-					/>
-				</div>
-				<div className="grid gap-2 text-sm font-semibold text-[var(--ink)] md:col-span-2">
-					<Label>Email</Label>
-					<Input
-						className="h-11"
-						type="email"
-						value={form.email}
-						onChange={(e) => setField('email', e.target.value)}
-						required
-					/>
-				</div>
+				<TextField
+					label="First name"
+					value={form.firstname}
+					onChange={(value) => setField('firstname', value)}
+				/>
+				<TextField
+					label="Last name"
+					value={form.lastname}
+					onChange={(value) => setField('lastname', value)}
+				/>
+				<TextField
+					label="Email"
+					type="email"
+					value={form.email}
+					onChange={(value) => setField('email', value)}
+				/>
 
 				{/* Tags section */}
 				<div className="grid gap-2 text-sm font-semibold text-[var(--ink)] md:col-span-2">
@@ -278,11 +266,11 @@ export function ContactForm({
 
 				{/* Notes */}
 				<div className="grid gap-2 text-sm font-semibold text-[var(--ink)] md:col-span-2">
-					<Label>Notes (markdown)</Label>
-					<Textarea
-						className="min-h-32"
+						<TextareaField
+						label="Notes (markdown)"
 						value={form.notes}
-						onChange={(e) => setField('notes', e.target.value)}
+						onChange={(value) => setField('notes', value)}
+						rows={6}
 					/>
 					{isEditing && contact?.notesUpdatedAt && (
 						<p className="text-xs text-[var(--muted)]">

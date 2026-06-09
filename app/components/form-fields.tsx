@@ -173,3 +173,28 @@ export function NumericField({
 		</FieldWrapper>
 	);
 }
+
+export function DateField({
+  label,
+  value,
+  onChange,
+  error,
+  span,
+}: {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  error?: string;
+  span?: "full";
+}) {
+  return (
+    <FieldWrapper label={label} error={error} span={span}>
+      <Input
+        type="date"
+        value={value}
+        onChange={(e: ChangeEvent<HTMLInputElement>) => onChange(e.target.value)}
+        className="h-11 border-[var(--line)] bg-white text-sm font-normal text-[var(--ink)]"
+      />
+    </FieldWrapper>
+  );
+}

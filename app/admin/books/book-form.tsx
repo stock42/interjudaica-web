@@ -7,8 +7,7 @@ import { useState, type ChangeEvent, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { TextField, TextareaField, SelectField, FieldWrapper } from "@/app/components/form-fields";
 import { useRouter } from "next/navigation";
 import type { TypeBook } from "@/models/books";
 
@@ -165,31 +164,23 @@ export function BookForm({ book }: { book?: TypeBook }) {
 					</p>
 				</div>
 
-				<div className="grid gap-2 text-sm font-semibold text-[var(--ink)]">
-					<Label>Price (USD)</Label>
-					<Input
-						className="h-11"
-						min={0}
-						step="any"
-						type="number"
-						value={form.price}
-						onChange={(event) => setField("price", event.target.value)}
-					/>
-				</div>
+				<TextField
+					label="Price (USD)"
+					type="number"
+					value={form.price}
+					onChange={(value) => setField("price", value)}
+				/>
 
-				<div className="grid gap-2 text-sm font-semibold text-[var(--ink)]">
-					<Label>Status</Label>
-					<Select value={form.status} onValueChange={(value) => setField("status", value)}>
-						<SelectTrigger className="h-11 w-full">
-							<SelectValue />
-						</SelectTrigger>
-						<SelectContent>
-							<SelectItem value="draft">Draft</SelectItem>
-							<SelectItem value="published">Published</SelectItem>
-							<SelectItem value="archived">Archived</SelectItem>
-						</SelectContent>
-					</Select>
-				</div>
+				<SelectField
+					label="Status"
+					value={form.status}
+					onChange={(value) => setField("status", value)}
+					options={[
+						{ value: "draft", label: "Draft" },
+						{ value: "published", label: "Published" },
+						{ value: "archived", label: "Archived" },
+					]}
+				/>
 
 				<div className="grid gap-2 text-sm font-semibold text-[var(--ink)]">
 					<Label>Cover image</Label>
@@ -224,23 +215,19 @@ export function BookForm({ book }: { book?: TypeBook }) {
 					</p>
 				</div>
 
-				<div className="grid gap-2 text-sm font-semibold text-[var(--ink)] md:col-span-2">
-					<Label>Short description</Label>
-					<Textarea
-						className="min-h-24"
-						value={form.description}
-						onChange={(event) => setField("description", event.target.value)}
-					/>
-				</div>
+				<TextareaField
+					label="Short description"
+					value={form.description}
+					onChange={(value) => setField("description", value)}
+					rows={4}
+				/>
 
-				<div className="grid gap-2 text-sm font-semibold text-[var(--ink)] md:col-span-2">
-					<Label>Long description</Label>
-					<Textarea
-						className="min-h-36"
-						value={form.longDescription}
-						onChange={(event) => setField("longDescription", event.target.value)}
-					/>
-				</div>
+				<TextareaField
+					label="Long description"
+					value={form.longDescription}
+					onChange={(value) => setField("longDescription", value)}
+					rows={6}
+				/>
 
 				{error ? (
 					<p className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700 md:col-span-2">
