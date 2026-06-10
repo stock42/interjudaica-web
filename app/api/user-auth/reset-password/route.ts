@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
 
+import { verifyCsrfToken, CSRF_COOKIE, CSRF_HEADER } from "@/services/csrf";
 import { UserStorage } from "@/services/users-storage";
 import { sendPasswordResetConfirmation } from "@/lib/send-password-reset-confirmation";
 import { PasswordResetAttemptStorage } from "@/services/password-reset-attempts-storage";
@@ -20,6 +21,11 @@ const resetLimiter = createRateLimiter("reset-password");
 
 export async function POST(request: NextRequest) {
 	try {
+		const csrfToken = request.headers.get(CSRF_HEADER) || request.cookies.get(CSRF_COOKIE)?.value
+		if (!csrfToken || !verifyCsrfToken(csrfToken)) {
+			return NextResponse.json({ error: "CSRF token missing or invalid" }, { status: 403 })
+		}
+
 		const ip =
 			request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
 		const rateCheck = await resetLimiter.check(ip, 10, 60_000);

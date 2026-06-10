@@ -1,12 +1,18 @@
 # Changelog
 
 ## 2026-06-10
+- Wire CSRF protection into 9 state-changing POST endpoints (login, register, contact, checkout, community/checkout, forums, forgot-password, reset-password, auth/login) using existing `services/csrf.ts` module. POST without valid CSRF token returns 403.
+- Add Playwright E2E test (`tests/api/csrf.e2e.ts`) covering all 9 endpoints — validates 403 without token and non-403 with valid token.
 - Add chat thread and message data models (`models/chat-threads.ts`, `models/chat-messages.ts`) with Zod schemas and Model classes, including 10KB content truncation for storage.
 - Add `ChatStorage` service (`services/chat-storage.ts`) with full CRUD for threads and messages, cascade delete, and TTL index on messages (90 days).
 - Add unit tests for chat models and storage (`tests/chat-storage.test.ts`).
 - Register chat storage indexes in boot sequence (`boot/index.ts`).
 - Add AI Assistant SSE streaming + Sheet DOM compatibility prototype at `/admin/ai-prototype` with simulated token streaming, auto-scroll, and cleanup on close.
 - Add DeepSeek R1 tool calling validation spike at `scripts/validate-deepseek-tool-calling.ts` — tests non-streaming tool_calls, SSE streaming deltas, and R1 reasoning_content dual-token behavior.
+- Wire email spooler cron into boot (`boot/index.ts`): call `processEmailSpooler()` immediately and on 60s interval.
+- Add `subject` field to `EmailSpooler` schema and store rendered template subject in campaign run spooler entries.
+- Fix empty email subject in `lib/email-spooler-cron.ts`: fall back to template subject when spooler entry has none.
+- Add `ensureIndexes()` calls for all CRM/email collections (templates, groups, campaigns, spooler, contacts, tags, CRM campaigns, CRM campaign contacts) in boot sequence.
 
 ## 2026-06-04
 - Translate Spanish copy on `/community` plans section to English ("Planes" → "Plans", "Elegí tu plan" → "Choose your plan").
