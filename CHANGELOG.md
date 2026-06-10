@@ -1,6 +1,7 @@
 # Changelog
 
 ## 2026-06-10
+- Add admin AI tools for users and operators (`app/api/agentes/chat/tools/users.tool.ts`): 8 tools (listUsers, getUser, updateUser, deleteUser, listOperators, createOperator, updateOperator, deleteOperator). All results pass through `filterToolResult()` from PII guard for defense-in-depth — passwords, verification codes, and security fields are stripped. `deleteUser` and `deleteOperator` have `needsApproval: true`. 21 unit tests in `tests/tools/users.tool.test.ts` verify safe data output and tool registration.
 - Add admin AI tools for papers, paper categories, and books (`app/api/agentes/chat/tools/papers.tool.ts`, `books.tool.ts`): 7 paper tools (list, get, create, update, delete, list categories, create category) and 6 book tools (list, get, create, update, delete, list sales). Paper creation auto-creates linked forum thread. Delete tools have `needsApproval: true`. Book sales strip access tokens for security.
 - Add agent tool execution audit logging (`services/agent-audit-storage.ts`, `lib/llm-audit-log.ts`): MongoDB storage for LLM tool-call logs with TTL index (180 days), parameter sanitization via PII guard, and 500-char truncation. 13 unit tests in `tests/agent-audit-storage.test.ts`.
 - Add PII redaction layer (`lib/llm-pii-guard.ts`) for LLM context: strips emails, IPs, JWTs, and session tokens via regex; field-level filtering of sensitive User/Operator fields (password, verification codes, login attempts, etc.); context truncation to max token count. 36 unit tests in `tests/llm-pii-guard.test.ts`.
