@@ -1,5 +1,8 @@
 # Changelog
 
+## 2026-06-10
+- Add AI Assistant SSE streaming + Sheet DOM compatibility prototype at `/admin/ai-prototype` with simulated token streaming, auto-scroll, and cleanup on close.
+
 ## 2026-06-04
 - Translate Spanish copy on `/community` plans section to English ("Planes" → "Plans", "Elegí tu plan" → "Choose your plan").
 - Replace `\n` with `<br />` elements in subscription plan descriptions on `/community` and add `whitespace-pre-line` to the checkout form description.
