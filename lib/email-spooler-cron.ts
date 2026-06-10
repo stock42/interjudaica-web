@@ -2,6 +2,8 @@ import 'server-only'
 
 import { getResend, getEmailFrom } from '@/lib/resend'
 import { EmailSpoolerStorage } from '@/services/email-spooler-storage'
+import { EmailCampaignStorage } from '@/services/email-campaigns-storage'
+import { EmailTemplateStorage } from '@/services/email-templates-storage'
 
 const FROM_EMAIL = getEmailFrom()
 
@@ -31,10 +33,20 @@ export async function processEmailSpooler(): Promise<{
 		}
 
 		try {
+			let subject = email.subject || ''
+
+			if (!subject && email.campaignUuid) {
+				const campaign = await EmailCampaignStorage.get(email.campaignUuid)
+				if (campaign) {
+					const template = await EmailTemplateStorage.get(campaign.templateUuid)
+					subject = template?.subject || ''
+				}
+			}
+
 			await resend.emails.send({
 				from: email.from || FROM_EMAIL,
 				to: email.to,
-				subject: '', // body already contains full HTML
+				subject,
 				html: email.body,
 			})
 

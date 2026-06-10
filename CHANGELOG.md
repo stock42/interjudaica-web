@@ -1,6 +1,10 @@
 # Changelog
 
 ## 2026-06-10
+- Add chat thread and message data models (`models/chat-threads.ts`, `models/chat-messages.ts`) with Zod schemas and Model classes, including 10KB content truncation for storage.
+- Add `ChatStorage` service (`services/chat-storage.ts`) with full CRUD for threads and messages, cascade delete, and TTL index on messages (90 days).
+- Add unit tests for chat models and storage (`tests/chat-storage.test.ts`).
+- Register chat storage indexes in boot sequence (`boot/index.ts`).
 - Add AI Assistant SSE streaming + Sheet DOM compatibility prototype at `/admin/ai-prototype` with simulated token streaming, auto-scroll, and cleanup on close.
 - Add DeepSeek R1 tool calling validation spike at `scripts/validate-deepseek-tool-calling.ts` — tests non-streaming tool_calls, SSE streaming deltas, and R1 reasoning_content dual-token behavior.
 

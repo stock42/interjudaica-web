@@ -52,10 +52,12 @@ export async function POST(
 		const deliveryTime = campaign.deliveryTime
 
 		const spoolerItems = contacts.map((contact) => {
+			const subject = renderTemplate(template.subject, contact)
 			const html = renderTemplate(template.html, contact)
 			return {
 				from: fromEmail,
 				to: contact.email,
+				subject,
 				body: html,
 				campaignUuid: uuid,
 				deliveryTime,

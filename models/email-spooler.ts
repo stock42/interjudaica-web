@@ -7,6 +7,7 @@ export const schemaEmailSpooler = z.object({
 	uuid: z.string().uuid().optional(),
 	from: z.string().email(),
 	to: z.string().email(),
+	subject: z.string().default(''),
 	body: z.string().min(1),
 	campaignUuid: z.string().uuid(),
 	deliveryTime: z.string().trim().nullable().default(null),

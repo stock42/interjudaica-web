@@ -12,6 +12,16 @@ import { ForumStorage } from "@/services/forums-storage";
 import { CouponStorage } from "@/services/coupons-storage";
 import { BookStorage } from "@/services/books-storage";
 import { BookSaleStorage } from "@/services/book-sales-storage";
+import { ChatStorage } from "@/services/chat-storage";
+import { EmailTemplateStorage } from "@/services/email-templates-storage";
+import { EmailGroupStorage } from "@/services/email-groups-storage";
+import { EmailCampaignStorage } from "@/services/email-campaigns-storage";
+import { EmailSpoolerStorage } from "@/services/email-spooler-storage";
+import { CrmContactStorage } from "@/services/crm-contacts-storage";
+import { CrmTagStorage } from "@/services/crm-tags-storage";
+import { CrmCampaignStorage } from "@/services/crm-campaigns-storage";
+import { CrmCampaignContactStorage } from "@/services/crm-campaign-contacts-storage";
+import { processEmailSpooler } from "@/lib/email-spooler-cron";
 
 export async function Boot() {
   await UserStorage.ensureIndexes();
@@ -24,8 +34,20 @@ export async function Boot() {
   await RabbiBioStorage.ensureIndexes();
   await CommunityUserStorage.ensureIndexes();
   await CouponStorage.ensureIndexes();
-  await BookStorage.ensureIndexes();
-  await BookSaleStorage.ensureIndexes();
+	await BookStorage.ensureIndexes();
+	await BookSaleStorage.ensureIndexes();
+	await ChatStorage.ensureIndexes();
+  await EmailTemplateStorage.ensureIndexes();
+  await EmailGroupStorage.ensureIndexes();
+  await EmailCampaignStorage.ensureIndexes();
+  await EmailSpoolerStorage.ensureIndexes();
+  await CrmContactStorage.ensureIndexes();
+  await CrmTagStorage.ensureIndexes();
+  await CrmCampaignStorage.ensureIndexes();
+  await CrmCampaignContactStorage.ensureIndexes();
   await ForumStorage.ensureSystemThreads();
   await OperatorStorage.ensureDefaultOperator();
+
+  processEmailSpooler();
+  setInterval(() => processEmailSpooler(), 60_000);
 }
