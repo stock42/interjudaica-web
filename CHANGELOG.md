@@ -1,6 +1,7 @@
 # Changelog
 
 ## 2026-06-10
+- Add PII redaction layer (`lib/llm-pii-guard.ts`) for LLM context: strips emails, IPs, JWTs, and session tokens via regex; field-level filtering of sensitive User/Operator fields (password, verification codes, login attempts, etc.); context truncation to max token count. 36 unit tests in `tests/llm-pii-guard.test.ts`.
 - Add Zod validation to admin config PUT endpoint (`models/config-schema.ts`) with strict schema (23 number keys, 1 string key), rejecting unknown keys and non-numeric values. Returns 400 with field-level error details on invalid payload.
 - Wire CSRF protection into 9 state-changing POST endpoints (login, register, contact, checkout, community/checkout, forums, forgot-password, reset-password, auth/login) using existing `services/csrf.ts` module. POST without valid CSRF token returns 403.
 - Add Playwright E2E test (`tests/api/csrf.e2e.ts`) covering all 9 endpoints — validates 403 without token and non-403 with valid token.
