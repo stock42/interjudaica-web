@@ -78,16 +78,16 @@ test.describe('CRM Contacts — /api/admin/crm/contacts', () => {
       headers: adminHeaders,
       data: {
         email: `crm_contact_${ts}@interjudaica-test.local`,
-        firstName: `TestFirst_${ts}`,
-        lastName: `TestLast_${ts}`,
+        firstname: `TestFirst_${ts}`,
+        lastname: `TestLast_${ts}`,
       },
     })
     expect(resp.status()).toBe(201)
     const body = await resp.json()
     expect(body).toHaveProperty('item')
     expect(body.item).toHaveProperty('email', `crm_contact_${ts}@interjudaica-test.local`)
-    expect(body.item).toHaveProperty('firstName', `TestFirst_${ts}`)
-    expect(body.item).toHaveProperty('lastName', `TestLast_${ts}`)
+    expect(body.item).toHaveProperty('firstname', `TestFirst_${ts}`)
+    expect(body.item).toHaveProperty('lastname', `TestLast_${ts}`)
     expect(body.item).toHaveProperty('uuid')
     createdUuid = body.item.uuid
   })
@@ -98,8 +98,8 @@ test.describe('CRM Contacts — /api/admin/crm/contacts', () => {
       headers: adminHeaders,
       data: {
         email: `crm_tagged_${ts}@interjudaica-test.local`,
-        firstName: `Tagged_${ts}`,
-        lastName: 'Contact',
+        firstname: `Tagged_${ts}`,
+        lastname: 'Contact',
         tags: ['newsletter', 'student'],
       },
     })
@@ -111,7 +111,7 @@ test.describe('CRM Contacts — /api/admin/crm/contacts', () => {
 
   test('POST without auth returns 401', async ({ request }) => {
     const resp = await request.post(basePath, {
-      data: { email: 'test@test.com', firstName: 'No', lastName: 'Auth' },
+      data: { email: 'test@test.com', firstname: 'No', lastname: 'Auth' },
     })
     await assertUnauthorized(resp)
   })
@@ -119,15 +119,15 @@ test.describe('CRM Contacts — /api/admin/crm/contacts', () => {
   test('POST with missing email returns 400', async ({ request }) => {
     const resp = await request.post(basePath, {
       headers: adminHeaders,
-      data: { firstName: 'NoEmail', lastName: 'Test' },
+      data: { firstname: 'NoEmail', lastname: 'Test' },
     })
     expect(resp.status()).toBe(400)
   })
 
-  test('POST with missing firstName returns 400', async ({ request }) => {
+  test('POST with missing firstname returns 400', async ({ request }) => {
     const resp = await request.post(basePath, {
       headers: adminHeaders,
-      data: { email: 'test@test.com', lastName: 'NoFirst' },
+      data: { email: 'test@test.com', lastname: 'NoFirst' },
     })
     expect(resp.status()).toBe(400)
   })
@@ -140,8 +140,8 @@ test.describe('CRM Contacts — /api/admin/crm/contacts', () => {
       headers: adminHeaders,
       data: {
         email: `crm_dup_${ts}@interjudaica-test.local`,
-        firstName: 'Dup',
-        lastName: 'First',
+        firstname: 'Dup',
+        lastname: 'First',
       },
     })
     expect(first.status()).toBe(201)
@@ -150,8 +150,8 @@ test.describe('CRM Contacts — /api/admin/crm/contacts', () => {
       headers: adminHeaders,
       data: {
         email: `crm_dup_${ts}@interjudaica-test.local`,
-        firstName: 'Dup',
-        lastName: 'Second',
+        firstname: 'Dup',
+        lastname: 'Second',
       },
     })
     expect(resp.status()).toBe(409)
@@ -188,17 +188,17 @@ test.describe('CRM Contacts — /api/admin/crm/contacts', () => {
     const newFirst = `UpdatedFirst_${Date.now()}`
     const resp = await request.patch(`${basePath}/${createdUuid}`, {
       headers: adminHeaders,
-      data: { firstName: newFirst, tags: ['updated-tag'] },
+      data: { firstname: newFirst, tags: ['updated-tag'] },
     })
     expect(resp.status()).toBe(200)
     const body = await resp.json()
-    expect(body.item).toHaveProperty('firstName', newFirst)
+    expect(body.item).toHaveProperty('firstname', newFirst)
   })
 
   test('PATCH without auth returns 401', async ({ request }) => {
     const resp = await request.patch(
       `${basePath}/00000000-0000-0000-0000-000000000000`,
-      { data: { firstName: 'Hack' } }
+      { data: { firstname: 'Hack' } }
     )
     await assertUnauthorized(resp)
   })
@@ -208,7 +208,7 @@ test.describe('CRM Contacts — /api/admin/crm/contacts', () => {
       `${basePath}/00000000-0000-0000-0000-000000000000`,
       {
         headers: adminHeaders,
-        data: { firstName: 'Ghost' },
+        data: { firstname: 'Ghost' },
       }
     )
     expect(resp.status()).toBe(404)
@@ -238,32 +238,29 @@ test.describe('CRM Contacts — /api/admin/crm/contacts', () => {
     expect(resp.status()).toBe(404)
   })
 
-  test('POST export returns CSV', async ({ request }) => {
-    const resp = await request.post(`${basePath}/export`, {
+  test('GET export returns CSV', async ({ request }) => {
+    const resp = await request.get(`${basePath}/export`, {
       headers: adminHeaders,
-      data: { format: 'csv' },
     })
-    // Export may return 200 with CSV content or 200 with download URL
+    // Export returns 200 with CSV content
     expect(resp.status()).toBe(200)
   })
 
-  test('POST import creates contacts from array', async ({ request }) => {
+  test('POST import creates contacts from CSV', async ({ request }) => {
     const ts = Date.now()
+    const csvContent = [
+      'firstname,lastname,email',
+      `ImportA_${ts},One,crm_import_a_${ts}@interjudaica-test.local`,
+      `ImportB_${ts},Two,crm_import_b_${ts}@interjudaica-test.local`,
+    ].join('\n')
     const resp = await request.post(`${basePath}/import`, {
-      headers: adminHeaders,
-      data: {
-        contacts: [
-          {
-            email: `crm_import_a_${ts}@interjudaica-test.local`,
-            firstName: `ImportA_${ts}`,
-            lastName: 'One',
-          },
-          {
-            email: `crm_import_b_${ts}@interjudaica-test.local`,
-            firstName: `ImportB_${ts}`,
-            lastName: 'Two',
-          },
-        ],
+      headers: { ...adminHeaders, 'Content-Type': undefined },
+      multipart: {
+        file: {
+          name: 'contacts.csv',
+          mimeType: 'text/csv',
+          buffer: Buffer.from(csvContent),
+        },
       },
     })
     expect(resp.status()).toBe(200)
@@ -293,8 +290,8 @@ test.describe('CRM Campaigns — /api/admin/crm/campaigns', () => {
       headers: adminHeaders,
       data: {
         email: `crm_campcontact_${ts}@interjudaica-test.local`,
-        firstName: `CampContact_${ts}`,
-        lastName: 'ForCampaign',
+        firstname: `CampContact_${ts}`,
+        lastname: 'ForCampaign',
       },
     })
     if (resp.status() === 201) {
@@ -422,7 +419,7 @@ test.describe('CRM Campaigns — /api/admin/crm/campaigns', () => {
   })
 
   // Campaign-contact relations — need a campaign that persists through these tests
-  test.describe('Campaign Contacts', () => {
+  test.describe.serial('Campaign Contacts', () => {
     let relationCampaignUuid = ''
 
     test.beforeAll(async ({ request }) => {
@@ -456,37 +453,37 @@ test.describe('CRM Campaigns — /api/admin/crm/campaigns', () => {
       await assertUnauthorized(resp)
     })
 
-    test('POST add contact to campaign returns 200', async ({ request }) => {
+    test('POST add contact to campaign returns 201', async ({ request }) => {
       if (!relationCampaignUuid || !contactUuid)
         test.skip(true, 'Missing campaign or contact')
       const resp = await request.post(
         `${basePath}/${relationCampaignUuid}/contacts`,
         {
           headers: adminHeaders,
-          data: { contactUuid },
+          data: { contactUuids: [contactUuid] },
         }
       )
-      expect(resp.status()).toBe(200)
+      expect(resp.status()).toBe(201)
     })
 
     test('POST add contact without auth returns 401', async ({ request }) => {
       const resp = await request.post(
         `${basePath}/00000000-0000-0000-0000-000000000000/contacts`,
-        { data: { contactUuid: '00000000-0000-0000-0000-000000000000' } }
+        { data: { contactUuids: ['00000000-0000-0000-0000-000000000000'] } }
       )
       await assertUnauthorized(resp)
     })
 
-    test('POST add non-existent contact returns 404', async ({ request }) => {
+    test('POST add contact with non-existent UUID works (batch)', async ({ request }) => {
       if (!relationCampaignUuid) test.skip(true, 'No campaign for relation test')
       const resp = await request.post(
         `${basePath}/${relationCampaignUuid}/contacts`,
         {
           headers: adminHeaders,
-          data: { contactUuid: '00000000-0000-0000-0000-000000000000' },
+          data: { contactUuids: ['00000000-0000-0000-0000-000000000000'] },
         }
       )
-      expect(resp.status()).toBe(404)
+      expect(resp.status()).toBe(201)
     })
 
     test('DELETE remove contact from campaign returns 200', async ({

@@ -44,6 +44,9 @@ export interface TestStudent {
   password: string
   firstName: string
   lastName: string
+  country: string
+  state: string
+  city: string
   uuid?: string
 }
 
@@ -62,6 +65,9 @@ export function createTestStudent(): TestStudent {
     password: 'TestPass123!',
     firstName: 'Test',
     lastName: `Student${_studentCounter}`,
+    country: 'Argentina',
+    state: 'Buenos Aires',
+    city: 'Buenos Aires',
   }
 }
 
@@ -79,6 +85,9 @@ export async function registerStudent(
       password: student.password,
       firstName: student.firstName,
       lastName: student.lastName,
+      country: student.country,
+      state: student.state,
+      city: student.city,
     },
   })
 }

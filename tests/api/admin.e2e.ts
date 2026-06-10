@@ -40,7 +40,7 @@ async function assertUnauthorized(resp: any) {
 /*  Courses                                                     */
 /* ──────────────────────────────────────────────────────────── */
 
-test.describe('Admin Courses — /api/admin/courses', () => {
+test.describe.serial('Admin Courses — /api/admin/courses', () => {
   const basePath = '/api/admin/courses'
   const validCourse = {
     title: `E2E Test Course ${Date.now()}`,
@@ -139,7 +139,7 @@ test.describe('Admin Courses — /api/admin/courses', () => {
 /*  Course Categories                                           */
 /* ──────────────────────────────────────────────────────────── */
 
-test.describe('Admin Course Categories — /api/admin/course-categories', () => {
+test.describe.serial('Admin Course Categories — /api/admin/course-categories', () => {
   const basePath = '/api/admin/course-categories'
   let createdUuid = ''
 
@@ -192,7 +192,7 @@ test.describe('Admin Course Categories — /api/admin/course-categories', () => 
 /*  Paper Categories                                            */
 /* ──────────────────────────────────────────────────────────── */
 
-test.describe('Admin Paper Categories — /api/admin/paper-categories', () => {
+test.describe.serial('Admin Paper Categories — /api/admin/paper-categories', () => {
   const basePath = '/api/admin/paper-categories'
   let createdUuid = ''
 
@@ -225,7 +225,7 @@ test.describe('Admin Paper Categories — /api/admin/paper-categories', () => {
 /*  Papers (includes Bug #1 coverage)                           */
 /* ──────────────────────────────────────────────────────────── */
 
-test.describe('Admin Papers — /api/admin/papers', () => {
+test.describe.serial('Admin Papers — /api/admin/papers', () => {
   const basePath = '/api/admin/papers'
   let createdUuid = ''
 
@@ -330,7 +330,7 @@ test.describe('Admin Papers — /api/admin/papers', () => {
 /*  Instructors                                                 */
 /* ──────────────────────────────────────────────────────────── */
 
-test.describe('Admin Instructors — /api/admin/instructors', () => {
+test.describe.serial('Admin Instructors — /api/admin/instructors', () => {
   const basePath = '/api/admin/instructors'
   let createdUuid = ''
 
@@ -380,7 +380,7 @@ test.describe('Admin Instructors — /api/admin/instructors', () => {
 /*  Books                                                       */
 /* ──────────────────────────────────────────────────────────── */
 
-test.describe('Admin Books — /api/admin/books', () => {
+test.describe.serial('Admin Books — /api/admin/books', () => {
   const basePath = '/api/admin/books'
   let createdUuid = ''
 
@@ -421,7 +421,7 @@ test.describe('Admin Books — /api/admin/books', () => {
 /*  Social Proof                                                */
 /* ──────────────────────────────────────────────────────────── */
 
-test.describe('Admin Social Proof — /api/admin/social-proof', () => {
+test.describe.serial('Admin Social Proof — /api/admin/social-proof', () => {
   const basePath = '/api/admin/social-proof'
   let createdUuid = ''
 
@@ -467,7 +467,7 @@ test.describe('Admin Social Proof — /api/admin/social-proof', () => {
 /*  Forums                                                      */
 /* ──────────────────────────────────────────────────────────── */
 
-test.describe('Admin Forums — /api/admin/forums', () => {
+test.describe.serial('Admin Forums — /api/admin/forums', () => {
   const basePath = '/api/admin/forums'
   let createdUuid = ''
 
@@ -523,15 +523,16 @@ test.describe('Admin Forums — /api/admin/forums', () => {
 /*  Coupons                                                     */
 /* ──────────────────────────────────────────────────────────── */
 
-test.describe('Admin Coupons — /api/admin/coupons', () => {
+test.describe.serial('Admin Coupons — /api/admin/coupons', () => {
   const basePath = '/api/admin/coupons'
   let createdUuid = ''
 
   test('POST creates coupon with uppercase code', async ({ request }) => {
+    const ts = Date.now()
     const resp = await request.post(basePath, {
       headers: adminHeaders,
       data: {
-        code: 'e2e-test-coupon',
+        code: `e2e-uppercase-${ts}`,
         percentOff: 25,
         scope: 'all',
       },
@@ -539,7 +540,7 @@ test.describe('Admin Coupons — /api/admin/coupons', () => {
     expect(resp.status()).toBe(201)
     const body = await resp.json()
     // Code should be uppercased automatically
-    expect(body.item.code).toBe('E2E-TEST-COUPON')
+    expect(body.item.code).toBe(`E2E-UPPERCASE-${ts}`)
     createdUuid = body.item.uuid
   })
 
@@ -600,7 +601,7 @@ test.describe('Admin Coupons — /api/admin/coupons', () => {
 /*  Pages (CMS)                                                 */
 /* ──────────────────────────────────────────────────────────── */
 
-test.describe('Admin Pages — /api/admin/pages', () => {
+test.describe.serial('Admin Pages — /api/admin/pages', () => {
   const basePath = '/api/admin/pages'
   let createdUuid = ''
 
@@ -640,7 +641,7 @@ test.describe('Admin Pages — /api/admin/pages', () => {
 /*  Users (Admin)                                               */
 /* ──────────────────────────────────────────────────────────── */
 
-test.describe('Admin Users — /api/admin/users', () => {
+test.describe.serial('Admin Users — /api/admin/users', () => {
   const basePath = '/api/admin/users'
   let createdUuid = ''
 
@@ -703,7 +704,7 @@ test.describe('Admin Users — /api/admin/users', () => {
 /*  Operators (Admin)                                           */
 /* ──────────────────────────────────────────────────────────── */
 
-test.describe('Admin Operators — /api/admin/operators', () => {
+test.describe.serial('Admin Operators — /api/admin/operators', () => {
   const basePath = '/api/admin/operators'
   let createdUuid = ''
 
@@ -757,7 +758,7 @@ test.describe('Admin Operators — /api/admin/operators', () => {
 /*  Config                                                      */
 /* ──────────────────────────────────────────────────────────── */
 
-test.describe('Admin Config — /api/admin/config', () => {
+test.describe.serial('Admin Config — /api/admin/config', () => {
   const basePath = '/api/admin/config'
 
   test('GET returns config entries', async ({ request }) => {
@@ -789,7 +790,7 @@ test.describe('Admin Config — /api/admin/config', () => {
 /*  Rabbi Bio                                                   */
 /* ──────────────────────────────────────────────────────────── */
 
-test.describe('Admin Rabbi Bio — /api/admin/rabbi-bio', () => {
+test.describe.serial('Admin Rabbi Bio — /api/admin/rabbi-bio', () => {
   const basePath = '/api/admin/rabbi-bio'
 
   test('GET returns rabbi bio', async ({ request }) => {
@@ -800,7 +801,10 @@ test.describe('Admin Rabbi Bio — /api/admin/rabbi-bio', () => {
   test('PUT updates rabbi bio', async ({ request }) => {
     const resp = await request.put(basePath, {
       headers: adminHeaders,
-      data: { markdown: `Updated bio content at ${new Date().toISOString()}` },
+      data: {
+        title: 'Ernesto Yattah',
+        markdown: `Updated bio content at ${new Date().toISOString()}`,
+      },
     })
     expect(resp.status()).toBe(200)
   })
@@ -810,7 +814,7 @@ test.describe('Admin Rabbi Bio — /api/admin/rabbi-bio', () => {
 /*  Contacts (Admin)                                            */
 /* ──────────────────────────────────────────────────────────── */
 
-test.describe('Admin Contacts — /api/admin/contacts', () => {
+test.describe.serial('Admin Contacts — /api/admin/contacts', () => {
   const basePath = '/api/admin/contacts'
   let contactUuid = ''
 
@@ -872,7 +876,7 @@ test.describe('Admin Contacts — /api/admin/contacts', () => {
 /*  Password Resets                                             */
 /* ──────────────────────────────────────────────────────────── */
 
-test.describe('Admin Password Resets — /api/admin/password-resets', () => {
+test.describe.serial('Admin Password Resets — /api/admin/password-resets', () => {
   test('GET list returns password reset attempts', async ({ request }) => {
     const resp = await request.get('/api/admin/password-resets', {
       headers: adminHeaders,
@@ -892,7 +896,7 @@ test.describe('Admin Password Resets — /api/admin/password-resets', () => {
 /*  Book Sales (readonly)                                       */
 /* ──────────────────────────────────────────────────────────── */
 
-test.describe('Admin Book Sales — /api/admin/book-sales', () => {
+test.describe.serial('Admin Book Sales — /api/admin/book-sales', () => {
   test('GET list returns book sales', async ({ request }) => {
     const resp = await request.get('/api/admin/book-sales', {
       headers: adminHeaders,
@@ -906,7 +910,7 @@ test.describe('Admin Book Sales — /api/admin/book-sales', () => {
 /*  Enrollments                                                 */
 /* ──────────────────────────────────────────────────────────── */
 
-test.describe('Admin Enrollments — /api/admin/enrollments', () => {
+test.describe.serial('Admin Enrollments — /api/admin/enrollments', () => {
   // Enrollment requires valid courseUuid and userUuid
   // This test is limited since we need existing courses and users
 
@@ -925,7 +929,7 @@ test.describe('Admin Enrollments — /api/admin/enrollments', () => {
 /*  Community Users                                             */
 /* ──────────────────────────────────────────────────────────── */
 
-test.describe('Admin Community Users — /api/admin/community-users', () => {
+test.describe.serial('Admin Community Users — /api/admin/community-users', () => {
   test('POST without auth returns 401', async ({ request }) => {
     const resp = await request.post('/api/admin/community-users', {
       data: { userUuid: '00000000-0000-0000-0000-000000000000' },
@@ -938,7 +942,7 @@ test.describe('Admin Community Users — /api/admin/community-users', () => {
 /*  Additional Admin Endpoints                                  */
 /* ──────────────────────────────────────────────────────────── */
 
-test.describe('Admin Overview — /api/admin/overview', () => {
+test.describe.serial('Admin Overview — /api/admin/overview', () => {
   test('GET returns dashboard stats', async ({ request }) => {
     const resp = await request.get('/api/admin/overview', {
       headers: adminHeaders,
@@ -947,7 +951,7 @@ test.describe('Admin Overview — /api/admin/overview', () => {
   })
 })
 
-test.describe('Admin Search — /api/admin/search', () => {
+test.describe.serial('Admin Search — /api/admin/search', () => {
   test('GET with query returns results', async ({ request }) => {
     const resp = await request.get('/api/admin/search?q=test', {
       headers: adminHeaders,
@@ -956,7 +960,7 @@ test.describe('Admin Search — /api/admin/search', () => {
   })
 })
 
-test.describe('Admin Subscription Plans — /api/admin/subscription-plans', () => {
+test.describe.serial('Admin Subscription Plans — /api/admin/subscription-plans', () => {
   const basePath = '/api/admin/subscription-plans'
 
   test('GET list returns plans', async ({ request }) => {
@@ -965,7 +969,7 @@ test.describe('Admin Subscription Plans — /api/admin/subscription-plans', () =
   })
 })
 
-test.describe('Admin Classes — /api/admin/classes', () => {
+test.describe.serial('Admin Classes — /api/admin/classes', () => {
   // Classes require a courseUuid query parameter
   test('GET classes for a course', async ({ request }) => {
     // First create a course to get a real UUID

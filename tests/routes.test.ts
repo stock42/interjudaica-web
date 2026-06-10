@@ -37,6 +37,8 @@ type WebhookEventShape = {
 	};
 };
 
+const planUuid = "33333333-3333-4333-8333-333333333333";
+
 const state = {
 	baseUrl: "https://interjudaica.example",
 	operatorRateAllowed: true,
@@ -52,6 +54,7 @@ const state = {
 	operatorUpdates: [] as Array<{ uuid: string; payload: unknown }>,
 	currentUser: null as null | SafeUser,
 	communityUser: null as null | CommunityUser,
+	planRecord: null as null | Record<string, unknown>,
 	portalUrl: "https://billing.stripe.com/session/test",
 	portalError: null as null | Error,
 	portalArgs: null as null | { customer: string; return_url: string },
@@ -239,6 +242,14 @@ mock.module("@/services/course-payments-storage", () => ({
 	},
 }));
 
+mock.module("server-only", () => ({}));
+
+mock.module("@/services/subscription-plans-storage", () => ({
+	SubscriptionPlanStorage: {
+		get: async () => state.planRecord,
+	},
+}));
+
 mock.module("@/services/coupons-storage", () => ({
 	CouponStorage: {
 		claimCoupon: async () => state.couponClaim,
@@ -376,6 +387,7 @@ describe("route behaviors", () => {
 		state.operatorUpdates = [];
 		state.currentUser = null;
 		state.communityUser = null;
+		state.planRecord = null;
 		state.portalUrl = "https://billing.stripe.com/session/test";
 		state.portalError = null;
 		state.portalArgs = null;
@@ -627,9 +639,10 @@ describe("route behaviors", () => {
 			firstName: "Cesar",
 		};
 		state.communityUser = { stripeCustomerId: "cus_existing" };
+		state.planRecord = { name: "Premium", price: 1900, billingInterval: "month" };
 		const request = new NextRequest("https://interjudaica.example/api/community/checkout", {
 			method: "POST",
-			body: JSON.stringify({}),
+			body: JSON.stringify({ planUuid }),
 			headers: { "content-type": "application/json" },
 		});
 
@@ -703,10 +716,11 @@ describe("route behaviors", () => {
 			email: "user@example.com",
 			firstName: "Cesar",
 		};
+		state.planRecord = { name: "Premium", price: 1900, billingInterval: "month" };
 		state.couponClaim = { coupon: { percentOff: 100 } };
 		const request = new NextRequest("https://interjudaica.example/api/community/checkout", {
 			method: "POST",
-			body: JSON.stringify({ couponCode: "free100" }),
+			body: JSON.stringify({ planUuid, couponCode: "free100" }),
 			headers: { "content-type": "application/json" },
 		});
 
@@ -714,7 +728,7 @@ describe("route behaviors", () => {
 
 		expect(response.status).toBe(200);
 		expect(await response.json()).toEqual({ url: "https://interjudaica.example/dashboard?community=success" });
-		expect(state.communityUpserts).toEqual([{ userUuid: "user-1" }]);
+		expect(state.communityUpserts).toEqual([{ userUuid: "user-1", planUuid }]);
 		expect(state.userUpdates).toEqual([{ uuid: "user-1", payload: { communityStatus: "active" } }]);
 		expect(state.checkoutCalls).toHaveLength(0);
 	});

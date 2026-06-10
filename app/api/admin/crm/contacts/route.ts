@@ -50,26 +50,33 @@ export async function POST(request: NextRequest) {
 
 	try {
 		const raw = await readJson(request)
-		const payload = schemaCrmContact.parse(raw)
 
-		// Resolve tag names → UUIDs inline
+		// Resolve tag names → UUIDs inline before Zod parse
+		// (schema validates tags as UUIDs, but we may receive tag names)
 		if (raw.tags && Array.isArray(raw.tags) && raw.tags.length > 0) {
 			const tagUuids: string[] = []
 
 			for (const tagName of raw.tags) {
 				if (typeof tagName !== 'string' || !tagName.trim()) continue
-				try {
-					const tag = await CrmTagStorage.createIfNotExists(tagName.trim())
-					if (tag.uuid) {
-						tagUuids.push(tag.uuid)
+				// Check if it's already a UUID
+				if (/^[0-9a-f-]{36}$/i.test(tagName.trim())) {
+					tagUuids.push(tagName.trim())
+				} else {
+					try {
+						const tag = await CrmTagStorage.createIfNotExists(tagName.trim())
+						if (tag.uuid) {
+							tagUuids.push(tag.uuid)
+						}
+					} catch {
+						// skip invalid tags
 					}
-				} catch {
-					// skip invalid tags
 				}
 			}
 
-			payload.tags = tagUuids
+			raw.tags = tagUuids
 		}
+
+		const payload = schemaCrmContact.parse(raw)
 
 		const item = await CrmContactStorage.create(payload)
 		return NextResponse.json({ item }, { status: 201 })
