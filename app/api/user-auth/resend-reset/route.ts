@@ -4,6 +4,7 @@ import { z } from "zod";
 import { UserStorage } from "@/services/users-storage";
 import { sendPasswordResetCode } from "@/lib/send-password-reset-code";
 import { readJson } from "@/app/api/_lib/admin-api";
+import { createRateLimiter } from "@/services/rate-limiter";
 
 export const runtime = "nodejs";
 
@@ -14,15 +15,16 @@ const schemaResend = z.object({
 const RESEND_COOLDOWN_SECONDS = Number(
 	process.env.RESET_RESEND_COOLDOWN_SECONDS ?? "60",
 );
-const RESEND_WINDOW_SECONDS = Number(
-	process.env.RESET_RESEND_WINDOW_SECONDS ?? "600",
-);
+const RESEND_WINDOW_MS =
+	Number(process.env.RESET_RESEND_WINDOW_SECONDS ?? "600") * 1000;
 const RESEND_LIMIT = Number(process.env.RESET_RESEND_LIMIT ?? "5");
-const resendCooldowns = new Map<string, number>();
-const resendWindows = new Map<string, { count: number; start: number }>();
 
-function getCooldownKey(email: string, ip: string | null) {
-	return `${email}:${ip ?? "unknown"}`;
+const resendResetLimiter = createRateLimiter("resend-reset");
+
+function getClientIp(request: NextRequest) {
+	return (
+		request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown"
+	);
 }
 
 export async function POST(request: NextRequest) {
@@ -34,40 +36,22 @@ export async function POST(request: NextRequest) {
 		}
 
 		const payload = parsed.data;
-		const ip =
-			request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "";
-		const key = getCooldownKey(payload.email, ip);
-		const now = Date.now();
-		const cooldownUntil = resendCooldowns.get(key) ?? 0;
+		const ip = getClientIp(request);
 
-		if (cooldownUntil > now) {
-			const retryAfter = Math.ceil((cooldownUntil - now) / 1000);
+		const [ipCheck, emailCheck] = await Promise.all([
+			resendResetLimiter.check(`ip:${ip}`, RESEND_LIMIT, RESEND_WINDOW_MS),
+			resendResetLimiter.check(`email:${payload.email}`, RESEND_LIMIT, RESEND_WINDOW_MS),
+		]);
+
+		const retryAfter = Math.max(ipCheck.retryAfter ?? 0, emailCheck.retryAfter ?? 0);
+
+		if (!ipCheck.allowed || !emailCheck.allowed) {
 			return NextResponse.json(
-				{
-					error: "Cooldown",
-					retryAfter,
-				},
+				{ error: "Too many requests", retryAfter },
 				{ status: 429 },
 			);
 		}
 
-		const window = resendWindows.get(key);
-		if (window && now - window.start < RESEND_WINDOW_SECONDS * 1000) {
-			if (window.count >= RESEND_LIMIT) {
-				return NextResponse.json(
-					{
-						error: "Too many requests",
-						retryAfter: RESEND_WINDOW_SECONDS,
-					},
-					{ status: 429 },
-				);
-			}
-			window.count += 1;
-		} else {
-			resendWindows.set(key, { count: 1, start: now });
-		}
-
-		resendCooldowns.set(key, now + RESEND_COOLDOWN_SECONDS * 1000);
 		const result = await UserStorage.createPasswordResetCode(payload.email);
 
 		if (result.ok) {
