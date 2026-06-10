@@ -1,0 +1,9 @@
+{
+  "tool_calling_supported": false,
+  "streaming_supported": false,
+  "reasoning_tokens_observed": false,
+  "raw_test1_summary": "SKIPPED: DEEPSEEK_API_KEY not set",
+  "raw_test2_summary": "SKIPPED: DEEPSEEK_API_KEY not set",
+  "raw_test3_summary": "SKIPPED: DEEPSEEK_API_KEY not set",
+  "timestamp": "2026-06-10T23:34:39.860Z"
+}
