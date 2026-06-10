@@ -14,6 +14,8 @@
 - Add `subject` field to `EmailSpooler` schema and store rendered template subject in campaign run spooler entries.
 - Fix empty email subject in `lib/email-spooler-cron.ts`: fall back to template subject when spooler entry has none.
 - Add `ensureIndexes()` calls for all CRM/email collections (templates, groups, campaigns, spooler, contacts, tags, CRM campaigns, CRM campaign contacts) in boot sequence.
+- Harden Turnstile CAPTCHA on contact form (`app/api/contact/route.ts`): when `TURNSTILE_SECRET_KEY` is set, `turnstileToken` is now required (was bypassable). Missing token returns 400 `{ error: "CAPTCHA verification required" }`. Without key set (dev), behavior is unchanged (backward compatible).
+- Add unit tests for contact form CAPTCHA enforcement (`tests/contact-captcha.test.ts`) covering all 4 scenarios.
 
 ## 2026-06-04
 - Translate Spanish copy on `/community` plans section to English ("Planes" → "Plans", "Elegí tu plan" → "Choose your plan").
