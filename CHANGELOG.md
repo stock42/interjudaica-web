@@ -1,6 +1,7 @@
 # Changelog
 
 ## 2026-06-10
+- Add agent tool execution audit logging (`services/agent-audit-storage.ts`, `lib/llm-audit-log.ts`): MongoDB storage for LLM tool-call logs with TTL index (180 days), parameter sanitization via PII guard, and 500-char truncation. 13 unit tests in `tests/agent-audit-storage.test.ts`.
 - Add PII redaction layer (`lib/llm-pii-guard.ts`) for LLM context: strips emails, IPs, JWTs, and session tokens via regex; field-level filtering of sensitive User/Operator fields (password, verification codes, login attempts, etc.); context truncation to max token count. 36 unit tests in `tests/llm-pii-guard.test.ts`.
 - Add Zod validation to admin config PUT endpoint (`models/config-schema.ts`) with strict schema (23 number keys, 1 string key), rejecting unknown keys and non-numeric values. Returns 400 with field-level error details on invalid payload.
 - Wire CSRF protection into 9 state-changing POST endpoints (login, register, contact, checkout, community/checkout, forums, forgot-password, reset-password, auth/login) using existing `services/csrf.ts` module. POST without valid CSRF token returns 403.
