@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import {
 	Collapsible,
 	CollapsibleContent,
@@ -147,21 +147,12 @@ function CollapsibleGroup({
 		(subGroups?.some((sg) =>
 			sg.links.some((link) => isLinkActive(pathname, link.href))
 		) ?? false)
-	const [open, setOpen] = useState(groupIsActive)
+	const [open, setOpen] = useState(true)
 
-	// Keep in sync with pathname changes — open when active, preserve user choice otherwise
-	const prevPathname = useRef(pathname)
+	// Close group when navigating away if not active
 	useEffect(() => {
-		if (pathname !== prevPathname.current) {
-			prevPathname.current = pathname
-			if (groupIsActive) setOpen(true)
-		}
-	}, [pathname, groupIsActive])
-
-	// Force open on initial mount if active (handles SSR hydration race)
-	useEffect(() => {
-		if (groupIsActive) setOpen(true)
-	}, [])
+		if (!groupIsActive) setOpen(false)
+	}, [groupIsActive])
 
 	const iconSize = depth === 0 ? 'h-4 w-4' : 'h-3.5 w-3.5'
 	const chevronSize = depth === 0 ? 'h-4 w-4' : 'h-3.5 w-3.5'
