@@ -49,8 +49,8 @@ export function createRateLimiter(namespace: string) {
 			);
 
 			if (updated) {
-				const count = updated.data?.count ?? 0;
-				const resetAt = updated.data?.resetAt ?? new Date();
+				const count = updated.count ?? 0;
+				const resetAt = updated.data?.resetAt ?? updated.resetAt ?? new Date();
 				if (count > limit) {
 					const retryAfter = Math.ceil(
 						(resetAt.getTime() - Date.now()) / 1000,
