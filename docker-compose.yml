@@ -1,0 +1,30 @@
+services:
+  app:
+    build: .
+    ports:
+      - "3025:3025"
+    environment:
+      - MONGODB_URL=mongodb://mongo:27017
+      - MONGODB_NAME=interjudaica
+      - AUTH_SECRET=${AUTH_SECRET:-change-me-in-production}
+      - DEEPSEEK_API_KEY=${DEEPSEEK_API_KEY:-}
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY:-}
+      - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET:-}
+      - RESEND_API_KEY=${RESEND_API_KEY:-}
+      - NEXT_PUBLIC_SITE_URL=http://localhost:3025
+      - NODE_ENV=production
+    depends_on:
+      mongo:
+        condition: service_started
+    restart: unless-stopped
+
+  mongo:
+    image: mongo:7
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    restart: unless-stopped
+
+volumes:
+  mongo_data:
