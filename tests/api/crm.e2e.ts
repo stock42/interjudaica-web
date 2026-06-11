@@ -254,7 +254,7 @@ test.describe('CRM Contacts — /api/admin/crm/contacts', () => {
       `ImportB_${ts},Two,crm_import_b_${ts}@interjudaica-test.local`,
     ].join('\n')
     const resp = await request.post(`${basePath}/import`, {
-      headers: { ...adminHeaders, 'Content-Type': undefined },
+      headers: { ...adminHeaders },
       multipart: {
         file: {
           name: 'contacts.csv',

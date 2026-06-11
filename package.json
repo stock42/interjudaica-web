@@ -15,9 +15,12 @@
     "test:all": "bun test && bun run lint && bun run tsc --noEmit && bun run test:e2e"
   },
   "dependencies": {
+    "@ai-sdk/deepseek": "^2.0.36",
+    "@ai-sdk/react": "^3.0.202",
     "@base-ui/react": "^1.5.0",
     "@react-email/render": "^2.0.8",
     "@tanstack/react-table": "^8.21.3",
+    "ai": "^6.0.200",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",

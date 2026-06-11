@@ -98,7 +98,8 @@ describe('ChatMessageModel', () => {
 
 	test('rejects invalid role', () => {
 		expect(() => {
-			new ChatMessageModel({ role: 'system', content: 'test' })
+			// @ts-expect-error - testing runtime Zod validation for invalid role
+			new ChatMessageModel({ role: 'invalid', content: 'test' })
 		}).toThrow()
 	})
 
@@ -125,10 +126,12 @@ describe('ChatMessageModel', () => {
 const mockThreads: Array<{
 	uuid: string
 	data: Record<string, unknown>
+	_updated?: Date
 }> = []
 const mockMessages: Array<{
 	uuid: string
 	data: Record<string, unknown>
+	_updated?: Date
 }> = []
 
 function resetMocks() {

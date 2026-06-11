@@ -18,7 +18,9 @@ import {
 	Settings,
 	ChevronRight,
 	Mail,
+	Bot,
 } from 'lucide-react'
+import { useAdminChat } from '@/app/admin/components/admin-layout-client'
 import type { ComponentType } from 'react'
 
 interface NavLink {
@@ -210,9 +212,21 @@ function CollapsibleGroup({
 
 export default function AdminNav() {
 	const pathname = usePathname()
+	const { openChat } = useAdminChat()
 
 	return (
 		<nav className="grid gap-1" aria-label="Admin navigation">
+			<button
+				type="button"
+				onClick={openChat}
+				className="flex w-full items-center gap-2.5 rounded-md text-sm font-semibold transition hover:bg-[rgba(244,189,51,0.1)] hover:text-[var(--gold)] px-3 py-2 text-[var(--muted)]"
+			>
+				<Bot className="h-4 w-4 shrink-0" />
+				<span className="text-left leading-tight">AI Assistant</span>
+			</button>
+
+			<hr className="mx-3 border-t border-[var(--line)]" />
+
 			{navGroups.map((group) => (
 				<CollapsibleGroup
 					key={group.label}

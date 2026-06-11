@@ -7,6 +7,17 @@ import { CourseClassFileStorage } from "@/services/course-class-files-storage";
 import { CourseClassStorage } from "@/services/course-classes-storage";
 import { requireAdminApi } from "@/app/api/_lib/admin-api";
 import { ConfigStorage } from "@/services/config-storage";
+import { verifyMagicBytes } from "@/lib/magic-bytes";
+
+const ALLOWED_TYPES = [
+  "application/pdf",
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "audio/mpeg",
+  "audio/mp4",
+  "video/mp4",
+];
 
 export const runtime = "nodejs";
 
@@ -57,6 +68,10 @@ export async function POST(
 		return NextResponse.json({ error: "Missing file" }, { status: 400 });
 	}
 
+	if (!ALLOWED_TYPES.includes(file.type)) {
+		return NextResponse.json({ error: "Invalid file type" }, { status: 400 });
+	}
+
 	if (file.size > maxFileSize) {
 		return NextResponse.json(
 			{ error: `File must be smaller than ${maxFileSize / (1024 * 1024)} MB` },
@@ -66,6 +81,11 @@ export async function POST(
 
 	const bytes = await file.arrayBuffer();
 	const buffer = Buffer.from(bytes);
+
+	if (!verifyMagicBytes(buffer, file.type)) {
+		return NextResponse.json({ error: "Invalid file type" }, { status: 400 });
+	}
+
 	const sanitized = safeName(file.name);
 	const filename = `${randomUUID()}-${sanitized}`;
 	const classUuid = courseClass.uuid ?? uuid;

@@ -39,18 +39,18 @@ export function createRateLimiter(namespace: string) {
 			const fullKey = `${prefix}${key}`;
 			const now = new Date();
 
-			const updated = await collection.findOneAndUpdate(
-				{
-					key: fullKey,
-					resetAt: { $gt: now },
-				},
-				{ $inc: { count: 1 } },
-				{ returnDocument: "after" },
-			);
+		const updated = await collection.findOneAndUpdate(
+			{
+				key: fullKey,
+				resetAt: { $gt: now },
+			},
+			{ $inc: { count: 1 } },
+			{ returnDocument: "after" },
+		) as unknown as RateLimitDoc | null;
 
-			if (updated) {
-				const count = updated.count ?? 0;
-				const resetAt = updated.data?.resetAt ?? updated.resetAt ?? new Date();
+		if (updated) {
+			const count = updated.count ?? 0;
+			const resetAt = updated.resetAt ?? new Date();
 				if (count > limit) {
 					const retryAfter = Math.ceil(
 						(resetAt.getTime() - Date.now()) / 1000,

@@ -1,4 +1,5 @@
 import { requireOperator } from "@/services/auth";
+import { AdminLayoutClient } from "@/app/admin/components/admin-layout-client";
 
 export const runtime = "nodejs";
 
@@ -9,5 +10,5 @@ export default async function AdminLayout({
 }>) {
   await requireOperator();
 
-  return children;
+  return <AdminLayoutClient>{children}</AdminLayoutClient>;
 }

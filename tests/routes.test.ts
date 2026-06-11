@@ -358,6 +358,21 @@ mock.module("@/lib/logger", () => ({
 	},
 }));
 
+mock.module("@/services/csrf", () => ({
+	verifyCsrfToken: () => true,
+	CSRF_COOKIE: "__Host-interjudaica_csrf",
+	CSRF_HEADER: "x-csrf-token",
+}));
+
+function postRequest(url: string, body: string | object, extraHeaders: Record<string, string> = {}) {
+	const bodyStr = typeof body === "string" ? body : JSON.stringify(body);
+	return new NextRequest(url, {
+		method: "POST",
+		body: bodyStr,
+		headers: { "content-type": "application/json", "x-csrf-token": "test", ...extraHeaders },
+	});
+}
+
 const { POST: operatorLogin } = await import("@/app/api/auth/login/route");
 const { GET: customerPortal } = await import("@/app/api/community/customer-portal/route");
 const { POST: registerUser } = await import("@/app/api/user-auth/register/route");
@@ -441,11 +456,7 @@ describe("route behaviors", () => {
 	});
 
 	test("operator login returns 400 on invalid JSON body", async () => {
-		const request = new NextRequest("https://interjudaica.example/api/auth/login", {
-			method: "POST",
-			body: "{bad json",
-			headers: { "content-type": "application/json" },
-		});
+		const request = postRequest("https://interjudaica.example/api/auth/login", "{bad json");
 
 		const response = await operatorLogin(request);
 
@@ -456,11 +467,7 @@ describe("route behaviors", () => {
 	test("operator login sets only the operator session cookie on success", async () => {
 		state.operatorRecord = { uuid: "op-1", data: { loginAttempts: 1 } };
 		state.authenticatedOperator = { uuid: "op-1", email: "admin@example.com", level: 10 };
-		const request = new NextRequest("https://interjudaica.example/api/auth/login", {
-			method: "POST",
-			body: JSON.stringify({ email: "admin@example.com", password: "secret" }),
-			headers: { "content-type": "application/json", "x-forwarded-for": "5.6.7.8" },
-		});
+		const request = postRequest("https://interjudaica.example/api/auth/login", { email: "admin@example.com", password: "secret" }, { "x-forwarded-for": "5.6.7.8" });
 
 		const response = await operatorLogin(request);
 		const setCookie = response.headers.get("set-cookie") ?? "";
@@ -507,11 +514,7 @@ describe("route behaviors", () => {
 
 	test("register rejects invalid payloads", async () => {
 		state.registerParseSuccess = false;
-		const request = new NextRequest("https://interjudaica.example/api/user-auth/register", {
-			method: "POST",
-			body: JSON.stringify({ email: "bad" }),
-			headers: { "content-type": "application/json" },
-		});
+		const request = postRequest("https://interjudaica.example/api/user-auth/register", { email: "bad" });
 
 		const response = await registerUser(request);
 
@@ -521,11 +524,7 @@ describe("route behaviors", () => {
 
 	test("register rejects duplicate emails", async () => {
 		state.existingUserByEmail = { uuid: "user-9", data: { email: "new@example.com" } };
-		const request = new NextRequest("https://interjudaica.example/api/user-auth/register", {
-			method: "POST",
-			body: JSON.stringify({ email: "new@example.com", firstName: "New", password: "supersecret" }),
-			headers: { "content-type": "application/json", "x-forwarded-for": "1.2.3.4" },
-		});
+		const request = postRequest("https://interjudaica.example/api/user-auth/register", { email: "new@example.com", firstName: "New", password: "supersecret" }, { "x-forwarded-for": "1.2.3.4" });
 
 		const response = await registerUser(request);
 
@@ -534,11 +533,7 @@ describe("route behaviors", () => {
 	});
 
 	test("register creates the user and sends verification email", async () => {
-		const request = new NextRequest("https://interjudaica.example/api/user-auth/register", {
-			method: "POST",
-			body: JSON.stringify({ email: "new@example.com", firstName: "New", password: "supersecret" }),
-			headers: { "content-type": "application/json", "x-forwarded-for": "1.2.3.4" },
-		});
+		const request = postRequest("https://interjudaica.example/api/user-auth/register", { email: "new@example.com", firstName: "New", password: "supersecret" }, { "x-forwarded-for": "1.2.3.4" });
 
 		const response = await registerUser(request);
 		const body = await response.json();
@@ -552,11 +547,7 @@ describe("route behaviors", () => {
 
 	test("reset password records failed attempts", async () => {
 		state.resetResult = { ok: false, error: "Invalid code" };
-		const request = new NextRequest("https://interjudaica.example/api/user-auth/reset-password", {
-			method: "POST",
-			body: JSON.stringify({ email: "USER@example.com", code: "123456", password: "supersecret" }),
-			headers: { "content-type": "application/json", "x-forwarded-for": "1.2.3.4" },
-		});
+		const request = postRequest("https://interjudaica.example/api/user-auth/reset-password", { email: "USER@example.com", code: "123456", password: "supersecret" }, { "x-forwarded-for": "1.2.3.4" });
 
 		const response = await resetPassword(request);
 
@@ -568,11 +559,7 @@ describe("route behaviors", () => {
 	});
 
 	test("reset password sends confirmation on success", async () => {
-		const request = new NextRequest("https://interjudaica.example/api/user-auth/reset-password", {
-			method: "POST",
-			body: JSON.stringify({ email: "USER@example.com", code: "123456", password: "supersecret" }),
-			headers: { "content-type": "application/json", "x-forwarded-for": "1.2.3.4" },
-		});
+		const request = postRequest("https://interjudaica.example/api/user-auth/reset-password", { email: "USER@example.com", code: "123456", password: "supersecret" }, { "x-forwarded-for": "1.2.3.4" });
 
 		const response = await resetPassword(request);
 
@@ -587,11 +574,7 @@ describe("route behaviors", () => {
 	});
 
 	test("course checkout requires an authenticated user", async () => {
-		const request = new NextRequest("https://interjudaica.example/api/checkout", {
-			method: "POST",
-			body: JSON.stringify({ courseUuid: "11111111-1111-4111-8111-111111111111" }),
-			headers: { "content-type": "application/json" },
-		});
+		const request = postRequest("https://interjudaica.example/api/checkout", { courseUuid: "11111111-1111-4111-8111-111111111111" });
 
 		const response = await courseCheckout(request);
 
@@ -612,11 +595,7 @@ describe("route behaviors", () => {
 			status: "published",
 		};
 		state.couponClaim = { coupon: { percentOff: 100 } };
-		const request = new NextRequest("https://interjudaica.example/api/checkout", {
-			method: "POST",
-			body: JSON.stringify({ courseUuid: state.courseRecord.uuid, couponCode: "free100" }),
-			headers: { "content-type": "application/json" },
-		});
+		const request = postRequest("https://interjudaica.example/api/checkout", { courseUuid: state.courseRecord!.uuid, couponCode: "free100" });
 
 		const response = await courseCheckout(request);
 
@@ -640,11 +619,7 @@ describe("route behaviors", () => {
 		};
 		state.communityUser = { stripeCustomerId: "cus_existing" };
 		state.planRecord = { name: "Premium", price: 1900, billingInterval: "month" };
-		const request = new NextRequest("https://interjudaica.example/api/community/checkout", {
-			method: "POST",
-			body: JSON.stringify({ planUuid }),
-			headers: { "content-type": "application/json" },
-		});
+		const request = postRequest("https://interjudaica.example/api/community/checkout", { planUuid });
 
 		const response = await communityCheckout(request);
 		const body = await response.json();
@@ -718,11 +693,7 @@ describe("route behaviors", () => {
 		};
 		state.planRecord = { name: "Premium", price: 1900, billingInterval: "month" };
 		state.couponClaim = { coupon: { percentOff: 100 } };
-		const request = new NextRequest("https://interjudaica.example/api/community/checkout", {
-			method: "POST",
-			body: JSON.stringify({ planUuid, couponCode: "free100" }),
-			headers: { "content-type": "application/json" },
-		});
+		const request = postRequest("https://interjudaica.example/api/community/checkout", { planUuid, couponCode: "free100" });
 
 		const response = await communityCheckout(request);
 

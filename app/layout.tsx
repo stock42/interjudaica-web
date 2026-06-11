@@ -3,6 +3,7 @@ import "./globals.css";
 import { TooltipProvider } from "@/components/ui/tooltip"
 import { SiteFooter, SiteHeader } from "@/app/components/portal-ui";
 import { BackToTop } from "@/app/components/back-to-top";
+import { AiChatFloat } from "@/app/components/ai-chat-float";
 import { Geist } from "next/font/google";
 import { cn } from "@/lib/utils";
 
@@ -41,6 +42,7 @@ export default function RootLayout({
           {children}
           <SiteFooter />
           <BackToTop />
+          <AiChatFloat />
         </TooltipProvider>
       </body>
     </html>
