@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { csrfFetch } from "@/lib/csrf-client";
 
 type Status = "idle" | "sending" | "sent" | "error";
 
@@ -23,7 +24,7 @@ export default function ForgotPasswordForm() {
     };
 
     try {
-      const response = await fetch("/api/user-auth/forgot-password", {
+      const response = await csrfFetch("/api/user-auth/forgot-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),

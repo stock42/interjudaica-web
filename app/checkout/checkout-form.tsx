@@ -4,6 +4,7 @@ import { useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import type { TypeCourse } from "@/models/courses";
+import { csrfFetch } from "@/lib/csrf-client";
 
 export function CheckoutForm({
 	course,
@@ -22,7 +23,7 @@ export function CheckoutForm({
 		setError("");
 
 		try {
-			const response = await fetch("/api/checkout", {
+			const response = await csrfFetch("/api/checkout", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({

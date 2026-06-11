@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { Label } from "@/components/ui/label";
+import { csrfFetch } from "@/lib/csrf-client";
 
 const COOLDOWN_FALLBACK = Number(
 	process.env.NEXT_PUBLIC_RESET_RESEND_COOLDOWN_SECONDS ?? "60",
@@ -76,7 +77,7 @@ export default function ResetPasswordForm() {
 		}
 
 		try {
-			const response = await fetch("/api/user-auth/reset-password", {
+			const response = await csrfFetch("/api/user-auth/reset-password", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({ email, code, password }),

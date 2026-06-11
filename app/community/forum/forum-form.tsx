@@ -5,6 +5,7 @@ import { useState, type FormEvent, type ChangeEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { csrfFetch } from "@/lib/csrf-client";
 
 export function CommunityThreadForm() {
 	const [loading, setLoading] = useState(false);
@@ -44,7 +45,7 @@ export function CommunityThreadForm() {
 		const title = String(formData.get("title") ?? "");
 		const content = String(formData.get("content") ?? "");
 
-		const response = await fetch("/api/forums", {
+		const response = await csrfFetch("/api/forums", {
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
 			body: JSON.stringify({

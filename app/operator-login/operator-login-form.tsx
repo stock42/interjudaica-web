@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { csrfFetch } from "@/lib/csrf-client";
 
 type Status = "idle" | "sending" | "error";
 
@@ -24,7 +25,7 @@ export function OperatorLoginForm({ nextPath }: { nextPath?: string }) {
     };
 
     try {
-      const response = await fetch("/api/auth/login", {
+      const response = await csrfFetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),

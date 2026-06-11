@@ -4,6 +4,7 @@ import { useState, type FormEvent } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { csrfFetch } from "@/lib/csrf-client";
 
 type Props = {
 	planUuid: string;
@@ -27,7 +28,7 @@ export function CheckoutCommunityForm({ planUuid, planName, planPriceCents, plan
 		setError("");
 
 		try {
-			const response = await fetch("/api/community/checkout", {
+			const response = await csrfFetch("/api/community/checkout", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({

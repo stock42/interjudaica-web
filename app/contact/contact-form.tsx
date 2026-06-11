@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { csrfFetch } from "@/lib/csrf-client";
 
 type Status = "idle" | "sending" | "sent" | "error";
 
@@ -27,7 +28,7 @@ export default function ContactForm() {
     };
 
     try {
-      const response = await fetch("/api/contact", {
+      const response = await csrfFetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),

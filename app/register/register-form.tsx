@@ -13,6 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { csrfFetch } from "@/lib/csrf-client";
 
 const COUNTRIES = [
   "United States",
@@ -113,7 +114,7 @@ export function RegisterForm() {
 
     setLoading(true);
 
-    const response = await fetch("/api/user-auth/register", {
+    const response = await csrfFetch("/api/user-auth/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
