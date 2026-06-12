@@ -210,6 +210,36 @@ The following files still reference the old `RabbiBio*` identifiers and will be 
 - Label: `"Biografía del Rabino"` → `"Owner biography"`
 - href: `/admin/rabbi-bio` → `/admin/owner-bio`
 
+## Wave 5: AI Entity Create Modal (2026-06-12)
+
+### Files created
+- `app/admin/components/ai-create-modal.tsx` — reusable AI-powered entity creation Dialog
+- `tests/unit/components/ai-create-modal.test.ts` — 41 tests covering pure helpers
+
+### Component design
+- **Props**: `entityType`, `entityName`, `onCreate(data): Promise<void>`, `systemPrompt?`, `open?`, `onOpenChange?`, `trigger?`
+- **Uses**: shadcn `Dialog` from `@/components/ui/dialog`, `Spinner` from `@/components/ui/spinner`, `SttMicrophone` from `@/components/share/stt-microphone` (Task 8)
+- **Chat integration**: `useChat` from `@ai-sdk/react` with `DefaultChatTransport` pointing at `/api/agentes/chat`
+- **Phase machine**: `idle` → `loading` → `preview` | `error` → `creating` → closed
+- **Prompt building**: `buildEntityPrompt()` combines entity type/name, optional system prompt, user input, and JSON output instruction into a single message (the chat endpoint determines the system prompt server-side, so instructions are embedded in the user message)
+- **JSON extraction**: `extractJsonFromText()` tries fenced code blocks first (` ```json `), then raw `{...}` objects; rejects arrays and primitives
+- **Preview**: `PreviewBlock` sub-component renders key-value pairs from parsed entity data using `formatKey()` (camelCase → Title Case) and `formatValue()` (booleans → Yes/No, arrays → count, strings → truncated at 120 chars, objects → `{ … }`)
+- **STT**: Uses `SttMicrophone.onTranscription` callback to append transcribed text to input
+- **Create flow**: Calls `onCreate(parsedData)`, shows creating spinner, closes dialog on success, shows error on failure
+
+### Patterns established
+- **Shadcn Dialog pattern**: `Dialog` + `DialogTrigger` (optional) + `DialogContent` + `DialogHeader` + `DialogFooter` with `DialogClose`
+- **Controlled/uncontrolled**: Supports both `open`/`onOpenChange` (controlled) and internal state (uncontrolled)
+- **Reset on open**: `useEffect` watches `open` transition from closed→open, resets all state via `startTransition`
+- **AI response processing**: Uses `expectingResponse` ref flag to avoid processing stale responses; processes chat messages only when `status === 'ready'` and flag is true
+- **Lint compliance**: All state updates inside effects wrapped in `startTransition()` to satisfy the `setState-in-effect` rule
+- **Test approach**: Pure logic functions tested without React DOM (no `@testing-library/react` needed); dependencies mocked with `mock.module()`
+
+### Verification
+- `bun test`: 321 pass, 0 fail across 28 files
+- `bun run lint`: No errors in new files (pre-existing errors in e2e files only)
+- `lsp_diagnostics`: Clean
+
 ## Wave 5: AI Chat Tools — createNewCourse + createCourseCategory (2026-06-12)
 
 ### Files created
