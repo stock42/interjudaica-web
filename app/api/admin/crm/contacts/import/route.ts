@@ -1,6 +1,10 @@
 import { NextResponse, type NextRequest } from 'next/server'
+import { ZodError } from 'zod'
 import { CrmContactStorage } from '@/services/crm-contacts-storage'
-import type { TypeCrmContactImport } from '@/models/crm-contacts'
+import {
+	schemaCrmContactImport,
+	type TypeCrmContactImport,
+} from '@/models/crm-contacts'
 import { requireAdminApi, routeError } from '@/app/api/_lib/admin-api'
 
 export const runtime = 'nodejs'
@@ -13,6 +17,7 @@ export async function POST(request: NextRequest) {
 	}
 
 	try {
+		// Parse multipart/form-data — NOT JSON
 		const formData = await request.formData()
 		const file = formData.get('file') as File | null
 
@@ -37,7 +42,11 @@ export async function POST(request: NextRequest) {
 		}
 
 		const header = lines[0].toLowerCase()
-		if (!header.includes('firstname') || !header.includes('lastname') || !header.includes('email')) {
+		if (
+			!header.includes('firstname') ||
+			!header.includes('lastname') ||
+			!header.includes('email')
+		) {
 			return NextResponse.json(
 				{
 					error:
@@ -47,12 +56,15 @@ export async function POST(request: NextRequest) {
 			)
 		}
 
-		const headerColumns = lines[0].split(',').map((h) => h.trim().toLowerCase())
+		const headerColumns = lines[0]
+			.split(',')
+			.map((h) => h.trim().toLowerCase())
 		const firstnameIdx = headerColumns.indexOf('firstname')
 		const lastnameIdx = headerColumns.indexOf('lastname')
 		const emailIdx = headerColumns.indexOf('email')
 
 		const contacts: TypeCrmContactImport[] = []
+		const validationErrors: { line: number; email: string; error: string }[] = []
 
 		for (let i = 1; i < lines.length; i++) {
 			const columns = lines[i].split(',').map((c) => c.trim())
@@ -60,14 +72,51 @@ export async function POST(request: NextRequest) {
 			const lastname = (columns[lastnameIdx] ?? '').trim()
 			const email = (columns[emailIdx] ?? '').trim()
 
-			if (firstname && lastname && email) {
-				contacts.push({ firstname, lastname, email })
+			if (!firstname || !lastname || !email) {
+				validationErrors.push({
+					line: i + 1, // 1-based line number in the file
+					email: email || '(missing)',
+					error: 'Missing required field (firstname, lastname, or email)',
+				})
+				continue
 			}
+
+			// Validate row with Zod before adding to import batch
+			try {
+				const validated = schemaCrmContactImport.parse({
+					firstname,
+					lastname,
+					email,
+				})
+				contacts.push(validated)
+			} catch (err) {
+				const messages =
+					err instanceof ZodError
+						? err.issues.map((e) => e.message).join('; ')
+						: 'Invalid row'
+				validationErrors.push({ line: i + 1, email, error: messages })
+			}
+		}
+
+		if (contacts.length === 0) {
+			return NextResponse.json(
+				{
+					error: 'No valid contacts found in CSV',
+					imported: 0,
+					skipped: 0,
+					validationErrors,
+				},
+				{ status: 400 },
+			)
 		}
 
 		const result = await CrmContactStorage.bulkImport(contacts)
 
-		return NextResponse.json(result)
+		return NextResponse.json({
+			...result,
+			validationErrors:
+				validationErrors.length > 0 ? validationErrors : undefined,
+		})
 	} catch (error) {
 		return routeError(error)
 	}
