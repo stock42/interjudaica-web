@@ -14,6 +14,7 @@ export async function POST(request: NextRequest) {
   response.cookies.set(USER_SESSION_COOKIE_NAME, "", {
     ...userSessionCookieOptions(),
     maxAge: 0,
+    expires: new Date(0),
   });
 
   return response;
