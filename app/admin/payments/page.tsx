@@ -1,65 +1,32 @@
-import type { Metadata } from "next";
-import { AdminShell, DataTable } from "@/app/components/portal-ui";
-import { CoursePaymentStorage } from "@/services/course-payments-storage";
-import { UserStorage } from "@/services/users-storage";
-import { CourseStorage } from "@/services/courses-storage";
+import type { Metadata } from 'next'
+import { AdminShell } from '@/app/components/portal-ui'
+import { PaymentsContent } from '@/app/admin/payments/payments-content'
 
-export const runtime = "nodejs";
-export const dynamic = "force-dynamic";
+export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-	title: "Admin Payments",
-	description: "Manage InterJudaica Stripe transactions.",
-};
+	title: 'Admin Payments',
+	description: 'Track course purchases, book sales, and community subscriptions.',
+}
 
-export default async function AdminPaymentsPage() {
-	const [payments, users, courses] = await Promise.all([
-		CoursePaymentStorage.list(),
-		UserStorage.list(),
-		CourseStorage.list(),
-	]);
-
-	const userMap = new Map(users.map((u) => [u.uuid, u]));
-	const courseMap = new Map(courses.map((c) => [c.uuid, c]));
-
-	const rows = payments.map((p) => {
-		const user = userMap.get(p.userUuid);
-		const course = courseMap.get(p.courseUuid);
-		const userName = user
-			? `${user.firstName} ${user.lastName}`.trim() || user.email
-			: p.userUuid;
-		const typeLabel = course ? `Course: ${course.title}` : "Course";
-		return [
-			p.stripeSessionId || "free",
-			userName,
-			typeLabel,
-			`$${(p.amount || 0).toFixed(2)} USD`,
-			p.status || "pending",
-			p.paidAt
-				? new Date(p.paidAt).toLocaleDateString("en-US", {
-						month: "short",
-						day: "numeric",
-						year: "numeric",
-					})
-				: p.createdAt
-					? new Date(p.createdAt).toLocaleDateString("en-US", {
-							month: "short",
-							day: "numeric",
-							year: "numeric",
-						})
-					: "-",
-		];
-	});
+export default async function AdminPaymentsPage({
+	searchParams,
+}: {
+	searchParams: Promise<{ search?: string; type?: string; page?: string }>
+}) {
+	const params = await searchParams
 
 	return (
 		<AdminShell
 			title="Payments"
-			description="Track one-time course purchases, recurring community subscriptions, refunds, and reconciliation notes."
+			description="Track course purchases, book sales, community subscriptions, and reconciliation notes."
 		>
-			<DataTable
-				columns={["Payment", "User", "Type", "Amount", "Status", "Date"]}
-				rows={rows.length ? rows : [[]]}
+			<PaymentsContent
+				search={params.search ?? ''}
+				type={params.type ?? ''}
+				page={Number(params.page) || 1}
 			/>
 		</AdminShell>
-	);
+	)
 }
