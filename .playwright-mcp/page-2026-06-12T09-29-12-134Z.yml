@@ -1,0 +1,128 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e3]:
+      - link "InterJudaica home" [ref=e4] [cursor=pointer]:
+        - /url: /
+        - img "InterJudaica logo" [ref=e5]
+        - generic [ref=e6]:
+          - generic [ref=e7]: InterJudaica
+          - generic [ref=e8]: Jewish Learning Institute
+      - navigation "Primary navigation" [ref=e9]:
+        - link "Home" [ref=e10] [cursor=pointer]:
+          - /url: /
+        - link "Courses" [ref=e11] [cursor=pointer]:
+          - /url: /courses
+        - link "Books" [ref=e12] [cursor=pointer]:
+          - /url: /books
+        - link "Community" [ref=e13] [cursor=pointer]:
+          - /url: /community
+        - link "Forum" [ref=e14] [cursor=pointer]:
+          - /url: /forum
+        - link "About Ernesto" [ref=e15] [cursor=pointer]:
+          - /url: /ernesto-yattah
+        - link "Contact" [ref=e16] [cursor=pointer]:
+          - /url: /contact
+        - button "More content" [ref=e18]:
+          - text: More content
+          - img [ref=e19]
+      - generic [ref=e21]:
+        - link "Login" [ref=e22] [cursor=pointer]:
+          - /url: /login
+        - link "Enroll" [ref=e23] [cursor=pointer]:
+          - /url: /register
+  - main [ref=e24]:
+    - generic [ref=e26]:
+      - generic [ref=e28]:
+        - paragraph [ref=e29]: Resources
+        - heading "Recommended Books" [level=2] [ref=e31]
+        - paragraph [ref=e32]: A curated collection of essential Jewish books and resources, hand-picked by Ernesto Yattah to deepen your learning.
+      - generic [ref=e33]: Recommended books will appear here soon. Check back for new additions.
+  - contentinfo [ref=e34]:
+    - generic [ref=e35]:
+      - generic [ref=e36]:
+        - generic [ref=e37]:
+          - img "InterJudaica logo" [ref=e38]
+          - generic [ref=e39]:
+            - generic [ref=e40]: InterJudaica
+            - generic [ref=e41]: Jewish Learning Institute
+        - paragraph [ref=e42]: Serious Jewish learning for students across the United States, built around live courses, community study, and accessible source material.
+      - generic [ref=e43]:
+        - heading "Navigation" [level=2] [ref=e44]
+        - generic [ref=e45]:
+          - link "Home" [ref=e46] [cursor=pointer]:
+            - /url: /
+          - link "Courses" [ref=e47] [cursor=pointer]:
+            - /url: /courses
+          - link "Resources" [ref=e48] [cursor=pointer]:
+            - /url: /resources-books
+          - link "About Ernesto" [ref=e49] [cursor=pointer]:
+            - /url: /#about-ernesto
+          - link "Contact" [ref=e50] [cursor=pointer]:
+            - /url: /#contact
+          - link "E2E Page 1780976691213" [ref=e51] [cursor=pointer]:
+            - /url: /page/e2e-page-1780976691213
+          - link "E2E Page 1780976672843" [ref=e52] [cursor=pointer]:
+            - /url: /page/e2e-page-1780976672843
+          - link "E2E Page 1780976652982" [ref=e53] [cursor=pointer]:
+            - /url: /page/e2e-page-1780976652982
+          - link "E2E Page 1780975746713" [ref=e54] [cursor=pointer]:
+            - /url: /page/e2e-page-1780975746713
+          - link "E2E Page 1780975551226" [ref=e55] [cursor=pointer]:
+            - /url: /page/e2e-page-1780975551226
+          - link "E2E Page 1780975526417" [ref=e56] [cursor=pointer]:
+            - /url: /page/e2e-page-1780975526417
+          - link "E2E Page 1780975480681" [ref=e57] [cursor=pointer]:
+            - /url: /page/e2e-page-1780975480681
+          - link "E2E Page 1780975460221" [ref=e58] [cursor=pointer]:
+            - /url: /page/e2e-page-1780975460221
+          - link "E2E Page 1780975435942" [ref=e59] [cursor=pointer]:
+            - /url: /page/e2e-page-1780975435942
+          - link "E2E Page 1780975412892" [ref=e60] [cursor=pointer]:
+            - /url: /page/e2e-page-1780975412892
+          - link "E2E Page 1780975390236" [ref=e61] [cursor=pointer]:
+            - /url: /page/e2e-page-1780975390236
+          - link "E2E Page 1780975301069" [ref=e62] [cursor=pointer]:
+            - /url: /page/e2e-page-1780975301069
+          - link "E2E Page 1780965957483" [ref=e63] [cursor=pointer]:
+            - /url: /page/e2e-page-1780965957483
+          - link "about" [ref=e64] [cursor=pointer]:
+            - /url: /page/about
+      - generic [ref=e65]:
+        - heading "Contact" [level=2] [ref=e66]
+        - generic [ref=e67]:
+          - 'link "WhatsApp: +54 9 11 5836 7095" [ref=e68] [cursor=pointer]':
+            - /url: https://wa.me/5491158367095
+          - 'link "Email: eyattah@hotmail.com" [ref=e69] [cursor=pointer]':
+            - /url: mailto:eyattah@hotmail.com
+          - generic [ref=e70]:
+            - paragraph [ref=e71]: Office Hours
+            - generic [ref=e72]:
+              - paragraph [ref=e73]: "Monday to Thursday: 9:00 AM - 10:00 PM"
+              - paragraph [ref=e74]: "Friday: 9:00 AM - 5:00 PM"
+              - paragraph [ref=e75]: "Sunday: 10:00 AM - 8:00 PM"
+              - paragraph [ref=e76]: Office closed on Shabbat and Jewish Holidays.
+              - paragraph [ref=e77]: Emails and WhatsApp messages will be answered after Shabbat and Holidays.
+      - generic [ref=e78]:
+        - heading "Follow us" [level=2] [ref=e79]
+        - generic [ref=e80]:
+          - link "Social link F" [ref=e81] [cursor=pointer]:
+            - /url: "#"
+            - text: F
+          - link "Social link I" [ref=e82] [cursor=pointer]:
+            - /url: "#"
+            - text: I
+          - link "Social link Y" [ref=e83] [cursor=pointer]:
+            - /url: "#"
+            - text: "Y"
+          - link "WhatsApp" [ref=e84] [cursor=pointer]:
+            - /url: https://wa.me/5491158367095
+            - text: W
+    - generic [ref=e85]:
+      - paragraph [ref=e86]: Copyright 2026 InterJudaica. All rights reserved.
+      - generic [ref=e87]:
+        - link "Terms and conditions" [ref=e88] [cursor=pointer]:
+          - /url: "#"
+        - link "Privacy" [ref=e89] [cursor=pointer]:
+          - /url: "#"
+  - button "Open Next.js Dev Tools" [ref=e95] [cursor=pointer]:
+    - img [ref=e96]

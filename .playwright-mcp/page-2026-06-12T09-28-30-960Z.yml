@@ -1,0 +1,225 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e3]:
+      - link "InterJudaica home" [ref=e4] [cursor=pointer]:
+        - /url: /
+        - img "InterJudaica logo" [ref=e5]
+        - generic [ref=e6]:
+          - generic [ref=e7]: InterJudaica
+          - generic [ref=e8]: Jewish Learning Institute
+      - navigation "Primary navigation" [ref=e9]:
+        - link "Home" [ref=e10] [cursor=pointer]:
+          - /url: /
+        - link "Courses" [ref=e11] [cursor=pointer]:
+          - /url: /courses
+        - link "Books" [ref=e12] [cursor=pointer]:
+          - /url: /books
+        - link "Community" [ref=e13] [cursor=pointer]:
+          - /url: /community
+        - link "Forum" [ref=e14] [cursor=pointer]:
+          - /url: /forum
+        - link "About Ernesto" [ref=e15] [cursor=pointer]:
+          - /url: /ernesto-yattah
+        - link "Contact" [ref=e16] [cursor=pointer]:
+          - /url: /contact
+        - button "More content" [ref=e18]:
+          - text: More content
+          - img [ref=e19]
+      - generic [ref=e21]:
+        - link "Login" [ref=e22] [cursor=pointer]:
+          - /url: /login
+        - link "Enroll" [ref=e23] [cursor=pointer]:
+          - /url: /register
+  - main [ref=e24]:
+    - generic [ref=e28]:
+      - heading "Learn Judaism with depth, history and tradition" [level=1] [ref=e29]:
+        - text: Learn Judaism
+        - text: with depth,
+        - text: history and tradition
+      - img [ref=e32]
+      - paragraph [ref=e38]: Online Jewish courses and community learning led by Ernesto Yattah.
+      - generic [ref=e39]:
+        - generic [ref=e40]:
+          - paragraph [ref=e41]: Live
+          - paragraph [ref=e42]: guided cohorts
+        - generic [ref=e43]:
+          - paragraph [ref=e44]: $19 USD
+          - paragraph [ref=e45]: community access
+        - generic [ref=e46]:
+          - paragraph [ref=e47]: Online
+          - paragraph [ref=e48]: from anywhere
+      - generic [ref=e49]:
+        - link "View courses" [ref=e50] [cursor=pointer]:
+          - /url: /courses
+          - text: View courses
+          - generic [ref=e51]: ">"
+        - link "Meet Ernesto Yattah" [ref=e52] [cursor=pointer]:
+          - /url: "#about-ernesto"
+    - generic [ref=e54]:
+      - heading "Featured Courses" [level=2] [ref=e57]
+      - generic [ref=e59]:
+        - article [ref=e60]:
+          - img [ref=e64]
+          - generic [ref=e67]:
+            - paragraph [ref=e68]: Course
+            - heading "Updated Course 1780976692552" [level=3] [ref=e69]
+            - paragraph [ref=e71]: Course details coming soon.
+            - generic [ref=e73]: $0
+            - link "More information" [ref=e75] [cursor=pointer]:
+              - /url: /course/updated-course-1780976692552
+              - text: More information
+              - generic [ref=e76]: ">"
+        - article [ref=e77]:
+          - img [ref=e81]
+          - generic [ref=e84]:
+            - paragraph [ref=e85]: Course
+            - heading "Updated Course 1780976674311" [level=3] [ref=e86]
+            - paragraph [ref=e88]: Course details coming soon.
+            - generic [ref=e90]: $0
+            - link "More information" [ref=e92] [cursor=pointer]:
+              - /url: /course/updated-course-1780976674311
+              - text: More information
+              - generic [ref=e93]: ">"
+        - article [ref=e94]:
+          - img [ref=e98]
+          - generic [ref=e101]:
+            - paragraph [ref=e102]: Course
+            - heading "Updated Course 1780976654405" [level=3] [ref=e103]
+            - paragraph [ref=e105]: Course details coming soon.
+            - generic [ref=e107]: $0
+            - link "More information" [ref=e109] [cursor=pointer]:
+              - /url: /course/updated-course-1780976654405
+              - text: More information
+              - generic [ref=e110]: ">"
+      - link "View all courses" [ref=e112] [cursor=pointer]:
+        - /url: /courses
+        - text: View all courses
+        - generic [ref=e113]: ">"
+    - generic [ref=e115]:
+      - generic [ref=e116]:
+        - img "Ernesto Yattah" [ref=e120]
+        - img [ref=e122]
+      - generic [ref=e127]:
+        - paragraph [ref=e128]: About the instructor
+        - heading "Ernesto Yattah" [level=2] [ref=e129]
+        - generic [ref=e130]:
+          - paragraph [ref=e131]: Teacher, guide, and passionate advocate for serious Jewish learning.
+          - paragraph [ref=e132]: Ernesto Yattah brings years of study and teaching experience into a clear, warm, and rigorous learning environment.
+          - paragraph [ref=e133]: His classes connect Torah, Jewish history, culture, and daily life so students can study with confidence and carry the ideas into practice.
+        - link "Learn more about Ernesto" [ref=e135] [cursor=pointer]:
+          - /url: /ernesto-yattah
+          - text: Learn more about Ernesto
+          - generic [ref=e136]: ">"
+    - generic [ref=e138]:
+      - heading "Why Choose InterJudaica?" [level=2] [ref=e141]
+      - generic [ref=e143]:
+        - article [ref=e144]:
+          - img [ref=e146]
+          - heading "Online classes" [level=3] [ref=e149]
+          - paragraph [ref=e150]: Learn live or at your own pace from home.
+        - article [ref=e151]:
+          - img [ref=e153]
+          - heading "Deep learning" [level=3] [ref=e156]
+          - paragraph [ref=e157]: Clear, rigorous content rooted in authentic sources.
+        - article [ref=e158]:
+          - img [ref=e160]
+          - heading "Cultural and spiritual focus" [level=3] [ref=e165]
+          - paragraph [ref=e166]: Connect history, Torah, and daily life.
+        - article [ref=e167]:
+          - img [ref=e169]
+          - heading "Access from anywhere" [level=3] [ref=e172]
+          - paragraph [ref=e173]: Courses and community wherever you are.
+    - generic [ref=e177]:
+      - img [ref=e179]
+      - heading "Join InterJudaica and begin your next course today." [level=2] [ref=e184]
+      - link "Enroll now" [ref=e185] [cursor=pointer]:
+        - /url: /register
+        - text: Enroll now
+        - generic [ref=e186]: ">"
+  - contentinfo [ref=e187]:
+    - generic [ref=e188]:
+      - generic [ref=e189]:
+        - generic [ref=e190]:
+          - img "InterJudaica logo" [ref=e191]
+          - generic [ref=e192]:
+            - generic [ref=e193]: InterJudaica
+            - generic [ref=e194]: Jewish Learning Institute
+        - paragraph [ref=e195]: Serious Jewish learning for students across the United States, built around live courses, community study, and accessible source material.
+      - generic [ref=e196]:
+        - heading "Navigation" [level=2] [ref=e197]
+        - generic [ref=e198]:
+          - link "Home" [ref=e199] [cursor=pointer]:
+            - /url: /
+          - link "Courses" [ref=e200] [cursor=pointer]:
+            - /url: /courses
+          - link "Resources" [ref=e201] [cursor=pointer]:
+            - /url: /resources-books
+          - link "About Ernesto" [ref=e202] [cursor=pointer]:
+            - /url: /#about-ernesto
+          - link "Contact" [ref=e203] [cursor=pointer]:
+            - /url: /#contact
+          - link "E2E Page 1780976691213" [ref=e204] [cursor=pointer]:
+            - /url: /page/e2e-page-1780976691213
+          - link "E2E Page 1780976672843" [ref=e205] [cursor=pointer]:
+            - /url: /page/e2e-page-1780976672843
+          - link "E2E Page 1780976652982" [ref=e206] [cursor=pointer]:
+            - /url: /page/e2e-page-1780976652982
+          - link "E2E Page 1780975746713" [ref=e207] [cursor=pointer]:
+            - /url: /page/e2e-page-1780975746713
+          - link "E2E Page 1780975551226" [ref=e208] [cursor=pointer]:
+            - /url: /page/e2e-page-1780975551226
+          - link "E2E Page 1780975526417" [ref=e209] [cursor=pointer]:
+            - /url: /page/e2e-page-1780975526417
+          - link "E2E Page 1780975480681" [ref=e210] [cursor=pointer]:
+            - /url: /page/e2e-page-1780975480681
+          - link "E2E Page 1780975460221" [ref=e211] [cursor=pointer]:
+            - /url: /page/e2e-page-1780975460221
+          - link "E2E Page 1780975435942" [ref=e212] [cursor=pointer]:
+            - /url: /page/e2e-page-1780975435942
+          - link "E2E Page 1780975412892" [ref=e213] [cursor=pointer]:
+            - /url: /page/e2e-page-1780975412892
+          - link "E2E Page 1780975390236" [ref=e214] [cursor=pointer]:
+            - /url: /page/e2e-page-1780975390236
+          - link "E2E Page 1780975301069" [ref=e215] [cursor=pointer]:
+            - /url: /page/e2e-page-1780975301069
+          - link "E2E Page 1780965957483" [ref=e216] [cursor=pointer]:
+            - /url: /page/e2e-page-1780965957483
+          - link "about" [ref=e217] [cursor=pointer]:
+            - /url: /page/about
+      - generic [ref=e218]:
+        - heading "Contact" [level=2] [ref=e219]
+        - generic [ref=e220]:
+          - 'link "WhatsApp: +54 9 11 5836 7095" [ref=e221] [cursor=pointer]':
+            - /url: https://wa.me/5491158367095
+          - 'link "Email: eyattah@hotmail.com" [ref=e222] [cursor=pointer]':
+            - /url: mailto:eyattah@hotmail.com
+          - generic [ref=e223]:
+            - paragraph [ref=e224]: Office Hours
+            - generic [ref=e225]:
+              - paragraph [ref=e226]: "Monday to Thursday: 9:00 AM - 10:00 PM"
+              - paragraph [ref=e227]: "Friday: 9:00 AM - 5:00 PM"
+              - paragraph [ref=e228]: "Sunday: 10:00 AM - 8:00 PM"
+              - paragraph [ref=e229]: Office closed on Shabbat and Jewish Holidays.
+              - paragraph [ref=e230]: Emails and WhatsApp messages will be answered after Shabbat and Holidays.
+      - generic [ref=e231]:
+        - heading "Follow us" [level=2] [ref=e232]
+        - generic [ref=e233]:
+          - link "Social link F" [ref=e234] [cursor=pointer]:
+            - /url: "#"
+            - text: F
+          - link "Social link I" [ref=e235] [cursor=pointer]:
+            - /url: "#"
+            - text: I
+          - link "Social link Y" [ref=e236] [cursor=pointer]:
+            - /url: "#"
+            - text: "Y"
+          - link "WhatsApp" [ref=e237] [cursor=pointer]:
+            - /url: https://wa.me/5491158367095
+            - text: W
+    - generic [ref=e238]:
+      - paragraph [ref=e239]: Copyright 2026 InterJudaica. All rights reserved.
+      - generic [ref=e240]:
+        - link "Terms and conditions" [ref=e241] [cursor=pointer]:
+          - /url: "#"
+        - link "Privacy" [ref=e242] [cursor=pointer]:
+          - /url: "#"
