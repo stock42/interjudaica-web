@@ -9,6 +9,8 @@ import { AdminStatPill } from '@/app/admin/components/admin-stat-pill'
 import type { TypeSubscriptionPlan } from '@/models/subscription-plans'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import { Sparkles } from 'lucide-react'
+import AiCreateModal from '@/app/admin/components/ai-create-modal'
 
 const formatUsd = new Intl.NumberFormat('en-US', {
 	style: 'currency',
@@ -98,6 +100,32 @@ export function SubscriptionPlansList({
 							New plan
 						</Link>
 					</Button>
+					<AiCreateModal
+						entityType="subscription-plan"
+						entityName="Subscription Plan"
+						trigger={
+							<Button variant="outline" size="sm" className="h-10 gap-1.5">
+								<Sparkles className="size-4 text-[var(--gold)]" />
+								AI Create
+							</Button>
+						}
+						onCreate={async (data) => {
+							const response = await fetch('/api/admin/subscription-plans', {
+								method: 'POST',
+								headers: { 'Content-Type': 'application/json' },
+								body: JSON.stringify(data),
+							})
+							if (response.status === 401) {
+								window.location.assign('/operator-login?next=/admin/subscription-plans')
+								return
+							}
+							if (!response.ok) {
+								const json = await response.json().catch(() => ({}))
+								throw new Error(json.error ?? 'Failed to create subscription plan')
+							}
+							router.refresh()
+						}}
+					/>
 				</div>
 				<div className="mt-4 flex flex-wrap gap-2 text-xs font-bold uppercase text-[var(--muted)]">
 					<AdminStatPill>

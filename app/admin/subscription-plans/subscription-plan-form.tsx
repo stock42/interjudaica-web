@@ -15,6 +15,8 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from '@/components/ui/select'
+import { Sparkles } from 'lucide-react'
+import AiCreateModal from '@/app/admin/components/ai-create-modal'
 import type { TypeSubscriptionPlan } from '@/models/subscription-plans'
 
 type PlanFormState = {
@@ -106,6 +108,34 @@ export function SubscriptionPlanForm({
 					</p>
 				</div>
 				<div className="flex flex-wrap gap-2">
+					<AiCreateModal
+						entityType="subscription-plan"
+						entityName="Subscription Plan"
+						trigger={
+							<Button variant="outline" size="sm" className="h-10 gap-1.5">
+								<Sparkles className="size-4 text-[var(--gold)]" />
+								AI Create
+							</Button>
+						}
+						onCreate={async (data) => {
+							const response = await fetch('/api/admin/subscription-plans', {
+								method: 'POST',
+								headers: { 'Content-Type': 'application/json' },
+								body: JSON.stringify(data),
+							})
+							if (response.status === 401) {
+								window.location.assign('/operator-login?next=/admin/subscription-plans')
+								return
+							}
+							if (!response.ok) {
+								const json = await response.json().catch(() => ({}))
+								throw new Error(json.error ?? 'Failed to create subscription plan')
+							}
+							const created = await response.json()
+							router.push(`/admin/subscription-plans/${created.item.uuid}`)
+							router.refresh()
+						}}
+					/>
 					<Link
 						href="/admin/subscription-plans"
 						className="inline-flex min-h-10 items-center justify-center rounded-full border border-[var(--line)] px-4 text-sm font-semibold transition hover:bg-[var(--paper)]"
