@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 import { PageShell, Section, SectionIntro } from "@/app/components/portal-ui";
 import { MarkdownRenderer } from "@/app/components/markdown-renderer";
-import { getRabbiBio } from "@/app/lib/rabbi-bio";
+import { getOwnerBio } from "@/app/lib/owner-bio";
 
 export const runtime = "nodejs";
 
@@ -11,8 +11,8 @@ export const metadata: Metadata = {
 	description: "Meet Ernesto Yattah and explore his background and teaching philosophy.",
 };
 
-export default async function RabbiBioPage() {
-	const bio = await getRabbiBio();
+export default async function OwnerBioPage() {
+	const bio = await getOwnerBio();
 
 	return (
 		<PageShell>

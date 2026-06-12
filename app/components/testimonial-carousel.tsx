@@ -39,15 +39,6 @@ export default function TestimonialCarousel({
 						align: "start",
 						loop: true,
 						duration: 30,
-						slides: { perView: 1, spacing: 28 },
-						breakpoints: {
-							"(min-width: 768px)": {
-								slides: { perView: 2, spacing: 28 },
-							},
-							"(min-width: 1024px)": {
-								slides: { perView: 3, spacing: 28 },
-							},
-						},
 					}}
 					className="group/carousel"
 					onMouseEnter={() => autoplay.stop()}

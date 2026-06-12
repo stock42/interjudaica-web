@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 export const runtime = "nodejs";
 
-export default async function RabbiBioPage() {
+export default async function OwnerBioPage() {
 	const bio = await OwnerBioStorage.getBySlug("ernesto-yattah");
 
 	return (
