@@ -65,7 +65,7 @@ const navGroups: NavGroup[] = [
 			{ href: '/admin/pages', label: 'Páginas' },
 			{ href: '/admin/translations', label: 'Traducciones' },
 			{ href: '/admin/social-proof', label: 'Testimonios' },
-			{ href: '/admin/rabbi-bio', label: 'Biografía del Rabino' },
+			{ href: '/admin/owner-bio', label: 'Owner biography' },
 		],
 	},
 	{

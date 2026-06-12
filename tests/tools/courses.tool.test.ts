@@ -153,7 +153,7 @@ describe('courses.tool', () => {
 					level: 'Beginner',
 					price: 0,
 					communityPrice: 0,
-					instructor: 'Rabbi Yattah',
+					instructor: 'Ernesto Yattah',
 				},
 				{
 					uuid: 'c2',
@@ -164,7 +164,7 @@ describe('courses.tool', () => {
 					level: 'Advanced',
 					price: 49,
 					communityPrice: 29,
-					instructor: 'Rabbi Cohen',
+					instructor: 'Ernesto Cohen',
 				},
 			)
 
@@ -203,9 +203,9 @@ describe('courses.tool', () => {
 				accent: '#164a9f',
 				description: 'Learn the basics',
 				summary: 'Basics of Torah',
-				instructor: 'Rabbi Yattah',
+				instructor: 'Ernesto Yattah',
 				instructorUuid: 'inst-1',
-				instructorSlug: 'rabbi-yattah',
+				instructorSlug: 'ernesto-yattah',
 				video: 'HD recordings',
 				certificate: 'Certificate included',
 				zoomLink: 'Live Zoom',

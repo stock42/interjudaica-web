@@ -57,7 +57,7 @@ export function CheckoutCommunityForm({ planUuid, planName, planPriceCents, plan
 				</p>
 				<p className="mt-3 text-2xl font-semibold">${priceDisplay} USD / {intervalLabel}</p>
 				<p className="mt-2 text-sm whitespace-pre-line text-[var(--muted)]">
-					{planDescription || "Private forum, Rabbi papers, and member-only discounts."}
+					{planDescription || "Private forum, member papers, and member-only discounts."}
 				</p>
 			</div>
 

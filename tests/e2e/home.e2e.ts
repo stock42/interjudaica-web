@@ -25,7 +25,7 @@ test.describe("home page", () => {
 			page.getByRole("heading", { name: /Featured Courses/i }),
 		).toBeVisible();
 		await expect(
-			page.getByRole("heading", { name: /Rabbi Ernesto Yattah/i }),
+			page.getByRole("heading", { name: /Ernesto Yattah/i }),
 		).toBeVisible();
 		await expect(
 			page.getByRole("heading", { name: /Why Choose InterJudaica/i }),

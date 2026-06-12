@@ -7,8 +7,8 @@ import { getRabbiBio } from "@/app/lib/rabbi-bio";
 export const runtime = "nodejs";
 
 export const metadata: Metadata = {
-	title: "Rabbi Ernesto Yattah",
-	description: "Meet Rabbi Ernesto Yattah and explore his background and teaching philosophy.",
+	title: "Ernesto Yattah",
+	description: "Meet Ernesto Yattah and explore his background and teaching philosophy.",
 };
 
 export default async function RabbiBioPage() {
@@ -18,9 +18,9 @@ export default async function RabbiBioPage() {
 		<PageShell>
 			<Section tone="transparent">
 				<SectionIntro
-					eyebrow="Rabbi"
-					title={bio?.title || "Rabbi Ernesto Yattah"}
-					text="Learn about Rabbi Ernesto Yattah, his background, and his mission at InterJudaica."
+					eyebrow="About"
+					title={bio?.title || "Ernesto Yattah"}
+					text="Learn about Ernesto Yattah, his background, and his mission at InterJudaica."
 				/>
 				<div className="rounded-lg border border-[var(--line)] bg-white p-6 text-[var(--ink)]">
 					{bio?.markdown ? (

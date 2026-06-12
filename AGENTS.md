@@ -97,7 +97,7 @@ Collection names currently in use:
 - `course_payments`
 - `contacts`
 - `password_reset_attempts`
-- `rabbi_bio`
+- `owner_bio`
 - `community_users`
 - `coupons`
 - `instructors`
@@ -206,7 +206,7 @@ Public content endpoints:
 | `GET` | `/api/papers` | Lists published papers by visibility. |
 | `GET` | `/api/papers/[slug]` | Returns one published paper by slug. |
 | `GET` | `/api/papers/[slug]/download` | Downloads a paper markdown file. |
-| `GET` | `/api/rabbi-bio` | Returns the public rabbi bio. |
+| `GET` | `/api/owner-bio` | Returns the public owner bio. |
 | `GET` | `/api/social-proof` | Lists published testimonials as `{ items }`. |
 | `POST` | `/api/books/checkout` | Creates a Stripe checkout session for a book. |
 | `GET` | `/api/books/[slug]` | Returns one published book by slug. |
@@ -222,8 +222,8 @@ Admin utility endpoints:
 | `POST` | `/api/admin/contacts/[uuid]/reply` | Sends a reply email (supports attachments) and marks as replied. |
 | `POST` | `/api/admin/contacts/[uuid]/mark-unread` | Marks a contact as new. |
 | `GET` | `/api/admin/password-resets` | Lists password reset attempts as `{ items }`. |
-| `GET` | `/api/admin/rabbi-bio` | Returns the current rabbi bio. |
-| `PUT` | `/api/admin/rabbi-bio` | Updates the rabbi bio content. |
+| `GET` | `/api/admin/owner-bio` | Returns the current owner bio. |
+| `PUT` | `/api/admin/owner-bio` | Updates the owner bio content. |
 | `POST` | `/api/admin/uploads/instructor-photo` | Requires operator auth; accepts `multipart/form-data` with `file`; returns `{ url }`. |
 | `POST` | `/api/admin/uploads/forum-asset` | Requires operator auth; accepts `multipart/form-data` with `file`; returns `{ url }`. |
 | `POST` | `/api/admin/uploads/book-cover` | Requires operator auth; accepts `multipart/form-data` with `file`; returns `{ url }`. |
@@ -412,7 +412,7 @@ Admin route map:
 - `/admin/classes/[courseUuid]`, `/admin/classes/[courseUuid]/new`, `/admin/classes/[courseUuid]/edit/[classUuid]`
 - `/admin/contacts`, `/admin/contacts/[uuid]`
 - `/admin/password-resets`
-- `/admin/rabbi-bio`
+- `/admin/owner-bio`
 - `/admin/enrollments`
 - `/admin/community-users`
 - `/admin/coupons`

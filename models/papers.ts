@@ -14,7 +14,7 @@ export const schemaPaper = z.object({
   date: z.string().trim().default(""),
   summary: z.string().trim().default(""),
   content: z.string().trim().default(""),
-  author: z.string().trim().default("Rabbi Yattah"),
+  author: z.string().trim().default("Ernesto Yattah"),
   status: z.enum(publishingStatuses).default("draft"),
   visibility: z.enum(paperVisibilities).default("community"),
 });

@@ -2,7 +2,7 @@ import { z } from "zod";
 import { createUuid, slugify } from "@/models/model-utils";
 
 export const forumStatuses = ["open", "closed", "hidden"] as const;
-export const forumCreators = ["rabbi", "student", "system"] as const;
+export const forumCreators = ["ernesto", "student", "system"] as const;
 
 export const schemaForumThread = z.object({
   uuid: z.string().uuid().optional(),

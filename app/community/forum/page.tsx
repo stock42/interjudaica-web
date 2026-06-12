@@ -15,7 +15,7 @@ import { hasActiveCommunityMembership } from "@/services/community-memberships";
 export const metadata: Metadata = {
   title: "Community Forum",
   description:
-    "Private InterJudaica community forum for member discussions and Rabbi Yattah papers.",
+    "Private InterJudaica community forum for member discussions and Ernesto Yattah papers.",
 };
 
 export default async function CommunityForumPage({
@@ -47,7 +47,7 @@ export default async function CommunityForumPage({
         <SectionIntro
           eyebrow="Forum"
           title="Community discussion"
-          text="Members can follow ongoing questions, paper discussions, course reflections, and replies from Rabbi Yattah."
+          text="Members can follow ongoing questions, paper discussions, course reflections, and replies from Ernesto Yattah."
           actions={
             <ButtonLink href="/community" tone="secondary">
               Membership

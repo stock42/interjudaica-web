@@ -5,7 +5,7 @@ import { PaperStorage } from "@/services/papers-storage";
 
 export const metadata: Metadata = {
   title: "Admin Papers",
-  description: "Manage Rabbi Yattah papers for community members.",
+  description: "Manage Ernesto Yattah papers for community members.",
 };
 
 export const runtime = "nodejs";
@@ -16,7 +16,7 @@ export default async function AdminPapersPage() {
   return (
     <AdminShell
       title="Papers"
-      description="Create, edit, and publish member-only papers and articles from Rabbi Yattah."
+      description="Create, edit, and publish member-only papers and articles from Ernesto Yattah."
     >
       <PaperList papers={papers} />
     </AdminShell>

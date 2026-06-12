@@ -45,7 +45,7 @@ export const navItems = [
   { href: "/books", label: "Books" },
   { href: "/community", label: "Community" },
   { href: "/forum", label: "Forum" },
-  { href: "/#about-rabbi", label: "About Rabbi" },
+  { href: "/ernesto-yattah", label: "About Ernesto" },
   { href: "/contact", label: "Contact" },
 ];
 
@@ -64,7 +64,7 @@ export const contactInfo = {
 
 export const communityBenefits = [
   "Private forum for ongoing questions and chavruta matching",
-  "Monthly papers and essays from Rabbi Yattah",
+  "Monthly papers and essays from Ernesto Yattah",
   "Member pricing on every course",
   "Early access to new cohorts and live sessions",
 ];

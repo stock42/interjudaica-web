@@ -7,7 +7,7 @@ const publicPages = [
 	{ path: "/community", heading: /Study between courses/i },
 	{ path: "/forum", heading: /^Announcements$/i },
 	{ path: "/contact", heading: /Send a message/i },
-	{ path: "/ernesto-yattah", heading: /Rabbi Ernesto Yattah/i },
+	{ path: "/ernesto-yattah", heading: /Ernesto Yattah/i },
 	{ path: "/login", heading: /Sign in to InterJudaica/i },
 	{ path: "/register", heading: /Create your student account/i },
 	{ path: "/forgot-password", heading: /Reset your password/i },

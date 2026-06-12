@@ -26,7 +26,7 @@ function formatDescription(text: string) {
 export const metadata: Metadata = {
   title: "Community",
   description:
-    "Join the InterJudaica community for private forums, Rabbi Yattah papers, and member pricing on courses.",
+    "Join the InterJudaica community for private forums, Ernesto Yattah papers, and member pricing on courses.",
 };
 
 export default async function CommunityPage() {
@@ -52,7 +52,7 @@ export default async function CommunityPage() {
               Study between courses
             </h1>
             <p className="mt-5 max-w-2xl text-lg leading-8 text-white/75">
-              Members get a private forum, monthly papers from Rabbi Yattah,
+              Members get a private forum, monthly papers from Ernesto Yattah,
               course discounts, and early access to new cohorts.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -166,11 +166,11 @@ export default async function CommunityPage() {
             <InfoList items={communityBenefits} />
           </div>
           <div>
-            <SectionIntro eyebrow="Latest papers" title="Rabbi Yattah essays" />
+            <SectionIntro eyebrow="Latest papers" title="Ernesto Yattah essays" />
             <div className="grid gap-4">
               {!isMember ? (
                 <p className="text-sm text-[var(--muted)]">
-                  Community members can access Rabbi Yattah papers after subscribing.
+                  Community members can access Ernesto Yattah papers after subscribing.
                 </p>
               ) : papers.length === 0 ? (
                 <p className="text-sm text-[var(--muted)]">

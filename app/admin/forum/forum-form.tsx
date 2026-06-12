@@ -205,7 +205,7 @@ export function ForumForm({
             onChange={(event) => setField("documentUrls", event.target.value)}
           />
           <span className="text-xs text-[var(--muted)]">
-            Only rabbi-created threads should include documents.
+            Only ernesto-created threads should include documents.
           </span>
         </div>
         <div className="grid gap-2 text-sm font-semibold text-[var(--ink)] md:col-span-2">
@@ -216,7 +216,7 @@ export function ForumForm({
             onChange={(event) => setField("videoUrls", event.target.value)}
           />
           <span className="text-xs text-[var(--muted)]">
-            Only rabbi-created threads should include videos.
+            Only ernesto-created threads should include videos.
           </span>
         </div>
         <div className="grid gap-2 text-sm font-semibold text-[var(--ink)]">

@@ -114,7 +114,7 @@ export async function SiteFooter() {
   const footerNavLinks = [
     { href: "/", label: "Home" },
     { href: "/courses", label: "Courses" },
-    { href: "/#about-rabbi", label: "About Rabbi" },
+    { href: "/#about-ernesto", label: "About Ernesto" },
     { href: "/#contact", label: "Contact" },
     ...publishedPages.map((page) => ({
       href: `/page/${page.slug}`,

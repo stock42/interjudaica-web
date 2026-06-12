@@ -138,7 +138,7 @@ export async function POST(request: NextRequest) {
 			if (course) {
 				const baseUrl = getBaseUrl();
 				sendForumReplyNotification({
-					email: course.instructor === "Rabbi Yattah" ? "info@interjudaica.com" : `${course.instructorSlug}@interjudaica.com`,
+					email: course.instructor === "Ernesto Yattah" ? "info@interjudaica.com" : `${course.instructorSlug}@interjudaica.com`,
 					firstName: course.instructor,
 					threadTitle: payload.title,
 					replyAuthor: `${user.firstName} ${user.lastName}`.trim(),

@@ -9,10 +9,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import type { TypeRabbiBio } from "@/models/rabbi-bio";
+import type { TypeOwnerBio } from "@/models/owner-bio";
 
-export function RabbiBioForm({ bio }: { bio: TypeRabbiBio | null }) {
-	const [title, setTitle] = useState(bio?.title ?? "Rabbi Ernesto Yattah");
+export function OwnerBioForm({ bio }: { bio: TypeOwnerBio | null }) {
+	const [title, setTitle] = useState(bio?.title ?? "Ernesto Yattah");
 	const [markdown, setMarkdown] = useState(bio?.markdown ?? "");
 	const [status, setStatus] = useState<"idle" | "saving" | "saved" | "error">(
 		"idle",
@@ -25,14 +25,14 @@ export function RabbiBioForm({ bio }: { bio: TypeRabbiBio | null }) {
 		setError("");
 
 		try {
-			const response = await fetch("/api/admin/rabbi-bio", {
+			const response = await fetch("/api/admin/owner-bio", {
 				method: "PUT",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({ title, markdown }),
 			});
 
 			if (response.status === 401) {
-				window.location.assign("/operator-login?next=/admin/rabbi-bio");
+				window.location.assign("/operator-login?next=/admin/owner-bio");
 				return;
 			}
 

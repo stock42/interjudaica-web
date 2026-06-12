@@ -338,7 +338,7 @@ test.describe.serial('Admin Instructors — /api/admin/instructors', () => {
     const resp = await request.post(basePath, {
       headers: adminHeaders,
       data: {
-        firstName: 'Rabbi',
+		firstName: 'Ernesto',
         lastName: `Test ${Date.now()}`,
         bio: 'A test instructor for e2e testing.',
       },
@@ -787,18 +787,18 @@ test.describe.serial('Admin Config — /api/admin/config', () => {
 })
 
 /* ──────────────────────────────────────────────────────────── */
-/*  Rabbi Bio                                                   */
+/*  Owner Bio                                                   */
 /* ──────────────────────────────────────────────────────────── */
 
-test.describe.serial('Admin Rabbi Bio — /api/admin/rabbi-bio', () => {
-  const basePath = '/api/admin/rabbi-bio'
+test.describe.serial('Admin Owner Bio — /api/admin/owner-bio', () => {
+  const basePath = '/api/admin/owner-bio'
 
-  test('GET returns rabbi bio', async ({ request }) => {
+  test('GET returns owner bio', async ({ request }) => {
     const resp = await request.get(basePath, { headers: adminHeaders })
     expect(resp.status()).toBe(200)
   })
 
-  test('PUT updates rabbi bio', async ({ request }) => {
+  test('PUT updates owner bio', async ({ request }) => {
     const resp = await request.put(basePath, {
       headers: adminHeaders,
       data: {

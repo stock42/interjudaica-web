@@ -258,7 +258,7 @@ export default async function Home() {
               <span className="h-px flex-1 bg-[var(--gold)]" />
             </div>
             <p className="max-w-[34rem] text-xl leading-9 text-white/86">
-              Online Jewish courses and community learning led by Rabbi Ernesto
+              Online Jewish courses and community learning led by Ernesto
               Yattah.
             </p>
             <div className="mt-8 grid max-w-[38rem] gap-px overflow-hidden rounded-lg border border-[rgba(244,189,51,0.28)] bg-[rgba(244,189,51,0.22)] sm:grid-cols-3">
@@ -280,8 +280,8 @@ export default async function Home() {
               <ButtonLink href="/courses">
                 View courses <span aria-hidden="true">&gt;</span>
               </ButtonLink>
-              <ButtonLink href="#about-rabbi" tone="secondary">
-                Meet Rabbi Yattah
+              <ButtonLink href="#about-ernesto" tone="secondary">
+                Meet Ernesto Yattah
               </ButtonLink>
             </div>
           </div>
@@ -317,7 +317,7 @@ export default async function Home() {
       </section>
 
       <section
-        id="about-rabbi"
+        id="about-ernesto"
         className="scroll-mt-28 bg-[#080b0d] py-12 text-[#f8f2e8]"
       >
         <div
@@ -329,7 +329,7 @@ export default async function Home() {
             <div className="absolute inset-9 overflow-hidden rounded-full bg-[radial-gradient(circle_at_center,rgba(244,189,51,0.22),rgba(244,189,51,0.06)_52%,rgba(5,6,8,0.92))]">
               <Image
                 src="/foto-ernesto-yattah-bg-transparent.png"
-                alt="Rabbi Ernesto Yattah"
+                alt="Ernesto Yattah"
                 width={1254}
                 height={1254}
                 className="h-full w-full object-cover object-top"
@@ -346,12 +346,12 @@ export default async function Home() {
               About the instructor
             </p>
             <h2 className="mt-3 font-display text-4xl font-semibold leading-tight text-[#f8f2e8] xl:text-5xl">
-              Rabbi Ernesto Yattah
+              Ernesto Yattah
             </h2>
             <div className="mt-5 grid gap-3 text-base leading-7 text-white/78 xl:text-lg xl:leading-8">
               <p>Teacher, guide, and passionate advocate for serious Jewish learning.</p>
               <p>
-                Rabbi Yattah brings years of study and teaching experience into
+                Ernesto Yattah brings years of study and teaching experience into
                 a clear, warm, and rigorous learning environment.
               </p>
               <p>
@@ -362,7 +362,7 @@ export default async function Home() {
             </div>
             <div className="mt-6">
               <ButtonLink href="/ernesto-yattah" tone="secondary">
-                Learn more about the Rabbi <span aria-hidden="true">&gt;</span>
+                Learn more about Ernesto <span aria-hidden="true">&gt;</span>
               </ButtonLink>
             </div>
           </div>

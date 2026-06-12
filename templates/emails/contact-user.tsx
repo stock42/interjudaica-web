@@ -5,7 +5,7 @@ import { base, card, h1, palette, small } from "@/templates/emails/_styles";
 const LOGO_URL =
   "https://interjudaica.com/_next/image?url=%2Flogo-interjudaica-transparente.png&w=1920&q=75";
 
-const RABBI_URL =
+const ERNESTO_URL =
   "https://interjudaica.com/_next/image?url=%2Ffoto-ernesto-yattah-bg-transparent.png&w=1920&q=75";
 
 export default function ContactUserEmail({
@@ -80,10 +80,10 @@ export default function ContactUserEmail({
           }}
         >
           <img
-            src={RABBI_URL}
+            src={ERNESTO_URL}
             width={96}
             height={96}
-            alt="Rabbi Ernesto Yattah"
+            alt="Ernesto Yattah"
             style={{
               borderRadius: 14,
               border: `1px solid ${palette.line}`,
@@ -92,7 +92,7 @@ export default function ContactUserEmail({
           />
           <div style={{ color: palette.text }}>
             <p style={{ margin: 0, color: palette.gold, fontWeight: 800 }}>
-              Rabbi Ernesto Yattah
+              Ernesto Yattah
             </p>
             <p
               style={{
@@ -103,7 +103,7 @@ export default function ContactUserEmail({
               }}
             >
               Teacher, guide, and passionate advocate for serious Jewish
-              learning. Rabbi Yattah brings years of study and teaching
+              learning. Ernesto Yattah brings years of study and teaching
               experience into a clear, warm, and rigorous learning environment.
             </p>
             <p
@@ -114,7 +114,7 @@ export default function ContactUserEmail({
                 lineHeight: "20px",
               }}
             >
-              Rabbi Yattah and his team will respond to your message as soon as
+              Ernesto Yattah and his team will respond to your message as soon as
               possible.
             </p>
           </div>

@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
         title: item.title,
         area: "Community Papers",
         paperUuid: item.uuid ?? "",
-        createdBy: "rabbi",
+        createdBy: "ernesto",
         content: item.summary || "Paper discussion",
         status: "open",
       });

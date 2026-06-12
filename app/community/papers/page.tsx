@@ -13,7 +13,7 @@ import { hasActiveCommunityMembership } from "@/services/community-memberships";
 export const metadata: Metadata = {
   title: "Community Papers",
   description:
-    "Member-only papers and essays from Rabbi Yattah for the InterJudaica community.",
+    "Member-only papers and essays from Ernesto Yattah for the InterJudaica community.",
 };
 
 export default async function CommunityPapersPage() {
@@ -34,7 +34,7 @@ export default async function CommunityPapersPage() {
       <Section tone="transparent">
         <SectionIntro
           eyebrow="Member papers"
-          title="Articles and source essays from Rabbi Yattah"
+          title="Articles and source essays from Ernesto Yattah"
           text="Community members receive monthly essays, source packets, and short reflections connected to ongoing study."
           actions={
             <ButtonLink href="/community" tone="secondary">

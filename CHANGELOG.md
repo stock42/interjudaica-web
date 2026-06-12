@@ -1,6 +1,7 @@
 # Changelog
 
 ## 2026-06-11
+- refactor: rename Rabbi→Ernesto/Owner across entire codebase — `rabbi_bio` collection → `owner_bio`, `RabbiBioModel` → `OwnerBioModel`, `/api/rabbi-bio` → `/api/owner-bio`, `/api/admin/rabbi-bio` → `/api/admin/owner-bio`, `/admin/rabbi-bio` → `/admin/owner-bio`, forum creator enum `"rabbi"` → `"ernesto"`, instructor defaults `"Rabbi Yattah"` → `"Ernesto Yattah"`, function `getRabbiBio()` → `getOwnerBio()`. Updated test fixtures, assertions, and AGENTS.md.
 - Create `Dockerfile` with `oven/bun:1` base image, single-stage build: install dependencies with `--frozen-lockfile`, build Next.js app, expose port 3025, run `bun run start`.
 - Add `.github/workflows/ci.yml` GitHub Actions workflow triggered on push/PR to main with steps: checkout, setup Bun (`oven-sh/setup-bun@v2`), install (`--frozen-lockfile`), lint, type check (`tsc --noEmit`), unit tests (`bun test`), and Docker build. 15-minute timeout, no deploy or E2E steps.
 - Create `.dockerignore` to exclude node_modules, .next, .env*, .git, .omo, tests, Playwright artifacts, IDE files, and docs from Docker build context, reducing image size and preventing secrets from leaking into images.

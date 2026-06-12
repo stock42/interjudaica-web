@@ -2,7 +2,7 @@
  * Phase 3 — Public/Student Endpoint Tests (API-level)
  *
  * Tests public-facing endpoints accessible without auth and student-authenticated endpoints.
- * Covers courses, papers, forums, books, social proof, contact, rabbi bio, and community checkout.
+ * Covers courses, papers, forums, books, social proof, contact, owner bio, and community checkout.
  *
  * Student auth setup follows the project pattern:
  *   register → verify → login → use cookie for authenticated requests.
@@ -467,24 +467,24 @@ test.describe('Contact', () => {
 })
 
 /* ──────────────────────────────────────────────────────────── */
-/*  Rabbi Bio                                                   */
+/*  Owner Bio                                                   */
 /* ──────────────────────────────────────────────────────────── */
 
-test.describe('Rabbi Bio', () => {
-  test('GET /api/rabbi-bio returns rabbi bio data', async ({ request }) => {
-    const resp = await request.get('/api/rabbi-bio')
+test.describe('Owner Bio', () => {
+  test('GET /api/owner-bio returns owner bio data', async ({ request }) => {
+    const resp = await request.get('/api/owner-bio')
     expect(resp.status()).toBe(200)
     const body = await resp.json()
     expect(body).toHaveProperty('item')
   })
 
-  test('GET /api/rabbi-bio works without auth', async ({ request }) => {
-    const resp = await request.get('/api/rabbi-bio')
+  test('GET /api/owner-bio works without auth', async ({ request }) => {
+    const resp = await request.get('/api/owner-bio')
     expect(resp.status()).not.toBe(401)
   })
 
-  test('GET /api/rabbi-bio item has expected shape', async ({ request }) => {
-    const resp = await request.get('/api/rabbi-bio')
+  test('GET /api/owner-bio item has expected shape', async ({ request }) => {
+    const resp = await request.get('/api/owner-bio')
     const body = await resp.json()
     if (body.item) {
       // The bio may be empty if not configured — that's fine

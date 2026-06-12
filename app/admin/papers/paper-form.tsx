@@ -51,7 +51,7 @@ function createFormState(
     title: paper?.title ?? "",
     categoryUuid: paper?.categoryUuid ?? matchingCategory?.uuid ?? "",
     date: paper?.date ?? "",
-    author: paper?.author ?? "Rabbi Yattah",
+    author: paper?.author ?? "Ernesto Yattah",
     status: paper?.status ?? "draft",
     visibility: paper?.visibility ?? "community",
     summary: paper?.summary ?? "",
