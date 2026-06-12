@@ -1,5 +1,8 @@
 # Changelog
 
+## 2026-06-12
+- Add AI tools for instructor creation (`create-instructor.tool.ts`) and subscription plan creation (`create-subscription-plan.tool.ts`). Both register with `role: 'admin'` (operator-only). 13 unit tests across 2 files. Barrel export updated in `tools/index.ts`.
+
 ## 2026-06-11
 - refactor: rename Rabbi→Ernesto/Owner across entire codebase — `rabbi_bio` collection → `owner_bio`, `RabbiBioModel` → `OwnerBioModel`, `/api/rabbi-bio` → `/api/owner-bio`, `/api/admin/rabbi-bio` → `/api/admin/owner-bio`, `/admin/rabbi-bio` → `/admin/owner-bio`, forum creator enum `"rabbi"` → `"ernesto"`, instructor defaults `"Rabbi Yattah"` → `"Ernesto Yattah"`, function `getRabbiBio()` → `getOwnerBio()`. Updated test fixtures, assertions, and AGENTS.md.
 - Create `Dockerfile` with `oven/bun:1` base image, single-stage build: install dependencies with `--frozen-lockfile`, build Next.js app, expose port 3025, run `bun run start`.
