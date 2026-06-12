@@ -66,7 +66,9 @@ describe('TranslateButton', () => {
 			await callAiTranslate('es')
 
 			expect(fetchMock).toHaveBeenCalledTimes(1)
-			const calls = fetchMock.mock.calls as Array<[string, RequestInit]>
+			const calls = fetchMock.mock.calls as unknown as Array<
+				[string, RequestInit]
+			>
 			expect(calls[0]![0]).toBe('/api/admin/translations/ai-translate')
 			const body = JSON.parse(calls[0]![1].body as string) as {
 				locale: string
@@ -123,7 +125,9 @@ describe('TranslateButton', () => {
 			)
 			await callAiTranslate('es')
 
-			const calls = fetchMock.mock.calls as Array<[string, RequestInit]>
+			const calls = fetchMock.mock.calls as unknown as Array<
+				[string, RequestInit]
+			>
 			const opts = calls[0]![1]
 			expect(opts.method).toBe('POST')
 			const headers = opts.headers as Record<string, string>
