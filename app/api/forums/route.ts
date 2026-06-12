@@ -24,6 +24,7 @@ const schemaCreate = z.object({
 export async function GET(request: NextRequest) {
 	const area = request.nextUrl.searchParams.get("area") ?? "";
 	const courseSlug = request.nextUrl.searchParams.get("courseSlug") ?? "";
+	const myThreads = request.nextUrl.searchParams.get("myThreads") === "true";
 	const page = Number(request.nextUrl.searchParams.get("page") ?? "1");
 	const limit = Number(request.nextUrl.searchParams.get("limit") ?? "10");
 
@@ -68,7 +69,8 @@ export async function GET(request: NextRequest) {
 		}
 	}
 
-	const result = await ForumStorage.listByFilter({ area, courseSlug, page, limit });
+	const createdByUuid = myThreads ? user.uuid : undefined;
+	const result = await ForumStorage.listByFilter({ area, courseSlug, createdByUuid, page, limit });
 	return NextResponse.json(result);
 }
 

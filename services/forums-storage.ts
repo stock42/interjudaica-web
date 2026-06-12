@@ -28,6 +28,7 @@ export class ForumStorage extends MongoDBStorage<TypeForumThread> {
       collection.createIndex({ "data.area": 1, _added: -1 }),
       collection.createIndex({ "data.courseSlug": 1, _added: -1 }),
       collection.createIndex({ "data.paperUuid": 1 }),
+      collection.createIndex({ "data.createdByUuid": 1, "data.area": 1, _added: -1 }),
       collection.createIndex({ "data.title": "text", "data.area": "text" }),
     ]);
 
@@ -49,11 +50,13 @@ export class ForumStorage extends MongoDBStorage<TypeForumThread> {
   static async listByFilter({
     area,
     courseSlug,
+    createdByUuid,
     page = 1,
     limit = 10,
   }: {
     area?: string;
     courseSlug?: string;
+    createdByUuid?: string;
     page?: number;
     limit?: number;
   }) {
@@ -64,6 +67,9 @@ export class ForumStorage extends MongoDBStorage<TypeForumThread> {
     }
     if (courseSlug) {
       filter["data.courseSlug"] = courseSlug;
+    }
+    if (createdByUuid) {
+      filter["data.createdByUuid"] = createdByUuid;
     }
 
     const result = await MongoDBStorage._search<TypeForumThread>(

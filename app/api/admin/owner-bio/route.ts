@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from 'next/server'
+import { revalidateTag } from 'next/cache'
 import { z } from 'zod'
 
 import { OwnerBioStorage } from '@/services/owner-bio-storage'
@@ -30,6 +31,8 @@ export async function PUT(request: NextRequest) {
 	try {
 		const payload = schemaUpdate.parse(await request.json())
 		const item = await OwnerBioStorage.upsertBySlug('ernesto-yattah', payload)
+		revalidateTag('owner-bio', 'max')
+		revalidateTag('ernesto-yattah', 'max')
 		return NextResponse.json({ item })
 	} catch (error) {
 		return routeError(error)

@@ -1,12 +1,14 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { TypeSafeUser } from "@/models/users";
 
 export function CommunityGrantForm({ users }: { users: TypeSafeUser[] }) {
+	const router = useRouter();
 	const [userUuid, setUserUuid] = useState("");
 	const [status, setStatus] = useState<"idle" | "saving" | "saved" | "error">(
 		"idle",
@@ -37,6 +39,7 @@ export function CommunityGrantForm({ users }: { users: TypeSafeUser[] }) {
 		}
 
 		setStatus("saved");
+		router.refresh();
 	}
 
 	return (
