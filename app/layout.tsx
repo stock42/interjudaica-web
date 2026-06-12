@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip"
 import { SiteFooter, SiteHeader } from "@/app/components/portal-ui";
 import { BackToTop } from "@/app/components/back-to-top";
 import { AiChatFloat } from "@/app/components/ai-chat-float";
+import { TranslationProvider } from "@/app/lib/translation-provider";
 import { Geist } from "next/font/google";
 import { cn } from "@/lib/utils";
 
@@ -37,13 +38,15 @@ export default function RootLayout({
       className={cn("h-full antialiased", "font-sans", geist.variable)}
     >
       <body className="flex min-h-full flex-col">
-        <TooltipProvider>
-          <SiteHeader />
-          {children}
-          <SiteFooter />
-          <BackToTop />
-          <AiChatFloat />
-        </TooltipProvider>
+        <TranslationProvider>
+          <TooltipProvider>
+            <SiteHeader />
+            {children}
+            <SiteFooter />
+            <BackToTop />
+            <AiChatFloat />
+          </TooltipProvider>
+        </TranslationProvider>
       </body>
     </html>
   );

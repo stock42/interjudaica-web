@@ -4,10 +4,8 @@ import { tool } from 'ai'
 import { z } from 'zod'
 import { registerTool } from '@/lib/llm-tool-auth'
 import { schemaPaper } from '@/models/papers'
-import { schemaPaperCategory } from '@/models/paper-categories'
 import { PaperStorage } from '@/services/papers-storage'
 import { PaperCategoryStorage } from '@/services/paper-categories-storage'
-import { ForumStorage } from '@/services/forums-storage'
 
 // ── Paper Tools ──
 
@@ -33,31 +31,6 @@ export const getPaper = tool({
 	},
 })
 registerTool('getPaper', { role: 'admin' })
-
-export const createPaper = tool({
-	description:
-		'Create a new paper. Auto-creates a linked forum thread in "Community Papers" area. Title is required; all other fields have sensible defaults.',
-	inputSchema: schemaPaper.omit({ uuid: true, slug: true }),
-	execute: async (input) => {
-		const paper = await PaperStorage.create(input)
-
-		// Auto-create forum thread (mirrors admin API pattern)
-		const existingThread = await ForumStorage.getByPaperUuid(paper.uuid ?? '')
-		if (!existingThread) {
-			await ForumStorage.create({
-				title: paper.title,
-				area: 'Community Papers',
-				paperUuid: paper.uuid ?? '',
-				createdBy: 'system',
-				content: paper.summary || 'New paper published',
-				status: 'open',
-			})
-		}
-
-		return paper
-	},
-})
-registerTool('createPaper', { role: 'admin' })
 
 export const updatePaper = tool({
 	description: 'Update an existing paper by UUID. Only fields provided will be changed.',
@@ -97,13 +70,3 @@ export const listPaperCategories = tool({
 	},
 })
 registerTool('listPaperCategories', { role: 'admin' })
-
-export const createPaperCategory = tool({
-	description: 'Create a new paper category',
-	inputSchema: schemaPaperCategory.omit({ uuid: true, slug: true }),
-	execute: async (input) => {
-		const category = await PaperCategoryStorage.create(input)
-		return category
-	},
-})
-registerTool('createPaperCategory', { role: 'admin' })
