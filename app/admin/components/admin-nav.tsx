@@ -14,11 +14,13 @@ import {
 	FileText,
 	Users,
 	DollarSign,
-	Megaphone,
 	Settings,
 	ChevronRight,
 	Mail,
 	Bot,
+	MessageSquare,
+	Contact,
+	Send,
 } from 'lucide-react'
 import { useAdminChat } from '@/app/admin/components/admin-layout-client'
 import type { ComponentType } from 'react'
@@ -92,24 +94,30 @@ const navGroups: NavGroup[] = [
 		],
 	},
 	{
-		label: 'Marketing',
-		icon: Megaphone,
+		label: 'Forum',
+		icon: MessageSquare,
+		links: [{ href: '/admin/forum', label: 'Forum' }],
+	},
+	{
+		label: 'Contact Inquiries',
+		icon: Mail,
+		links: [{ href: '/admin/contacts', label: 'Contact Inquiries' }],
+	},
+	{
+		label: 'CRM',
+		icon: Contact,
 		links: [
-			{ href: '/admin/forum', label: 'Forum' },
-			{ href: '/admin/contacts', label: 'Contact Inquiries' },
-			{ href: '/admin/crm/contacts', label: 'CRM Contacts' },
-			{ href: '/admin/crm/campaigns', label: 'CRM Campaigns' },
+			{ href: '/admin/crm/contacts', label: 'Contacts' },
+			{ href: '/admin/crm/campaigns', label: 'Campaigns' },
+			{ href: '/admin/email/groups', label: 'Groups' },
 		],
-		subGroups: [
-			{
-				label: 'Email',
-				icon: Mail,
-				links: [
-					{ href: '/admin/email/templates', label: 'Templates' },
-					{ href: '/admin/email/campaigns', label: 'Campaigns' },
-					{ href: '/admin/email/groups', label: 'Groups' },
-				],
-			},
+	},
+	{
+		label: 'Email',
+		icon: Send,
+		links: [
+			{ href: '/admin/email/templates', label: 'Templates' },
+			{ href: '/admin/email/campaigns', label: 'Campaigns' },
 		],
 	},
 	{
