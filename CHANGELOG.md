@@ -4,6 +4,7 @@
 - Create `Dockerfile` with `oven/bun:1` base image, single-stage build: install dependencies with `--frozen-lockfile`, build Next.js app, expose port 3025, run `bun run start`.
 - Add `.github/workflows/ci.yml` GitHub Actions workflow triggered on push/PR to main with steps: checkout, setup Bun (`oven-sh/setup-bun@v2`), install (`--frozen-lockfile`), lint, type check (`tsc --noEmit`), unit tests (`bun test`), and Docker build. 15-minute timeout, no deploy or E2E steps.
 - Create `.dockerignore` to exclude node_modules, .next, .env*, .git, .omo, tests, Playwright artifacts, IDE files, and docs from Docker build context, reducing image size and preventing secrets from leaking into images.
+- Set up `bun test` TDD infrastructure: create `tests/setup.ts` with MongoDB mock helpers (`mockDb`, `createMockCollection` with full CRUD stubs), create `tests/unit/models/sample.test.ts` with 10 example tests verifying the mock infrastructure, add `tests/unit/` directory structure mirroring source layout.
 
 ## 2026-06-11
 - Add `docker-compose.yml` with app + MongoDB 7 services. App builds from Dockerfile, exposes port 3025, connects to MongoDB via `mongodb://mongo:27017`, and uses `$${VAR:-default}` env var syntax. MongoDB uses named volume `mongo_data` for persistence.
