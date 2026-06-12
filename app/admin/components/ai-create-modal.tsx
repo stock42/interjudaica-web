@@ -37,6 +37,10 @@ export interface AiCreateModalProps {
 	entityName: string
 	onCreate(data: Record<string, unknown>): Promise<void>
 	systemPrompt?: string
+	/** Called when AI successfully parses entity data — useful for fetching extra preview info (e.g. contact count) */
+	onDataParsed?: (data: Record<string, unknown>) => void
+	/** Extra content rendered below the PreviewBlock in the preview card */
+	previewExtra?: React.ReactNode
 	open?: boolean
 	onOpenChange?: (open: boolean) => void
 	trigger?: React.ReactNode
@@ -150,6 +154,8 @@ export default function AiCreateModal({
 	open: controlledOpen,
 	onOpenChange: controlledOnOpenChange,
 	trigger,
+	onDataParsed,
+	previewExtra,
 }: AiCreateModalProps) {
 	// ── Open state (controlled or uncontrolled) ──────────────────
 	const [internalOpen, setInternalOpen] = useState(false)
@@ -256,6 +262,7 @@ export default function AiCreateModal({
 			if (data) {
 				setParsedData(data)
 				setPhase('preview')
+				onDataParsed?.(data)
 			} else {
 				setPhaseError(
 					`AI responded but the output could not be parsed as ${entityName.toLowerCase()} data. Try rephrasing your description.`,
@@ -263,7 +270,7 @@ export default function AiCreateModal({
 				setPhase('error')
 			}
 		})
-	}, [status, messages, chatError, entityName])
+	}, [status, messages, chatError, entityName, onDataParsed])
 
 	// ── Send handler ─────────────────────────────────────────────
 	const handleSend = useCallback(() => {
@@ -389,6 +396,7 @@ export default function AiCreateModal({
 							</h4>
 						</div>
 						<PreviewBlock data={parsedData} />
+						{previewExtra}
 						<p className="mt-3 text-xs text-[var(--muted)]">
 							Send another message to refine, or click
 							Create to save.
