@@ -16,6 +16,8 @@ export * from './pages.tool'
 export * from './papers.tool'
 export * from './social-proof.tool'
 export * from './users.tool'
+export * from './create-course.tool'
+export * from './create-course-category.tool'
 
 // Side-effect imports — modules self-register via registerTool()
 // createPage/createTestimonial avoid naming collisions with pages.tool/social-proof.tool
