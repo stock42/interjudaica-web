@@ -109,7 +109,7 @@ const navGroups: NavGroup[] = [
 		links: [
 			{ href: '/admin/crm/contacts', label: 'Contacts' },
 			{ href: '/admin/crm/campaigns', label: 'Campaigns' },
-			{ href: '/admin/email/groups', label: 'Groups' },
+			{ href: '/admin/crm/groups', label: 'Groups' },
 		],
 	},
 	{
@@ -118,6 +118,7 @@ const navGroups: NavGroup[] = [
 		links: [
 			{ href: '/admin/email/templates', label: 'Templates' },
 			{ href: '/admin/email/campaigns', label: 'Campaigns' },
+			{ href: '/admin/email/groups', label: 'Groups' },
 		],
 	},
 	{

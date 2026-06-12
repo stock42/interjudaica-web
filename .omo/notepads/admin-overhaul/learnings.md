@@ -9,6 +9,19 @@
 - `onCreate` handler POSTs to `/api/admin/subscription-plans` with the AI-generated JSON body.
 - Follows the same pattern as `social-proof`, `papers`, `pages`, and `paper-categories`.
 
+## CRM Groups
+
+- Created CRM Contact Groups module following the email groups pattern exactly.
+- Model has: uuid, name, slug (auto), description, query (JSON string), contactCount (cached number).
+- Used `crm_groups` collection (NOT `email_groups`).
+- Admin CRUD at `/api/admin/crm/groups` with preview endpoints.
+- Preview endpoint: `GET /api/admin/crm/groups/[uuid]/preview` → parses query → `CrmContactStorage.getMatchingContacts()` → `{ items, count }`.
+- AI create button: `AiCreateModal` with `entityType="crm-group"`, system prompt describing `crm_contacts` collection fields.
+- Form uses `description` field (not `promoting` like email groups).
+- List shows: Name, Description, Contact Count, Has Query, Actions.
+- Run button on list page fetches preview inline (same pattern as email groups).
+- Nav: CRM section → Contacts, Campaigns, Groups (→ `/admin/crm/groups`); Email section → Templates, Campaigns, Groups (→ `/admin/email/groups`).
+
 ## Final Verification Fixes (2026-06-12)
 
 ### Embla Carousel v8 API — `perView` removal
