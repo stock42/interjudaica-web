@@ -47,7 +47,7 @@ Overhauled `app/admin/payments/page.tsx` to use the new `/api/admin/payments` AP
 - **Search**: Debounced search input (400ms) that filters by user name, email, or item. Updates URL params for shareable/bookmarkable filters.
 - **Type filter**: Dropdown with All types / Courses / Books / Subscriptions using URL `?type=` param.
 - **Pagination**: Uses shadcn `Pagination`, `PaginationContent`, `PaginationItem`, `PaginationLink`, `PaginationPrevious`, `PaginationNext`, `PaginationEllipsis` components. Page numbers use URL `?page=` param. Smart range with ellipsis for large page counts.
-- **Data display**: Reuses existing `DataTable` from `portal-ui.tsx` with columns: Payment, User, Type, Amount, Status, Date.
+- **Data display**: Inline table with columns Payment, User, Type, Amount, Status, Date. Rows are clickable (opens detail modal). Status badges use semantic color coding. Includes CSV export and payment detail modal.
 - **States**: Handles loading (progress text), empty (no match message), and error (API failure message) with centered placeholder panels.
 - **Unified payments**: The API aggregates course payments, book sales, and community subscriptions into a single unified payment list. No more separate storage calls in the page.
 - **API params**: `?search=&type=&page=&limit=` — pagination defaults to 30 items per page, max 100.
@@ -63,3 +63,27 @@ Created public `/resources-books` page using existing `recommended-books` module
 - **Footer link**: Added to `SiteFooter` Navigation column between "Courses" and "About Ernesto".
 - **SEO**: Metadata title "Resources — Books" with descriptive meta description.
 - **No model changes needed**: The pre-existing `recommended-books` schema (name, author, coverImageUrl, amazonLink, description, order, status) mapped perfectly to the card requirements.
+
+## Book AI Development Assistant (2026-06-12)
+
+Created a dedicated AI-powered book development assistant with persistent MongoDB memory at `/admin/books/[uuid]/ai-assistant`.
+
+**Architecture**:
+- **Model**: `models/book-ai-conversation.ts` — links book conversations to chat threads (UUID, bookUuid, operatorUuid, threadUuid, timestamps)
+- **Storage**: `services/book-ai-conversation-storage.ts` — CRUD for book AI conversations with indexes on uuid, bookUuid, and threadUuid
+- **Chat endpoint**: `POST /api/admin/books/[uuid]/ai-assistant/chat` — dedicated streaming endpoint with book-specific system prompt and tools
+- **Conversations API**: `GET/POST /api/admin/books/[uuid]/ai-assistant/conversations` — list/create conversations per book, admin auth required
+- **Page**: `app/admin/books/[uuid]/ai-assistant/page.tsx` — server component fetches book, renders client chat UI
+- **Client**: `book-ai-chat-client.tsx` — full chat interface with conversation sidebar, new/select/delete conversations, message rendering with tool call cards and reasoning blocks
+
+**AI Tools**:
+- `updateBookContent` — updates book's longDescription field via BookStorage
+- `generateBookChapter` — returns structured context for AI chapter generation; AI uses system prompt (full book content) to generate, then `updateBookContent` to save
+- Both registered in `app/api/agentes/chat/tools/books.tool.ts` with `role: 'admin'`
+
+**Key features**:
+- AI has access to full book content (title, description, longDescription, status, price) in system prompt
+- Conversations persist across sessions via MongoDB (ChatStorage for messages, book_ai_conversations for mapping)
+- Admin auth required for all endpoints
+- Deep linking from book edit form ("AI Assistant" button)
+- Follows existing UI patterns: Sheet-based chat drawer, Collapsible tool cards, Reasoning blocks, message bubbles

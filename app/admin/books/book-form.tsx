@@ -140,6 +140,14 @@ export function BookForm({ book }: { book?: TypeBook }) {
 					</p>
 				</div>
 				<div className="flex flex-wrap gap-2">
+					{isEditing && book?.uuid ? (
+						<Link
+							href={`/admin/books/${book.uuid}/ai-assistant`}
+							className="inline-flex min-h-10 items-center justify-center rounded-full border border-[var(--gold)]/30 bg-[var(--gold)]/5 px-4 text-sm font-semibold text-[var(--gold)] transition hover:bg-[var(--gold)]/10"
+						>
+							AI Assistant
+						</Link>
+					) : null}
 					<Link
 						href="/admin/books"
 						className="inline-flex min-h-10 items-center justify-center rounded-full border border-[var(--line)] px-4 text-sm font-semibold transition hover:bg-[var(--paper)]"

@@ -71,6 +71,78 @@ export const deleteBook = tool({
 })
 registerTool('deleteBook', { role: 'admin', needsApproval: true })
 
+// ── Book AI Assistant Tools ──
+
+export const updateBookContent = tool({
+	description:
+		'Update the content (longDescription) of a specific book. Use this to refine, expand, or replace the book\'s main content based on AI suggestions. The longDescription field holds the book\'s full text content.',
+	inputSchema: z.object({
+		uuid: z.string().uuid().describe('Book UUID to update'),
+		longDescription: z
+			.string()
+			.min(1)
+			.max(10000)
+			.describe('New long description/content for the book'),
+	}),
+	execute: async ({ uuid, longDescription }) => {
+		const updated = await BookStorage.update(uuid, {
+			longDescription,
+		})
+		if (!updated) throw new Error(`Book not found: ${uuid}`)
+		return { success: true, bookTitle: updated.title, uuid: updated.uuid }
+	},
+})
+registerTool('updateBookContent', { role: 'admin' })
+
+export const generateBookChapter = tool({
+	description:
+		'Request chapter generation for a book. Returns structured context so the AI can generate the chapter content and then present it for review. The AI should use updateBookContent to append or save the generated chapter.',
+	inputSchema: z.object({
+		uuid: z
+			.string()
+			.uuid()
+			.describe('Book UUID to generate chapter for'),
+		chapterTitle: z
+			.string()
+			.min(1)
+			.max(200)
+			.describe('Title of the chapter to generate'),
+		chapterDescription: z
+			.string()
+			.min(1)
+			.max(2000)
+			.describe('What the chapter should cover — topics, themes, approach'),
+		approximateWordCount: z
+			.number()
+			.int()
+			.min(100)
+			.max(5000)
+			.default(800)
+			.describe('Approximate word count for the chapter'),
+	}),
+	execute: async ({
+		uuid,
+		chapterTitle,
+		chapterDescription,
+		approximateWordCount,
+	}) => {
+		const book = await BookStorage.get(uuid)
+		if (!book) throw new Error(`Book not found: ${uuid}`)
+		return {
+			success: true,
+			book: { uuid: book.uuid, title: book.title, slug: book.slug },
+			chapterRequest: {
+				chapterTitle,
+				chapterDescription,
+				approximateWordCount,
+			},
+			instruction:
+				'Use the full book context from the system prompt to generate this chapter. Write in a scholarly yet accessible style suitable for an English-language Jewish studies audience. Format the chapter with markdown headings, paragraphs, and blockquotes where appropriate. After generating, present the chapter to the operator and offer to save it via updateBookContent.',
+		}
+	},
+})
+registerTool('generateBookChapter', { role: 'admin' })
+
 // ── Book Sales Tools ──
 
 export const listBookSales = tool({

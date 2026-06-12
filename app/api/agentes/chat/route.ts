@@ -13,6 +13,7 @@ import { redactPii, filterToolResult } from '@/lib/llm-pii-guard'
 import { authorizeTool } from '@/lib/llm-tool-auth'
 import { auditToolCall } from '@/lib/llm-audit-log'
 import { ChatStorage } from '@/services/chat-storage'
+import { BookStorage } from '@/services/books-storage'
 import { checkChatRateLimit } from '@/lib/llm-rate-limiter'
 import { getCurrentOperator } from '@/services/auth'
 import { getCurrentUser } from '@/services/user-auth'
@@ -50,7 +51,11 @@ export async function POST(req: Request) {
 	}
 
 	// 2. Parse request body
-	let body: { messages?: unknown[]; threadUuid?: string }
+	let body: {
+		messages?: unknown[]
+		threadUuid?: string
+		contextUuid?: string
+	}
 	try {
 		body = await req.json()
 	} catch {
@@ -83,8 +88,34 @@ export async function POST(req: Request) {
 	const recentMessages = await ChatStorage.getRecentMessages(threadUuid, 20)
 
 	// 5. Build system prompt based on role
-	const systemPrompt =
+	let systemPrompt =
 		role === 'operator' ? ADMIN_SYSTEM_PROMPT : STUDENT_SYSTEM_PROMPT
+
+	// 5a. Enrich system prompt with book context when contextUuid is provided
+	if (body.contextUuid && role === 'operator') {
+		try {
+			const book = await BookStorage.get(body.contextUuid)
+			if (book) {
+				const bookContext = [
+					'',
+					'─── BOOK CONTEXT ───',
+					`You are currently assisting with the book "${book.title}" (slug: ${book.slug}, status: ${book.status}).`,
+					`Book UUID: ${book.uuid}`,
+					`Price: $${(book.price / 100).toFixed(2)} USD`,
+					'',
+					'Full book content (longDescription):',
+					book.longDescription || '(no content yet)',
+					'',
+					'When the operator asks you to work on this book, use the tools updateBookContent and generateBookChapter.',
+					'Always reference the book by its UUID when calling tools.',
+					'─── END BOOK CONTEXT ───',
+				].join('\n')
+				systemPrompt = systemPrompt + bookContext
+			}
+		} catch {
+			// Book not found — proceed with default system prompt
+		}
+	}
 
 	// 6. Build filtered tools object (role-based authorization)
 	const tools: ToolSet = {}
