@@ -1,7 +1,13 @@
 # Changelog
 
 ## 2026-06-12
+<<<<<<< Updated upstream
+- Add floating language switch button (`components/share/translate-button.tsx`) — fixed position bottom-right, Popover-based, supports EN/ES/HE/FR with flags. Calls AI translate endpoint before switching locale. Handles non-admin gracefully. 13 unit tests. Public translations endpoint at `/api/translations`.
+=======
+- Create `useTranslation()` React hook and `TranslationProvider` context to wire existing MongoDB translations to the UI. `app/lib/use-translation.tsx` exports client-side `useTranslation()` hook returning `{ t(key), locale, setLocale }`, pure `translate()` function for testing, and `TranslationClientProvider` component that injects translations as a JSON script tag. `app/lib/translation-provider.tsx` is a server component that reads `NEXT_LOCALE` cookie, fetches translations from `TranslationStorage`, and renders the client provider. Root layout (`app/layout.tsx`) wraps all children in `TranslationProvider`. Falls back chain: dictionary → English defaults → raw key. 15 unit tests in `tests/unit/lib/use-translation.test.ts` verify translation lookup, context behavior, and fallback logic.
+>>>>>>> Stashed changes
 - Add AI tools for instructor creation (`create-instructor.tool.ts`) and subscription plan creation (`create-subscription-plan.tool.ts`). Both register with `role: 'admin'` (operator-only). 13 unit tests across 2 files. Barrel export updated in `tools/index.ts`.
+- Create reusable STT microphone component (`components/share/stt-microphone.tsx`) using browser Web Speech API. Renders microphone button with pulsing red dot recording indicator, emits transcribed text via `onTranscription(text)` callback, handles mic-denied/no-speech/unsupported errors. 7 unit tests in `tests/unit/components/stt-microphone.test.ts`.
 
 ## 2026-06-11
 - refactor: rename Rabbi→Ernesto/Owner across entire codebase — `rabbi_bio` collection → `owner_bio`, `RabbiBioModel` → `OwnerBioModel`, `/api/rabbi-bio` → `/api/owner-bio`, `/api/admin/rabbi-bio` → `/api/admin/owner-bio`, `/admin/rabbi-bio` → `/admin/owner-bio`, forum creator enum `"rabbi"` → `"ernesto"`, instructor defaults `"Rabbi Yattah"` → `"Ernesto Yattah"`, function `getRabbiBio()` → `getOwnerBio()`. Updated test fixtures, assertions, and AGENTS.md.
