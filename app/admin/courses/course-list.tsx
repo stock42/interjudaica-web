@@ -10,6 +10,7 @@ import type { TypeCourse } from "@/models/courses";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import AiCourseCreateButton from "@/app/admin/courses/ai-course-create-button";
 
 const formatUsd = new Intl.NumberFormat("en-US", {
   style: "currency",
@@ -113,9 +114,12 @@ export function CourseList({ courses }: { courses: TypeCourse[] }) {
             </div>
           </form>
 
-          <Button asChild size="lg" className="h-11">
-            <Link href="/admin/courses/new">New course</Link>
-          </Button>
+          <div className="flex items-center gap-2">
+            <AiCourseCreateButton />
+            <Button asChild size="lg" className="h-11">
+              <Link href="/admin/courses/new">New course</Link>
+            </Button>
+          </div>
         </div>
 
         <div className="mt-4 flex flex-wrap gap-2 text-xs font-bold uppercase text-[var(--muted)]">

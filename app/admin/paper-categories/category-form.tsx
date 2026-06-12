@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState, type FormEvent } from "react";
+import { Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { useRouter } from "next/navigation";
+import AiCreateModal from "@/app/admin/components/ai-create-modal";
 import type { TypePaperCategory } from "@/models/paper-categories";
 
 
@@ -45,6 +47,7 @@ export function PaperCategoryForm({
   const [form, setForm] = useState(() => createFormState(category));
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [aiOpen, setAiOpen] = useState(false);
   const isEditing = Boolean(category?.uuid);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -81,6 +84,7 @@ export function PaperCategoryForm({
   }
 
   return (
+    <>
     <section className="rounded-lg border border-[var(--line)] bg-white p-4 sm:p-5">
       <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
@@ -91,12 +95,24 @@ export function PaperCategoryForm({
             Slug is generated automatically from the category name.
           </p>
         </div>
-        <Link
-          href="/admin/paper-categories"
-          className="inline-flex min-h-10 items-center justify-center rounded-full border border-[var(--line)] px-4 text-sm font-semibold transition hover:bg-[var(--paper)]"
-        >
-          Back to list
-        </Link>
+        <div className="flex items-center gap-2">
+          {!isEditing && (
+            <Button
+              variant="outline"
+              className="border-[var(--gold)]/40 text-[var(--gold)] hover:bg-[var(--gold)]/10"
+              onClick={() => setAiOpen(true)}
+            >
+              <Sparkles className="size-4" data-icon="inline-start" />
+              AI create
+            </Button>
+          )}
+          <Link
+            href="/admin/paper-categories"
+            className="inline-flex min-h-10 items-center justify-center rounded-full border border-[var(--line)] px-4 text-sm font-semibold transition hover:bg-[var(--paper)]"
+          >
+            Back to list
+          </Link>
+        </div>
       </div>
 
       <form className="grid gap-4 md:grid-cols-2" onSubmit={handleSubmit}>
@@ -160,5 +176,33 @@ export function PaperCategoryForm({
         </div>
       </form>
     </section>
+
+    {!isEditing && (
+      <AiCreateModal
+        entityType="paper-category"
+        entityName="Paper Category"
+        open={aiOpen}
+        onOpenChange={setAiOpen}
+        systemPrompt={`You are creating a paper category for the InterJudaica platform's Jewish studies papers. Return a JSON object with these fields:
+- name (string, required, min 2 chars): The category name (e.g., "Kabbalah", "Talmud", "Jewish Philosophy")
+- description (string): A brief description of this category
+- enabled (boolean, default true): Whether the category is active
+Choose meaningful Jewish study category names that help organize academic papers.`}
+        onCreate={async (data) => {
+          const res = await fetch("/api/admin/paper-categories", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data),
+          })
+          if (!res.ok) {
+            const d = await res.json().catch(() => ({}))
+            throw new Error(d.error ?? "Failed to create category")
+          }
+          router.push("/admin/paper-categories")
+          router.refresh()
+        }}
+      />
+    )}
+    </>
   );
 }

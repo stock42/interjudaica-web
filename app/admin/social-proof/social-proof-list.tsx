@@ -9,6 +9,8 @@ import type { TypeSocialProof } from "@/models/social-proof";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Sparkles } from "lucide-react";
+import AiCreateModal from "@/app/admin/components/ai-create-modal";
 
 export function SocialProofList({ items }: { items: TypeSocialProof[] }) {
   const router = useRouter();
@@ -96,6 +98,32 @@ export function SocialProofList({ items }: { items: TypeSocialProof[] }) {
           <Button asChild size="lg" className="h-11">
             <Link href="/admin/social-proof/new">New testimonial</Link>
           </Button>
+          <AiCreateModal
+            entityType="testimonial"
+            entityName="Testimonial"
+            trigger={
+              <Button variant="outline" size="sm" className="h-10 gap-1.5">
+                <Sparkles className="size-4 text-[var(--gold)]" />
+                AI Create
+              </Button>
+            }
+            onCreate={async (data) => {
+              const response = await fetch("/api/admin/social-proof", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data),
+              });
+              if (response.status === 401) {
+                window.location.assign("/operator-login?next=/admin/social-proof");
+                return;
+              }
+              if (!response.ok) {
+                const json = await response.json().catch(() => ({}));
+                throw new Error(json.error ?? "Failed to create testimonial");
+              }
+              router.refresh();
+            }}
+          />
         </div>
       </section>
 

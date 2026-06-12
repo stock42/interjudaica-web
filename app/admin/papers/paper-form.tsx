@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useState, type FormEvent } from "react";
+import { Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useRouter } from "next/navigation";
 import { TextField, TextareaField, DateField, FieldWrapper } from "@/app/components/form-fields";
+import AiCreateModal from "@/app/admin/components/ai-create-modal";
 import type { TypePaperCategory } from "@/models/paper-categories";
 import type { TypePaper } from "@/models/papers";
 
@@ -70,6 +72,7 @@ export function PaperForm({
   const [form, setForm] = useState(() => createFormState(paper, categories));
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [aiOpen, setAiOpen] = useState(false);
   const isEditing = Boolean(paper?.uuid);
   const selectedCategory = useMemo(
     () => categories.find((category) => category.uuid === form.categoryUuid),
@@ -131,6 +134,7 @@ export function PaperForm({
   }
 
   return (
+    <>
     <section className="rounded-lg border border-[var(--line)] bg-white p-4 sm:p-5">
       <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
@@ -141,12 +145,24 @@ export function PaperForm({
             Slug is generated automatically from the title.
           </p>
         </div>
-        <Link
-          href="/admin/papers"
-          className="inline-flex min-h-10 items-center justify-center rounded-full border border-[var(--line)] px-4 text-sm font-semibold transition hover:bg-[var(--paper)]"
-        >
-          Back to list
-        </Link>
+        <div className="flex items-center gap-2">
+          {!isEditing && (
+            <Button
+              variant="outline"
+              className="border-[var(--gold)]/40 text-[var(--gold)] hover:bg-[var(--gold)]/10"
+              onClick={() => setAiOpen(true)}
+            >
+              <Sparkles className="size-4" data-icon="inline-start" />
+              AI create
+            </Button>
+          )}
+          <Link
+            href="/admin/papers"
+            className="inline-flex min-h-10 items-center justify-center rounded-full border border-[var(--line)] px-4 text-sm font-semibold transition hover:bg-[var(--paper)]"
+          >
+            Back to list
+          </Link>
+        </div>
       </div>
 
       <form className="grid gap-4 md:grid-cols-2" onSubmit={handleSubmit}>
@@ -259,6 +275,40 @@ export function PaperForm({
         </div>
       </form>
     </section>
+
+    {!isEditing && (
+      <AiCreateModal
+        entityType="paper"
+        entityName="Paper"
+        open={aiOpen}
+        onOpenChange={setAiOpen}
+        systemPrompt={`You are creating a Jewish studies paper/article for the InterJudaica platform. Return a JSON object with these fields:
+- title (string, required, min 2 chars): The paper title
+- categoryUuid (string, optional): UUID of an existing paper category
+- category (string): The paper category name
+- date (string, format YYYY-MM-DD): Publication date
+- summary (string): A brief summary/abstract
+- content (string, markdown): The full paper content in markdown
+- author (string, default "Ernesto Yattah"): The author name
+- status (string, "draft"|"published"|"archived", default "draft")
+- visibility (string, "public"|"community"|"private", default "community")
+Generate rich, academic-quality Jewish content. Make the paper substantive with detailed markdown content.`}
+        onCreate={async (data) => {
+          const res = await fetch("/api/admin/papers", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data),
+          })
+          if (!res.ok) {
+            const d = await res.json().catch(() => ({}))
+            throw new Error(d.error ?? "Failed to create paper")
+          }
+          router.push("/admin/papers")
+          router.refresh()
+        }}
+      />
+    )}
+    </>
   );
 }
 

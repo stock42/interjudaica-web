@@ -3,7 +3,9 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Sparkles } from "lucide-react";
 import { adminTextControlClass } from "@/app/admin/components/admin-controls";
+import AiCreateModal from "@/app/admin/components/ai-create-modal";
 
 import type { TypePaper } from "@/models/papers";
 import { Input } from "@/components/ui/input";
@@ -16,6 +18,7 @@ export function PaperList({ papers }: { papers: TypePaper[] }) {
   const [status, setStatus] = useState("");
   const [visibility, setVisibility] = useState("");
   const [deletingUuid, setDeletingUuid] = useState("");
+  const [aiOpen, setAiOpen] = useState(false);
   const normalizedQuery = query.trim().toLowerCase();
 
   const filteredPapers = useMemo(
@@ -106,9 +109,20 @@ export function PaperList({ papers }: { papers: TypePaper[] }) {
               </Select>
             </div>
           </form>
-          <Button asChild size="lg" className="h-11">
-            <Link href="/admin/papers/new">New paper</Link>
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="lg"
+              className="h-11 border-[var(--gold)]/40 text-[var(--gold)] hover:bg-[var(--gold)]/10"
+              onClick={() => setAiOpen(true)}
+            >
+              <Sparkles className="size-4" data-icon="inline-start" />
+              AI create
+            </Button>
+            <Button asChild size="lg" className="h-11">
+              <Link href="/admin/papers/new">New paper</Link>
+            </Button>
+          </div>
         </div>
       </section>
 
@@ -189,6 +203,37 @@ export function PaperList({ papers }: { papers: TypePaper[] }) {
           </table>
         </div>
       </section>
+
+      <AiCreateModal
+        entityType="paper"
+        entityName="Paper"
+        open={aiOpen}
+        onOpenChange={setAiOpen}
+        systemPrompt={`You are creating a Jewish studies paper/article for the InterJudaica platform. Return a JSON object with these fields:
+- title (string, required, min 2 chars): The paper title
+- categoryUuid (string, optional): UUID of an existing paper category
+- category (string): The paper category name
+- date (string, format YYYY-MM-DD): Publication date
+- summary (string): A brief summary/abstract
+- content (string, markdown): The full paper content in markdown
+- author (string, default "Ernesto Yattah"): The author name
+- status (string, "draft"|"published"|"archived", default "draft")
+- visibility (string, "public"|"community"|"private", default "community")
+Generate rich, academic-quality Jewish content. Make the paper substantive with detailed markdown content.`}
+        onCreate={async (data) => {
+          const res = await fetch("/api/admin/papers", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data),
+          })
+          if (!res.ok) {
+            const d = await res.json().catch(() => ({}))
+            throw new Error(d.error ?? "Failed to create paper")
+          }
+          router.push("/admin/papers")
+          router.refresh()
+        }}
+      />
     </div>
   );
 }

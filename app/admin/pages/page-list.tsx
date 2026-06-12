@@ -10,6 +10,8 @@ import type { TypePage } from "@/models/pages";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Sparkles } from "lucide-react";
+import AiCreateModal from "@/app/admin/components/ai-create-modal";
 
 export function PageList({ pages }: { pages: TypePage[] }) {
 	const router = useRouter();
@@ -83,9 +85,35 @@ export function PageList({ pages }: { pages: TypePage[] }) {
 							</Select>
 						</div>
 					</form>
-					<Button asChild size="lg" className="h-11">
-						<Link href="/admin/pages/new">New page</Link>
-					</Button>
+				<Button asChild size="lg" className="h-11">
+					<Link href="/admin/pages/new">New page</Link>
+				</Button>
+				<AiCreateModal
+					entityType="page"
+					entityName="Page"
+					trigger={
+						<Button variant="outline" size="sm" className="h-10 gap-1.5">
+							<Sparkles className="size-4 text-[var(--gold)]" />
+							AI Create
+						</Button>
+					}
+					onCreate={async (data) => {
+						const response = await fetch("/api/admin/pages", {
+							method: "POST",
+							headers: { "Content-Type": "application/json" },
+							body: JSON.stringify(data),
+						});
+						if (response.status === 401) {
+							window.location.assign("/operator-login?next=/admin/pages");
+							return;
+						}
+						if (!response.ok) {
+							const json = await response.json().catch(() => ({}));
+							throw new Error(json.error ?? "Failed to create page");
+						}
+						router.refresh();
+					}}
+				/>
 				</div>
 				<div className="mt-4 flex flex-wrap gap-2 text-xs font-bold uppercase text-[var(--muted)]">
 					<AdminStatPill>{filteredPages.length} visible</AdminStatPill>

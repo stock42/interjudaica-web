@@ -9,6 +9,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Sparkles } from "lucide-react";
+import AiCreateModal from "@/app/admin/components/ai-create-modal";
 import type { TypeSocialProof } from "@/models/social-proof";
 
 
@@ -92,12 +94,42 @@ export function SocialProofForm({ item }: { item?: TypeSocialProof }) {
             Testimonials appear on the homepage when published.
           </p>
         </div>
-        <Link
-          href="/admin/social-proof"
-          className="inline-flex min-h-10 items-center justify-center rounded-full border border-[var(--line)] px-4 text-sm font-semibold transition hover:bg-[var(--paper)]"
-        >
-          Back to list
-        </Link>
+        <div className="flex flex-wrap gap-2">
+          <AiCreateModal
+            entityType="testimonial"
+            entityName="Testimonial"
+            trigger={
+              <Button variant="outline" size="sm" className="h-10 gap-1.5">
+                <Sparkles className="size-4 text-[var(--gold)]" />
+                AI Create
+              </Button>
+            }
+            onCreate={async (data) => {
+              const response = await fetch("/api/admin/social-proof", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data),
+              });
+              if (response.status === 401) {
+                window.location.assign("/operator-login?next=/admin/social-proof");
+                return;
+              }
+              if (!response.ok) {
+                const json = await response.json().catch(() => ({}));
+                throw new Error(json.error ?? "Failed to create testimonial");
+              }
+              const created = await response.json();
+              router.push(`/admin/social-proof/${created.item.uuid}`);
+              router.refresh();
+            }}
+          />
+          <Link
+            href="/admin/social-proof"
+            className="inline-flex min-h-10 items-center justify-center rounded-full border border-[var(--line)] px-4 text-sm font-semibold transition hover:bg-[var(--paper)]"
+          >
+            Back to list
+          </Link>
+        </div>
       </div>
 
       <form className="grid gap-4 md:grid-cols-2" onSubmit={handleSubmit}>

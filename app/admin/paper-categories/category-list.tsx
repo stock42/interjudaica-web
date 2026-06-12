@@ -3,8 +3,10 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Sparkles } from "lucide-react";
 import { adminTextControlClass } from "@/app/admin/components/admin-controls";
 import { AdminStatPill } from "@/app/admin/components/admin-stat-pill";
+import AiCreateModal from "@/app/admin/components/ai-create-modal";
 
 import type { TypePaperCategory } from "@/models/paper-categories";
 import { Input } from "@/components/ui/input";
@@ -20,6 +22,7 @@ export function PaperCategoryList({
   const [query, setQuery] = useState("");
   const [enabled, setEnabled] = useState("");
   const [deletingUuid, setDeletingUuid] = useState("");
+  const [aiOpen, setAiOpen] = useState(false);
   const normalizedQuery = query.trim().toLowerCase();
 
   const filteredCategories = useMemo(
@@ -95,9 +98,20 @@ export function PaperCategoryList({
             </div>
           </form>
 
-          <Button asChild size="lg" className="h-11">
-            <Link href="/admin/paper-categories/new">New category</Link>
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="lg"
+              className="h-11 border-[var(--gold)]/40 text-[var(--gold)] hover:bg-[var(--gold)]/10"
+              onClick={() => setAiOpen(true)}
+            >
+              <Sparkles className="size-4" data-icon="inline-start" />
+              AI create
+            </Button>
+            <Button asChild size="lg" className="h-11">
+              <Link href="/admin/paper-categories/new">New category</Link>
+            </Button>
+          </div>
         </div>
 
         <div className="mt-4 flex flex-wrap gap-2 text-xs font-bold uppercase text-[var(--muted)]">
@@ -178,6 +192,31 @@ export function PaperCategoryList({
           </table>
         </div>
       </section>
+
+      <AiCreateModal
+        entityType="paper-category"
+        entityName="Paper Category"
+        open={aiOpen}
+        onOpenChange={setAiOpen}
+        systemPrompt={`You are creating a paper category for the InterJudaica platform's Jewish studies papers. Return a JSON object with these fields:
+- name (string, required, min 2 chars): The category name (e.g., "Kabbalah", "Talmud", "Jewish Philosophy")
+- description (string): A brief description of this category
+- enabled (boolean, default true): Whether the category is active
+Choose meaningful Jewish study category names that help organize academic papers.`}
+        onCreate={async (data) => {
+          const res = await fetch("/api/admin/paper-categories", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data),
+          })
+          if (!res.ok) {
+            const d = await res.json().catch(() => ({}))
+            throw new Error(d.error ?? "Failed to create category")
+          }
+          router.push("/admin/paper-categories")
+          router.refresh()
+        }}
+      />
     </div>
   );
 }

@@ -10,6 +10,7 @@ import type { TypeInstructor } from "@/models/instructors";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { InstructorAiCreateButton } from "@/app/admin/instructors/instructor-ai-create-button";
 
 export function InstructorList({
   instructors,
@@ -103,9 +104,12 @@ export function InstructorList({
               </Select>
             </div>
           </form>
-          <Button asChild size="lg" className="h-11">
-            <Link href="/admin/instructors/new">New instructor</Link>
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            <Button asChild size="lg" className="h-11">
+              <Link href="/admin/instructors/new">New instructor</Link>
+            </Button>
+            <InstructorAiCreateButton className="h-11" />
+          </div>
         </div>
       </section>
 
