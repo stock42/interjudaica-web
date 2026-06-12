@@ -344,3 +344,40 @@ The following files still reference the old `RabbiBio*` identifiers and will be 
 - ESLint clean on all 3 new files
 - `bun run lint` passes (only pre-existing lint issues in unrelated test files)
 
+
+## AI Auto-Translate: OpenAI → DeepSeek Migration (2026-06-12)
+
+**Changed:** `app/api/admin/translations/ai-translate/route.ts`
+
+**What:**
+- Replaced raw `fetch` to `https://api.openai.com/v1/chat/completions` with `generateText` from the Vercel AI SDK using `deepseekProvider` from `@/lib/ai-provider`.
+- Environment variable priority: `DEEPSEEK_API_KEY` → `AI_API_KEY` (was `OPENAI_API_KEY` → `AI_API_KEY`).
+- Added `TranslationStorage.setTranslations()` call after successful translation so results are persisted to MongoDB.
+- Supports optional `model` param override using the exported `deepseek()` factory.
+
+**Why:**
+- Consolidate all AI calls under DeepSeek provider configured in `lib/ai-provider.ts`.
+- Use the Vercel AI SDK's `generateText` for consistent error handling and provider abstraction.
+
+**API contract preserved:**
+- `POST` → `{ locale, translated: Record<string, string> }`
+- Same error codes: 400, 401, 502
+- Same `apiKey` and `model` optional body params
+
+## AI Button on Owner Bio Page (2026-06-12)
+
+### What
+- Added "Generate with AI" button to `app/admin/owner-bio/owner-bio-form.tsx` using the shared `AiCreateModal` component.
+- Modal calls `PUT /api/admin/owner-bio` (upsert) with AI-generated `{ title, markdown }`.
+- On success, local form state updates immediately so the user sees the new content without page reload.
+
+### Pattern
+- `AiCreateModal` is designed as a generic "describe → AI generates JSON → upsert" flow.
+- The `onCreate` callback handles the actual API call — for the owner bio, this is a `PUT` (upsert by slug `"ernesto-yattah"`).
+- The form passes `systemPrompt` with domain context (Ernesto Yattah, InterJudaica, target market) to guide the AI's output.
+- The bio is a singleton — always upsert, never create a second record.
+
+### Why
+- `AiCreateModal` is already built and tested with the Vercel AI SDK chat transport.
+- Reuses the same `/api/agentes/chat` streaming endpoint as the admin AI chat drawer.
+- The `updateOwnerBio` tool (`app/api/agentes/chat/tools/update-owner-bio.tool.ts`) already exists for agentic AI flows — the modal is a complementary manual-trigger approach.
