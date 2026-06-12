@@ -472,6 +472,7 @@ If a check fails due to missing local services such as MongoDB, report that expl
 
 - Always document every project change in `CHANGELOG.md` in the same commit.
 - Always create a git commit with a descriptive message after each completed change.
+- Always `git push` after every commit. Do NOT batch pushes — push immediately after each commit.
 - When unrelated user changes exist in the worktree, leave them unstaged and mention them in the handoff.
 
 ## Repo Hygiene
