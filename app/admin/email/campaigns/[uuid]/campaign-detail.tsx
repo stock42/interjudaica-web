@@ -19,6 +19,7 @@ export function CampaignDetail({ campaign }: { campaign: CampaignWithStats }) {
 	const router = useRouter()
 	const [running, setRunning] = useState(false)
 	const [retrying, setRetrying] = useState(false)
+	const [stopping, setStopping] = useState(false)
 	const [spooler, setSpooler] = useState<TypeEmailSpooler[]>([])
 	const [spoolerPage, setSpoolerPage] = useState(1)
 	const [spoolerTotal, setSpoolerTotal] = useState(0)
@@ -59,6 +60,20 @@ export function CampaignDetail({ campaign }: { campaign: CampaignWithStats }) {
 		setRetrying(false); setReloadKey(k => k + 1)
 	}
 
+	async function handleStop() {
+		if (!confirm('⚠️ Stop this campaign? This will cancel all pending emails and mark the campaign as stopped. This action cannot be undone.')) return
+		setStopping(true); setResult('')
+		const res = await fetch(`/api/admin/email/campaigns/${campaign.uuid}/stop`, { method: 'POST' })
+		const d = await res.json().catch(() => ({}))
+		if (res.ok) {
+			setResult('Campaign stopped. All pending emails cancelled.')
+			router.refresh()
+		} else {
+			setResult(d.error ?? 'Failed to stop campaign.')
+		}
+		setStopping(false); setReloadKey(k => k + 1)
+	}
+
 	return (
 		<div className="grid gap-6">
 			{/* Stats bar */}
@@ -74,6 +89,11 @@ export function CampaignDetail({ campaign }: { campaign: CampaignWithStats }) {
 			{/* Actions */}
 			<section className="flex flex-wrap items-center gap-3 rounded-lg border border-[var(--line)] bg-white p-4">
 				<Button onClick={handleRun} disabled={running} className="h-10">{running ? 'Initializing…' : '▶ Run campaign'}</Button>
+				{campaign.status === 'running' && (
+					<Button onClick={handleStop} disabled={stopping} className="h-10 bg-red-600 text-white hover:bg-red-700 focus-visible:ring-red-500">
+						{stopping ? 'Stopping…' : '⏹ STOP campaign'}
+					</Button>
+				)}
 				<Button onClick={handleRetry} disabled={retrying} variant="outline" className="h-10">{retrying ? 'Retrying…' : '↻ Retry all errors'}</Button>
 				<Button asChild variant="outline" className="h-10"><Link href={`/admin/email/campaigns/${campaign.uuid}`}>Edit campaign</Link></Button>
 				<Link href="/admin/email/campaigns" className="text-sm text-[var(--muted)] hover:underline">Back to list</Link>

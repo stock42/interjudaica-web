@@ -229,6 +229,30 @@ export class EmailSpoolerStorage extends MongoDBStorage<TypeEmailSpooler> {
 		}
 	}
 
+	/** Cancel all pending (new) spooler entries for a stopped campaign */
+	static async cancelPending(campaignUuid: string): Promise<number> {
+		await EmailSpoolerStorage.ensureIndexes()
+		const collection =
+			await MongoDBStorage.getCollection<TypeEmailSpooler>(
+				EmailSpoolerStorage.COLLECTION,
+			)
+		const result = await collection.updateMany(
+			{
+				'data.campaignUuid': campaignUuid,
+				'data.status': 'new',
+			} as Filter<TypeDocument<TypeEmailSpooler>>,
+			{
+				$set: {
+					'data.status': 'error',
+					'data.error': 'Campaign stopped by operator',
+					_updated: new Date(),
+				},
+				$inc: { _n: 1 },
+			},
+		)
+		return result.modifiedCount
+	}
+
 	static async deleteByCampaign(campaignUuid: string) {
 		await EmailSpoolerStorage.ensureIndexes()
 		return MongoDBStorage._deleteMany<TypeEmailSpooler>(

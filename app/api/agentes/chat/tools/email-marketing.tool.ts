@@ -464,6 +464,8 @@ export const runEmailCampaign = tool({
 			return { message: 'No contacts matched', count: 0 }
 		}
 
+		await EmailCampaignStorage.update(campaignUuid, { status: 'running' })
+
 		const fromEmail = getEmailFrom()
 
 		const spoolerItems = contacts.map((contact) => {
@@ -481,7 +483,6 @@ export const runEmailCampaign = tool({
 		})
 
 		await EmailSpoolerStorage.createBatch(spoolerItems)
-		await EmailCampaignStorage.update(campaignUuid, { status: 'done' })
 
 		return {
 			message: 'Campaign initialized successfully',

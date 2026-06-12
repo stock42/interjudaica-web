@@ -48,6 +48,8 @@ export async function POST(
 			return NextResponse.json({ message: 'No contacts matched', count: 0 })
 		}
 
+		await EmailCampaignStorage.update(uuid, { status: 'running' })
+
 		const fromEmail = getEmailFrom()
 		const deliveryTime = campaign.deliveryTime
 
@@ -66,7 +68,6 @@ export async function POST(
 		})
 
 		await EmailSpoolerStorage.createBatch(spoolerItems)
-		await EmailCampaignStorage.update(uuid, { status: 'done' })
 
 		return NextResponse.json({
 			message: 'Campaign initialized',

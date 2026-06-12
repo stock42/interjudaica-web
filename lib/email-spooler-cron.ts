@@ -23,12 +23,27 @@ export async function processEmailSpooler(): Promise<{
 	// Get pending emails ordered by creation time (oldest first)
 	const pending = await EmailSpoolerStorage.listPending(50)
 
+	// Cache campaign statuses to avoid repeated DB lookups
+	const campaignStatusCache = new Map<string, string | null>()
+
 	for (const email of pending) {
 		// Check delivery time
 		if (email.deliveryTime) {
 			const deliveryDate = new Date(email.deliveryTime)
 			if (deliveryDate > new Date()) {
 				continue // Not yet time to send
+			}
+		}
+
+		// Skip emails belonging to stopped campaigns
+		if (email.campaignUuid) {
+			if (!campaignStatusCache.has(email.campaignUuid)) {
+				const campaign = await EmailCampaignStorage.get(email.campaignUuid)
+				campaignStatusCache.set(email.campaignUuid, campaign?.status ?? null)
+			}
+			const campaignStatus = campaignStatusCache.get(email.campaignUuid)
+			if (campaignStatus === 'stopped') {
+				continue // Campaign was stopped — skip sending
 			}
 		}
 

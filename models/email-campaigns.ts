@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { createUuid, slugify } from '@/models/model-utils'
 
-export const emailCampaignStatuses = ['draft', 'running', 'done'] as const
+export const emailCampaignStatuses = ['draft', 'running', 'stopped', 'done'] as const
 
 export const schemaEmailCampaign = z.object({
 	uuid: z.string().uuid().optional(),

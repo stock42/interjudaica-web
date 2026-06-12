@@ -87,3 +87,45 @@ Created a dedicated AI-powered book development assistant with persistent MongoD
 - Admin auth required for all endpoints
 - Deep linking from book edit form ("AI Assistant" button)
 - Follows existing UI patterns: Sheet-based chat drawer, Collapsible tool cards, Reasoning blocks, message bubbles
+
+## Email Campaign Stop Button & PATCH Fix (2026-06-12)
+
+Added campaign panic stop functionality and fixed the campaign lifecycle state machine:
+
+### Campaign Status Machine
+- **draft** → **running** (via `POST /run`) → **done** (when all emails processed) or **stopped** (via panic button)
+- Previously: run set status directly to "done", never entering "running" state
+- Fixed: run now sets "running", enabling the stop button to appear
+
+### New STOP Endpoint
+- `POST /api/admin/email/campaigns/[uuid]/stop` — sets campaign status to "stopped" and marks all pending spooler entries as error with message "Campaign stopped by operator"
+- Validates campaign is in "running" state before stopping (409 if not)
+- Admin auth required
+
+### Panic Stop Button
+- Red button (`bg-red-600 hover:bg-red-700`) in campaign detail action bar
+- Only visible when `campaign.status === 'running'`
+- Confirmation dialog: "Stop this campaign? This will cancel all pending emails and mark the campaign as stopped. This action cannot be undone."
+- Disabled state with "Stopping…" text while request is in flight
+
+### Spooler Cron Safety Net
+- `processEmailSpooler()` now checks campaign status before sending each email
+- Uses a local `Map<string, string | null>` cache to avoid repeated DB lookups per batch
+- Emails belonging to stopped campaigns are skipped during cron processing
+
+### Model Changes
+- Added `'stopped'` to `emailCampaignStatuses` enum in `models/email-campaigns.ts`
+- Added `EmailSpoolerStorage.cancelPending(uuid)` method to bulk-update pending spooler entries
+
+### UI Status Colors
+- Added `stopped: 'bg-red-100 text-red-700'` to campaign list status badge colors
+
+### Files Changed
+- `models/email-campaigns.ts` — added "stopped" status
+- `app/api/admin/email/campaigns/[uuid]/stop/route.ts` — new stop endpoint
+- `app/api/admin/email/campaigns/[uuid]/run/route.ts` — changed done→running
+- `app/admin/email/campaigns/[uuid]/campaign-detail.tsx` — panic button + confirmation dialog
+- `app/admin/email/campaigns/campaigns-list.tsx` — stopped status color
+- `services/email-spooler-storage.ts` — cancelPending method
+- `lib/email-spooler-cron.ts` — skip stopped campaigns
+- `app/api/agentes/chat/tools/email-marketing.tool.ts` — runEmailCampaign sets running
