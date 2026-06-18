@@ -42,9 +42,9 @@ export type Course = {
 export const navItems = [
   { href: "/", label: "Home" },
   { href: "/courses", label: "Courses" },
+  { href: "/books", label: "Books" },
   { href: "/community", label: "Community" },
-  { href: "/ernesto-yattah", label: "About Ernesto" },
-  { href: "/contact", label: "Contact" },
+  { href: "/forum", label: "Forum" },
 ];
 
 export const contactInfo = {
