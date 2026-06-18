@@ -7,10 +7,9 @@ import StudentUserMenu from "@/components/share/student-user-menu";
 import OperatorUserMenu from "@/components/share/operator-user-menu";
 import {
 	contactInfo,
-	navItems,
 } from "@/app/lib/content";
 import { PageStorage } from "@/services/pages-storage";
-import { MoreContentMenu } from "@/app/components/more-content-menu";
+import { NavLinks } from "@/app/components/nav-links";
 import {
 	ButtonLink,
 	Eyebrow,
@@ -68,16 +67,7 @@ export async function SiteHeader() {
           aria-label="Primary navigation"
           className="order-3 -mx-4 flex w-[calc(100%+2rem)] gap-4 overflow-x-auto px-4 pb-1 sm:order-none sm:mx-0 sm:w-auto sm:overflow-visible sm:px-0 lg:gap-8"
         >
-          {navItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="shrink-0 border-b-2 border-transparent px-1 py-2 text-base font-medium text-[rgba(248,242,232,0.9)] transition hover:border-[var(--gold)] hover:text-[var(--gold)]"
-            >
-              {item.label}
-            </Link>
-          ))}
-          <MoreContentMenu pages={publishedPages} />
+          <NavLinks pages={publishedPages} />
         </nav>
 
         <div className="flex shrink-0 items-center gap-2">

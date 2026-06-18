@@ -30,6 +30,12 @@ export default async function LoginPage({
     >
       <LoginForm nextPath={next} />
       <Link
+        href="/forgot-password"
+        className="mt-5 inline-flex text-sm font-semibold text-[var(--sapphire)] underline underline-offset-4"
+      >
+        Forgot password?
+      </Link>
+      <Link
         href="/register"
         className="mt-5 inline-flex text-sm font-semibold text-[var(--sapphire)] underline underline-offset-4"
       >

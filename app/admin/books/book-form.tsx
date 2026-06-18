@@ -89,6 +89,38 @@ export function BookForm({ book }: { book?: TypeBook }) {
 		setField("coverUrl", data.url);
 	}
 
+	async function uploadPdf(event: ChangeEvent<HTMLInputElement>) {
+		const file = event.target.files?.[0];
+		if (!file) return;
+
+		setUploading("file");
+		setError("");
+
+		const formData = new FormData();
+		formData.set("file", file);
+
+		const response = await fetch("/api/admin/uploads/book-file", {
+			method: "POST",
+			body: formData,
+		});
+
+		setUploading("");
+		event.target.value = "";
+
+		if (response.status === 401) {
+			window.location.assign("/operator-login?next=/admin/books");
+			return;
+		}
+
+		const data = await response.json().catch(() => ({}));
+		if (!response.ok) {
+			setError(data.error ?? "The PDF could not be uploaded.");
+			return;
+		}
+
+		setField("filePath", data.url);
+	}
+
 	async function handleSubmit(event: FormEvent<HTMLFormElement>) {
 		event.preventDefault();
 		setLoading(true);
@@ -211,16 +243,23 @@ export function BookForm({ book }: { book?: TypeBook }) {
 				</div>
 
 				<div className="grid gap-2 text-sm font-semibold text-[var(--ink)]">
-					<Label>PDF file path</Label>
+					<Label>PDF file</Label>
 					<Input
 						className="h-11"
-						placeholder="/uploads/books/example.pdf"
-						value={form.filePath}
-						onChange={(event) => setField("filePath", event.target.value)}
+						accept=".pdf"
+						type="file"
+						onChange={uploadPdf}
 					/>
-					<p className="text-xs text-[var(--muted)]">
-						Upload the PDF to public/uploads/books and enter the relative path.
-					</p>
+					{uploading === "file" ? (
+						<span className="text-xs font-bold text-[var(--sapphire)]">
+							Uploading...
+						</span>
+					) : null}
+					{form.filePath ? (
+						<p className="text-xs text-[var(--jade)]">
+							Uploaded: {form.filePath}
+						</p>
+					) : null}
 				</div>
 
 				<TextareaField
