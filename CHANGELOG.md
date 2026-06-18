@@ -1,6 +1,8 @@
 # Changelog
 
 ## 2026-06-18
+- Home page: replace hardcoded "$19 USD" community price with dynamic most expensive plan from `SubscriptionPlanStorage.list()`. Falls back to "$19 USD" if no plans exist.
+- Login page: fix "Forgot password?" and "Create student account" link spacing — now wrapped in flex-col container with proper gap.
 - Navbar: reduce primary nav items from 7 to 5 (remove "Books" and "Forum") to prevent Login/Enroll button overflow on medium screens. Add active-section highlighting via new `NavLinks` client component using `usePathname()` — current route gets gold bottom border.
 - Login page: add "Forgot password?" link (`/forgot-password`) between login form and "Create student account" link.
 - Admin books: add PDF upload capability. New `POST /api/admin/uploads/book-file` route accepts `multipart/form-data` with `file` (PDF only, max 50 MB), validates via magic bytes (`%PDF`), writes to `public/uploads/books/`, returns `{ url }`. `book-form.tsx` now uses file `<Input type="file" accept=".pdf">` with `uploadPdf()` function replacing the old manual text input.

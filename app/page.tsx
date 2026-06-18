@@ -4,6 +4,7 @@ import { listPublicCourses } from "@/app/lib/public-courses";
 import { listSocialProof } from "@/app/lib/social-proof";
 import { formatUsd } from "@/app/lib/content";
 import TestimonialCarousel from "@/app/components/testimonial-carousel";
+import { SubscriptionPlanStorage } from "@/services/subscription-plans-storage";
 import type { TypePublicCourse } from "@/models/courses";
 
 export const runtime = "nodejs";
@@ -188,11 +189,19 @@ function SectionTitle({
 }
 
 export default async function Home() {
-  const [homeCourses, testimonials] = await Promise.all([
+  const [homeCourses, testimonials, plans] = await Promise.all([
     listPublicCourses(),
     listSocialProof(),
+    SubscriptionPlanStorage.list(),
   ]);
   const featuredCourses = homeCourses.slice(0, 3);
+  const mostExpensivePlan =
+    plans.length > 0
+      ? plans.reduce((max, plan) => (plan.price > max.price ? plan : max), plans[0])
+      : null;
+  const heroPrice = mostExpensivePlan
+    ? `$${mostExpensivePlan.price / 100} USD`
+    : "$19 USD";
   const whyChoose = [
     {
       icon: "screen" as const,
@@ -217,7 +226,7 @@ export default async function Home() {
   ];
   const heroStats = [
     ["Live", "guided cohorts"],
-    ["$19 USD", "community access"],
+    [heroPrice, "community access"],
     ["Online", "from anywhere"],
   ];
 

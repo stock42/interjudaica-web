@@ -29,18 +29,20 @@ export default async function LoginPage({
       text="Use your student account to access courses, community membership, papers, and forum discussions."
     >
       <LoginForm nextPath={next} />
-      <Link
-        href="/forgot-password"
-        className="mt-5 inline-flex text-sm font-semibold text-[var(--sapphire)] underline underline-offset-4"
-      >
-        Forgot password?
-      </Link>
-      <Link
-        href="/register"
-        className="mt-5 inline-flex text-sm font-semibold text-[var(--sapphire)] underline underline-offset-4"
-      >
-        Create student account
-      </Link>
+      <div className="mt-5 flex flex-col gap-2">
+        <Link
+          href="/forgot-password"
+          className="text-sm font-semibold text-[var(--sapphire)] underline underline-offset-4"
+        >
+          Forgot password?
+        </Link>
+        <Link
+          href="/register"
+          className="text-sm font-semibold text-[var(--sapphire)] underline underline-offset-4"
+        >
+          Create student account
+        </Link>
+      </div>
     </AuthPanel>
   );
 }
