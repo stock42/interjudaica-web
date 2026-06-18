@@ -42,7 +42,7 @@ export function GroupForm({ group }: { group?: TypeCrmGroup }) {
 		try {
 			const res = await fetch('/api/agentes/generate-query', {
 				method: 'POST', headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ description: form.description }),
+				body: JSON.stringify({ promoting: form.description }),
 			})
 			const d = await res.json()
 			if (!res.ok) { setError(d.error ?? 'AI generation failed'); return }
