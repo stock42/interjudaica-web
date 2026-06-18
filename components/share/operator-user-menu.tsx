@@ -1,7 +1,5 @@
 "use client"
 
-import Link from "next/link"
-
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import {
   Popover,
@@ -52,13 +50,6 @@ export default function OperatorUserMenu({
         </PopoverHeader>
 
         <Separator />
-
-        <Link
-          href="/admin"
-          className="rounded-md px-2.5 py-2 text-sm font-medium transition hover:bg-muted"
-        >
-          Backoffice
-        </Link>
 
         <form action="/api/auth/logout" method="post">
           <button
