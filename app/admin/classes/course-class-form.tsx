@@ -1,17 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
+import { useState, type ChangeEvent, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { ClassFileManager } from "@/app/admin/classes/class-file-manager";
 import type { TypeCourse } from "@/models/courses";
 import type { TypeCourseClass } from "@/models/course-classes";
-import type { TypeCourseClassFile } from "@/models/course-class-files";
-
 
 type CourseClassFormState = {
 	title: string;
@@ -41,19 +40,7 @@ export function CourseClassForm({
 	const [loading, setLoading] = useState(false);
 	const [uploading, setUploading] = useState(false);
 	const [error, setError] = useState("");
-	const [files, setFiles] = useState<TypeCourseClassFile[]>([]);
 	const isEditing = Boolean(courseClass?.uuid);
-
-	useEffect(() => {
-		if (!courseClass?.uuid) {
-			return;
-		}
-
-		fetch(`/api/admin/classes/${courseClass.uuid}/files`)
-			.then((response) => response.json())
-			.then((data) => setFiles(data.items ?? []))
-			.catch(() => setFiles([]));
-	}, [courseClass?.uuid]);
 
 	function setField(name: keyof CourseClassFormState, value: string) {
 		setForm((current) => ({ ...current, [name]: value }));
@@ -93,54 +80,6 @@ export function CourseClassForm({
 		}
 
 		setField("imageUrl", data.url);
-	}
-
-	async function uploadFile(event: ChangeEvent<HTMLInputElement>) {
-		const file = event.target.files?.[0];
-
-		if (!file || !courseClass?.uuid) {
-			return;
-		}
-
-		const formData = new FormData();
-		formData.set("file", file);
-
-		const response = await fetch(`/api/admin/classes/${courseClass.uuid}/files`, {
-			method: "POST",
-			body: formData,
-		});
-
-		if (response.status === 401) {
-			window.location.assign(`/operator-login?next=/admin/classes/${course.uuid}`);
-			return;
-		}
-
-		const data = await response.json().catch(() => ({}));
-
-		if (!response.ok) {
-			setError(data.error ?? "The file could not be uploaded.");
-			return;
-		}
-
-		setFiles((current) => [data.item, ...current]);
-		event.target.value = "";
-	}
-
-	async function deleteFile(file: TypeCourseClassFile) {
-		if (!courseClass?.uuid || !file.uuid) {
-			return;
-		}
-
-		const response = await fetch(
-			`/api/admin/classes/${courseClass.uuid}/files/${file.uuid}`,
-			{ method: "DELETE" },
-		);
-
-		if (!response.ok) {
-			return;
-		}
-
-		setFiles((current) => current.filter((item) => item.uuid !== file.uuid));
 	}
 
 	async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -253,29 +192,11 @@ export function CourseClassForm({
 				</div>
 
 				{isEditing ? (
-					<div className="grid gap-2 text-sm font-semibold text-[var(--ink)] md:col-span-2">
-						<Label>Class files</Label>
-						<Input type="file" onChange={uploadFile} />
-						{files.length ? (
-							<ul className="mt-2 grid gap-2 text-sm text-[var(--muted)]">
-								{files.map((file) => (
-									<li key={file.uuid} className="flex items-center justify-between gap-3">
-										<span>{file.originalName || file.title || file.uuid}</span>
-										<button
-											className="text-xs font-semibold text-red-600 underline"
-											type="button"
-											onClick={() => deleteFile(file)}
-										>
-											Remove
-										</button>
-									</li>
-								))}
-							</ul>
-						) : (
-							<p className="text-xs text-[var(--muted)]">
-								No files uploaded yet.
-							</p>
-						)}
+					<div className="md:col-span-2">
+						<ClassFileManager
+							courseUuid={course.uuid ?? ""}
+							classUuid={courseClass?.uuid ?? ""}
+						/>
 					</div>
 				) : (
 					<p className="text-xs text-[var(--muted)] md:col-span-2">

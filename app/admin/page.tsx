@@ -4,6 +4,7 @@ import {
   AdminStatGrid,
   DataTable,
 } from "@/app/components/portal-ui";
+import { AdminOverviewPanels } from "@/app/admin/admin-overview-panels";
 import { CourseCategoryStorage } from "@/services/course-categories-storage";
 import { CourseStorage } from "@/services/courses-storage";
 import { ForumStorage } from "@/services/forums-storage";
@@ -21,6 +22,14 @@ export const metadata: Metadata = {
 };
 
 export const runtime = "nodejs";
+
+function percent(part: number, total: number): number {
+  if (total === 0) {
+    return 0;
+  }
+
+  return Math.round((part / total) * 100);
+}
 
 export default async function AdminPage() {
   const [
@@ -53,6 +62,50 @@ export default async function AdminPage() {
   const openThreads = forums.filter((thread) => thread.status === "open");
   const activeUsers = users.filter((user) => user.status === "active");
   const enabledOperators = operators.filter((operator) => operator.enabled);
+  const signals = [
+    {
+      label: "Published courses",
+      value: percent(publishedCourses.length, courses.length),
+      detail: `${publishedCourses.length} of ${courses.length} courses`,
+    },
+    {
+      label: "Published papers",
+      value: percent(publishedPapers.length, papers.length),
+      detail: `${publishedPapers.length} of ${papers.length} papers`,
+    },
+    {
+      label: "Active students",
+      value: percent(activeUsers.length, users.length),
+      detail: `${activeUsers.length} of ${users.length} users`,
+    },
+    {
+      label: "Published pages",
+      value: percent(publishedPages.length, cmsPages.length),
+      detail: `${publishedPages.length} of ${cmsPages.length} pages`,
+    },
+  ];
+  const quickActions = [
+    {
+      href: "/admin/courses/new",
+      title: "Create course",
+      text: "Add a course and then attach classes, files, and forum access.",
+    },
+    {
+      href: "/admin/enrollments",
+      title: "Grant course access",
+      text: "Manually enroll a student when payment or support requires it.",
+    },
+    {
+      href: "/admin/contacts",
+      title: "Review inquiries",
+      text: "Reply to students and keep contact messages organized.",
+    },
+    {
+      href: "/admin/config",
+      title: "Tune settings",
+      text: "Adjust upload limits, rate limits, sessions, and payment defaults.",
+    },
+  ];
 
   return (
     <AdminShell
@@ -95,6 +148,9 @@ export default async function AdminPage() {
             },
           ]}
         />
+
+        <AdminOverviewPanels signals={signals} quickActions={quickActions} />
+
         <DataTable
           columns={["Area", "Records", "Published/Open", "Admin path"]}
           rows={[

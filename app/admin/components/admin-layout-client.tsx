@@ -14,8 +14,10 @@ export function AdminLayoutClient({ children }: { children: ReactNode }) {
 
 	return (
 		<AdminChatContext.Provider value={{ openChat: () => setChatOpen(true) }}>
-			{children}
-			<AiChatDrawer open={chatOpen} onOpenChange={setChatOpen} />
+			<div data-admin-route="true">
+				{children}
+				<AiChatDrawer open={chatOpen} onOpenChange={setChatOpen} />
+			</div>
 		</AdminChatContext.Provider>
 	)
 }

@@ -74,6 +74,12 @@ body {
   font-family: var(--font-body);
 }
 
+body:has([data-admin-route="true"]) > header,
+body:has([data-admin-route="true"]) > footer,
+body:has([data-admin-route="true"]) > button[aria-label="Back to top"] {
+  display: none;
+}
+
 button,
 input,
 select,

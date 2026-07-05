@@ -247,7 +247,9 @@ Admin CRUD endpoints, all requiring operator auth:
 | `PATCH` | `/api/admin/classes/[uuid]` | Updates one course class by UUID. |
 | `DELETE` | `/api/admin/classes/[uuid]` | Deletes one course class by UUID. |
 | `GET` | `/api/admin/classes/[uuid]/files` | Lists files for a class as `{ items }`. |
-| `POST` | `/api/admin/classes/[uuid]/files` | Uploads a file for a class and returns `{ item }`. |
+| `POST` | `/api/admin/classes/[uuid]/files` | Uploads any file type for a class with optional title/description and returns `{ item }`. |
+| `GET` | `/api/admin/classes/[uuid]/files/[fileUuid]` | Downloads a class file for an operator. |
+| `PATCH` | `/api/admin/classes/[uuid]/files/[fileUuid]` | Updates class file title/description by UUID. |
 | `DELETE` | `/api/admin/classes/[uuid]/files/[fileUuid]` | Deletes a class file by UUID. |
 | `GET` | `/api/admin/course-categories/[uuid]` | Gets one course category by UUID. |
 | `PATCH` | `/api/admin/course-categories/[uuid]` | Updates one course category by UUID. |

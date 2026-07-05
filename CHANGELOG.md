@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-07-05
+- Add unrestricted course class material uploads: admin class files now accept any file type, store editable title/description metadata, and expose admin `GET`/`PATCH /api/admin/classes/[uuid]/files/[fileUuid]` for downloads and metadata updates.
+- Wire purchased course class pages to live classes and protected class-material downloads for actively enrolled students.
+- Clean up class material files and MongoDB records when deleting a class, preventing orphaned class uploads.
+- Improve admin UX with a branded sticky admin shell, context-collapsed navigation, clearer AI assistant command, dashboard operating signals, priority action shortcuts, and admin-only chrome without the public header/footer.
+- Ignore private runtime `/uploads` files in git and Docker build context.
+- Add `DESIGN.md` for the existing InterJudaica visual system and `PROJECT_IMPROVEMENTS.md` with a prioritized improvement backlog.
+
 ## 2026-06-18
 - Home page: replace hardcoded "$19 USD" community price with dynamic most expensive plan from `SubscriptionPlanStorage.list()`. Falls back to "$19 USD" if no plans exist.
 - Login page: fix "Forgot password?" and "Create student account" link spacing — now wrapped in flex-col container with proper gap.

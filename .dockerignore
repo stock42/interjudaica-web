@@ -6,6 +6,7 @@ node_modules
 .gitignore
 .gitattributes
 .omo
+uploads
 tests
 e2e
 playwright-report

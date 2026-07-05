@@ -6,6 +6,7 @@ export const schemaCourseClassFile = z.object({
 	courseUuid: z.string().uuid(),
 	classUuid: z.string().uuid(),
 	title: z.string().trim().default(""),
+	description: z.string().trim().default(""),
 	originalName: z.string().trim().default(""),
 	mimeType: z.string().trim().default(""),
 	size: z.coerce.number().int().min(0).default(0),
@@ -13,12 +14,13 @@ export const schemaCourseClassFile = z.object({
 });
 
 export type TypeCourseClassFile = z.infer<typeof schemaCourseClassFile>;
+export type TypeCourseClassFileInput = z.input<typeof schemaCourseClassFile>;
 
 export class CourseClassFileModel {
 	private uuid: string;
 	private fileData: TypeCourseClassFile;
 
-	constructor(props: TypeCourseClassFile) {
+	constructor(props: TypeCourseClassFileInput) {
 		const parsedData = schemaCourseClassFile.parse(props);
 		this.uuid = parsedData.uuid ?? createUuid();
 		this.fileData = {

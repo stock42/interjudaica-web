@@ -338,13 +338,39 @@ export function AdminShell({
   return (
     <PageShell>
       <Section tone="transparent">
-        <div className="grid gap-8 lg:grid-cols-[16rem_1fr]">
+        <div className="grid gap-6 lg:grid-cols-[18rem_minmax(0,1fr)] lg:gap-8">
           <aside className="lg:sticky lg:top-28 lg:self-start">
-            <div className="rounded-lg border border-[var(--line)] bg-[linear-gradient(180deg,rgba(23,28,32,0.98),rgba(8,10,12,0.98))] p-3 shadow-[var(--shadow)]">
-              <div className="flex items-center justify-between gap-2 px-3 py-2">
-                <p className="text-xs font-bold uppercase tracking-[0.18em] text-[var(--gold)]">
-                  Admin
-                </p>
+            <div className="overflow-hidden rounded-lg border border-[var(--line)] bg-[linear-gradient(180deg,rgba(23,28,32,0.98),rgba(8,10,12,0.98))] shadow-[var(--shadow)]">
+              <div className="border-b border-[var(--line)] p-4">
+                <Link
+                  href="/admin"
+                  className="flex min-w-0 items-center gap-3"
+                  aria-label="InterJudaica admin home"
+                >
+                  <Image
+                    src="/logo-interjudaica.png"
+                    alt="InterJudaica logo"
+                    width={1500}
+                    height={1500}
+                    className="h-11 w-11 shrink-0 rounded-full border border-[rgba(244,189,51,0.32)]"
+                  />
+                  <span className="min-w-0">
+                    <span className="block truncate font-display text-xl font-semibold text-[var(--gold)]">
+                      InterJudaica
+                    </span>
+                    <span className="block truncate text-xs font-semibold text-[var(--muted)]">
+                      Backoffice
+                    </span>
+                  </span>
+                </Link>
+              </div>
+              <div className="flex items-center justify-between gap-2 border-b border-[var(--line)] px-4 py-3">
+                <Link
+                  href="/"
+                  className="text-xs font-bold uppercase tracking-[0.12em] text-[var(--muted)] transition hover:text-[var(--gold)]"
+                >
+                  View site
+                </Link>
                 <form action="/api/auth/logout" method="post">
                   <button
                     className="rounded-md border border-[var(--line)] px-2.5 py-1 text-xs font-bold text-[var(--muted)] transition hover:bg-[rgba(244,189,51,0.1)] hover:text-[var(--gold)]"
@@ -354,18 +380,28 @@ export function AdminShell({
                   </button>
                 </form>
               </div>
-              <AdminNav />
+              <div className="max-h-[calc(100dvh-17rem)] overflow-y-auto p-3">
+                <AdminNav />
+              </div>
             </div>
           </aside>
           <div className="min-w-0">
-            <div className="mb-8">
-              <Eyebrow>Backoffice</Eyebrow>
-              <h1 className="font-display text-4xl font-semibold leading-tight text-[var(--ink)] sm:text-5xl">
-                {title}
-              </h1>
-              <p className="mt-4 max-w-3xl text-base leading-7 text-[var(--muted)]">
-                {description}
-              </p>
+            <div className="mb-6 flex flex-col gap-4 border-b border-[var(--line)] pb-6 lg:flex-row lg:items-end lg:justify-between">
+              <div>
+                <Eyebrow>Backoffice</Eyebrow>
+                <h1 className="font-display text-4xl font-semibold leading-tight text-[var(--ink)] sm:text-5xl">
+                  {title}
+                </h1>
+                <p className="mt-4 max-w-3xl text-base leading-7 text-[var(--muted)]">
+                  {description}
+                </p>
+              </div>
+              <Link
+                href="/admin"
+                className="inline-flex min-h-10 w-fit items-center justify-center rounded-md border border-[var(--line)] px-4 text-sm font-semibold text-[var(--muted)] transition hover:bg-[rgba(244,189,51,0.1)] hover:text-[var(--gold)]"
+              >
+                Admin home
+              </Link>
             </div>
             {children}
           </div>

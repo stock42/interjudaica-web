@@ -2,6 +2,7 @@ import "server-only";
 
 import {
 	CourseClassFileModel,
+	type TypeCourseClassFileInput,
 	type TypeCourseClassFile,
 } from "@/models/course-class-files";
 import { MongoDBStorage } from "@/services/MongoDBStorage";
@@ -54,9 +55,9 @@ export class CourseClassFileStorage extends MongoDBStorage<TypeCourseClassFile> 
 		return doc?.data ?? null;
 	}
 
-	static async create(input: Partial<TypeCourseClassFile>) {
+	static async create(input: TypeCourseClassFileInput) {
 		await CourseClassFileStorage.ensureIndexes();
-		const file = new CourseClassFileModel(input as TypeCourseClassFile);
+		const file = new CourseClassFileModel(input);
 		await MongoDBStorage._insert<TypeCourseClassFile>(
 			CourseClassFileStorage.COLLECTION,
 			file,
@@ -64,8 +65,42 @@ export class CourseClassFileStorage extends MongoDBStorage<TypeCourseClassFile> 
 		return file.getData();
 	}
 
+	static async update(uuid: string, input: Partial<TypeCourseClassFile>) {
+		await CourseClassFileStorage.ensureIndexes();
+		const existing = await MongoDBStorage._getByUUID<TypeCourseClassFile>(
+			CourseClassFileStorage.COLLECTION,
+			uuid,
+		);
+
+		if (!existing) {
+			return null;
+		}
+
+		const file = new CourseClassFileModel({
+			...existing.data,
+			...input,
+			uuid,
+		});
+
+		await MongoDBStorage._replaceData<TypeCourseClassFile>(
+			CourseClassFileStorage.COLLECTION,
+			uuid,
+			file.getData(),
+		);
+
+		return file.getData();
+	}
+
 	static async delete(uuid: string) {
 		await CourseClassFileStorage.ensureIndexes();
 		return MongoDBStorage._delete(CourseClassFileStorage.COLLECTION, uuid);
+	}
+
+	static async deleteByClass(classUuid: string) {
+		await CourseClassFileStorage.ensureIndexes();
+		return MongoDBStorage._deleteMany<TypeCourseClassFile>(
+			CourseClassFileStorage.COLLECTION,
+			{ "data.classUuid": classUuid },
+		);
 	}
 }

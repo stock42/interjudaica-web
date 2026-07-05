@@ -1,5 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { schemaCourseClass } from "@/models/course-classes";
+import { removeStoredCourseClassFile } from "@/services/course-class-file-disk";
+import { CourseClassFileStorage } from "@/services/course-class-files-storage";
 import { CourseClassStorage } from "@/services/course-classes-storage";
 import { readJson, requireAdminApi, routeError } from "@/app/api/_lib/admin-api";
 
@@ -60,12 +62,30 @@ export async function DELETE(
 		return auth.response;
 	}
 
-	const { uuid } = await params;
-	const deletedCount = await CourseClassStorage.delete(uuid);
+	try {
+		const { uuid } = await params;
+		const existing = await CourseClassStorage.get(uuid);
 
-	if (!deletedCount) {
-		return NextResponse.json({ error: "Not found" }, { status: 404 });
+		if (!existing) {
+			return NextResponse.json({ error: "Not found" }, { status: 404 });
+		}
+
+		const files = await CourseClassFileStorage.listByClass(uuid);
+
+		await Promise.all(
+			files.map((file) => removeStoredCourseClassFile(file.storagePath)),
+		);
+
+		const deletedCount = await CourseClassStorage.delete(uuid);
+
+		if (!deletedCount) {
+			return NextResponse.json({ error: "Not found" }, { status: 404 });
+		}
+
+		await CourseClassFileStorage.deleteByClass(uuid);
+
+		return NextResponse.json({ deleted: true });
+	} catch (error) {
+		return routeError(error);
 	}
-
-	return NextResponse.json({ deleted: true });
 }

@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import {
 	Collapsible,
 	CollapsibleContent,
@@ -156,12 +156,8 @@ function CollapsibleGroup({
 		(subGroups?.some((sg) =>
 			sg.links.some((link) => isLinkActive(pathname, link.href))
 		) ?? false)
-	const [open, setOpen] = useState(true)
-
-	// Close group when navigating away if not active
-	useEffect(() => {
-		if (!groupIsActive) setOpen(false)
-	}, [groupIsActive])
+	const [manualOpen, setManualOpen] = useState(false)
+	const open = groupIsActive || manualOpen
 
 	const iconSize = depth === 0 ? 'h-4 w-4' : 'h-3.5 w-3.5'
 	const chevronSize = depth === 0 ? 'h-4 w-4' : 'h-3.5 w-3.5'
@@ -171,9 +167,9 @@ function CollapsibleGroup({
 	const childGap = depth === 0 ? 'gap-0.5 pb-1 pt-0.5' : 'gap-0.5 pb-0.5 pt-0.5'
 
 	return (
-		<Collapsible open={open} onOpenChange={setOpen}>
+		<Collapsible open={open} onOpenChange={setManualOpen}>
 			<CollapsibleTrigger
-				className={`flex w-full items-center gap-2.5 rounded-md text-sm font-semibold transition hover:bg-[rgba(244,189,51,0.1)] hover:text-[var(--gold)] ${padding} ${
+				className={`flex w-full items-center gap-2.5 rounded-md text-sm font-semibold transition hover:bg-[rgba(244,189,51,0.1)] hover:text-[var(--gold)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gold)] ${padding} ${
 					groupIsActive
 						? 'text-[var(--gold)] bg-[rgba(244,189,51,0.08)]'
 						: 'text-[var(--muted)]'
@@ -229,13 +225,13 @@ export default function AdminNav() {
 			<button
 				type="button"
 				onClick={openChat}
-				className="flex w-full items-center gap-2.5 rounded-md text-sm font-semibold transition hover:bg-[rgba(244,189,51,0.1)] hover:text-[var(--gold)] px-3 py-2 text-[var(--muted)]"
+				className="flex w-full items-center gap-2.5 rounded-md border border-[var(--line)] bg-[rgba(244,189,51,0.06)] px-3 py-2 text-sm font-semibold text-[var(--gold)] transition hover:bg-[rgba(244,189,51,0.12)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gold)]"
 			>
 				<Bot className="h-4 w-4 shrink-0" />
 				<span className="text-left leading-tight">AI Assistant</span>
 			</button>
 
-			<hr className="mx-3 border-t border-[var(--line)]" />
+			<hr className="my-2 border-t border-[var(--line)]" />
 
 			{navGroups.map((group) => (
 				<CollapsibleGroup

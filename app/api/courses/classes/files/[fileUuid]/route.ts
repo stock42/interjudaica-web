@@ -1,7 +1,6 @@
-import { createReadStream } from "fs";
-import { stat } from "fs/promises";
 import { NextResponse, type NextRequest } from "next/server";
 
+import { createFileDownloadResponse } from "@/app/api/_lib/file-download";
 import { CourseClassFileStorage } from "@/services/course-class-files-storage";
 import { CourseEnrollmentStorage } from "@/services/course-enrollments-storage";
 import { getCurrentUser } from "@/services/user-auth";
@@ -33,18 +32,5 @@ export async function GET(
 		return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 	}
 
-	try {
-		const stats = await stat(file.storagePath);
-		const stream = createReadStream(file.storagePath);
-
-		return new NextResponse(stream as unknown as ReadableStream, {
-			headers: {
-				"Content-Type": file.mimeType || "application/octet-stream",
-				"Content-Length": stats.size.toString(),
-				"Content-Disposition": `attachment; filename=\"${file.originalName}\"`,
-			},
-		});
-	} catch {
-		return NextResponse.json({ error: "File not found" }, { status: 404 });
-	}
+	return createFileDownloadResponse(file);
 }
