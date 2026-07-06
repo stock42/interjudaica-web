@@ -1,303 +1,323 @@
-import type { Metadata } from "next";
-import Link from "next/link";
-import { redirect } from "next/navigation";
+import type { Metadata } from 'next'
+import Link from 'next/link'
+import { redirect } from 'next/navigation'
 
+import { ButtonLink, PageShell, Section, SectionIntro } from '@/app/components/portal-ui'
+import { getCurrentUser } from '@/services/user-auth'
+import { CourseEnrollmentStorage } from '@/services/course-enrollments-storage'
+import { CourseClassProgressStorage } from '@/services/course-class-progress-storage'
+import { CourseClassStorage } from '@/services/course-classes-storage'
+import { CourseStorage } from '@/services/courses-storage'
+import { BookSaleStorage } from '@/services/book-sales-storage'
+import { EmailPreferencesToggle } from '@/app/dashboard/email-preferences-toggle'
+import { listForumThreads } from '@/app/lib/forums'
+import { CommunityUserStorage } from '@/services/community-users-storage'
 import {
-  ButtonLink,
-  PageShell,
-  Section,
-  SectionIntro,
-} from "@/app/components/portal-ui";
-import { getCurrentUser } from "@/services/user-auth";
-import { CourseEnrollmentStorage } from "@/services/course-enrollments-storage";
-import { CourseStorage } from "@/services/courses-storage";
-import { BookSaleStorage } from "@/services/book-sales-storage";
-import { EmailPreferencesToggle } from "@/app/dashboard/email-preferences-toggle";
-import { listForumThreads } from "@/app/lib/forums";
-import { CommunityUserStorage } from "@/services/community-users-storage";
-import {
-  activateCommunityMembershipFromCheckoutSession,
-  isActiveCommunityStatus,
-} from "@/services/community-memberships";
-import { reportError } from "@/lib/logger";
+	activateCommunityMembershipFromCheckoutSession,
+	isActiveCommunityStatus,
+} from '@/services/community-memberships'
+import { reportError } from '@/lib/logger'
 
-export const runtime = "nodejs";
-export const dynamic = "force-dynamic";
+export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: "Dashboard",
-  description: "InterJudaica student dashboard for courses and community.",
-};
+	title: 'Dashboard',
+	description: 'InterJudaica student dashboard for courses and community.',
+}
 
 export default async function DashboardPage({
-  searchParams,
+	searchParams,
 }: {
-  searchParams: Promise<{
-    payment?: string;
-    course?: string;
-    community?: string;
-    billing?: string;
-    session_id?: string;
-  }>;
+	searchParams: Promise<{
+		payment?: string
+		course?: string
+		community?: string
+		billing?: string
+		session_id?: string
+	}>
 }) {
-  const { payment, community, billing, session_id: sessionId } = await searchParams;
-  let user = await getCurrentUser();
+	const { payment, community, billing, session_id: sessionId } = await searchParams
+	let user = await getCurrentUser()
 
-  if (!user) {
-    redirect("/login?next=/dashboard");
-  }
+	if (!user) {
+		redirect('/login?next=/dashboard')
+	}
 
-  let communityActivationPending = false;
-  if (community === "success" && sessionId) {
-    try {
-      const activation = await activateCommunityMembershipFromCheckoutSession(
-        sessionId,
-        user.uuid,
-      );
-      if (activation.ok) {
-        user = activation.user;
-      } else {
-        communityActivationPending = activation.reason === "pending";
-      }
-    } catch (error) {
-      communityActivationPending = true;
-      reportError({
-        event: "community_checkout_return_activation_failed",
-        error,
-        route: "/dashboard",
-        context: {
-          sessionId,
-          userUuid: user.uuid,
-        },
-        level: "warn",
-      });
-    }
-  }
+	let communityActivationPending = false
+	if (community === 'success' && sessionId) {
+		try {
+			const activation = await activateCommunityMembershipFromCheckoutSession(
+				sessionId,
+				user.uuid,
+			)
+			if (activation.ok) {
+				user = activation.user
+			} else {
+				communityActivationPending = activation.reason === 'pending'
+			}
+		} catch (error) {
+			communityActivationPending = true
+			reportError({
+				event: 'community_checkout_return_activation_failed',
+				error,
+				route: '/dashboard',
+				context: {
+					sessionId,
+					userUuid: user.uuid,
+				},
+				level: 'warn',
+			})
+		}
+	}
 
-  const enrollments = await CourseEnrollmentStorage.listByUser(user.uuid);
-  const courses = await Promise.all(
-    enrollments.map((enrollment) => CourseStorage.get(enrollment.courseUuid)),
-  );
-  const dashboardCourses = courses.filter(
-    (course): course is NonNullable<typeof course> => Boolean(course),
-  );
+	const enrollments = await CourseEnrollmentStorage.listByUser(user.uuid)
+	const courses = await Promise.all(
+		enrollments.map(enrollment => CourseStorage.get(enrollment.courseUuid)),
+	)
+	const dashboardCourses = courses.filter(
+		(course): course is NonNullable<typeof course> => Boolean(course),
+	)
+	const courseProgress = new Map(
+		await Promise.all(
+			dashboardCourses.map(async course => {
+				const [classes, progress] = await Promise.all([
+					CourseClassStorage.listByCourse(course.uuid ?? ''),
+					CourseClassProgressStorage.listByUserCourse(user.uuid, course.uuid ?? ''),
+				])
+				const completed = progress.filter(item => item.completed).length
+				return [course.uuid ?? '', { total: classes.length, completed }] as const
+			}),
+		),
+	)
 
-  const myBooks = await BookSaleStorage.listByEmail(user.email);
-  const paidBooks = myBooks.filter((sale) => sale.status === "paid");
-  const communityUser = await CommunityUserStorage.getByUserUuid(user.uuid);
-  const hasActiveCommunity = isActiveCommunityStatus(user, communityUser);
-  const forumResult = await listForumThreads({
-    area: "Announcements",
-    page: 1,
-    limit: 3,
-  });
+	const myBooks = await BookSaleStorage.listByEmail(user.email)
+	const paidBooks = myBooks.filter(sale => sale.status === 'paid')
+	const communityUser = await CommunityUserStorage.getByUserUuid(user.uuid)
+	const hasActiveCommunity = isActiveCommunityStatus(user, communityUser)
+	const forumResult = await listForumThreads({
+		area: 'Announcements',
+		page: 1,
+		limit: 3,
+	})
 
-  return (
-    <PageShell>
-      <Section tone="transparent">
-        <SectionIntro
-          eyebrow="Student dashboard"
-          title="Welcome back"
-          text="Continue purchased courses, manage the community membership, review live sessions, and jump back into forum threads."
-        />
+	return (
+		<PageShell>
+			<Section tone="transparent">
+				<SectionIntro
+					eyebrow="Student dashboard"
+					title="Welcome back"
+					text="Continue purchased courses, manage the community membership, review live sessions, and jump back into forum threads."
+				/>
 
-        {payment === "success" ? (
-          <div className="rounded-lg border border-[var(--line)] bg-[rgba(244,189,51,0.12)] p-4 text-sm font-semibold text-[var(--ink)]">
-            Payment received. Your course enrollment is being activated.
-          </div>
-        ) : null}
+				{payment === 'success' ?
+					<div className="rounded-lg border border-[var(--line)] bg-[rgba(244,189,51,0.12)] p-4 text-sm font-semibold text-[var(--ink)]">
+						Payment received. Your course enrollment is being activated.
+					</div>
+				:	null}
 
-        {community === "success" ? (
-          <div className="rounded-lg border border-[var(--line)] bg-[rgba(22,74,159,0.08)] p-4 text-sm font-semibold text-[var(--ink)]">
-            {hasActiveCommunity
-              ? "Community membership activated."
-              : communityActivationPending
-                ? "Payment received. We are confirming your membership now."
-                : "Payment received. Your membership will unlock as soon as Stripe confirms it."}
-          </div>
-        ) : null}
+				{community === 'success' ?
+					<div className="rounded-lg border border-[var(--line)] bg-[rgba(22,74,159,0.08)] p-4 text-sm font-semibold text-[var(--ink)]">
+						{hasActiveCommunity ?
+							'Community membership activated.'
+						: communityActivationPending ?
+							'Payment received. We are confirming your membership now.'
+						:	'Payment received. Your membership will unlock as soon as Stripe confirms it.'
+						}
+					</div>
+				:	null}
 
-        {billing === "unavailable" ? (
-          <div className="rounded-lg border border-[var(--line)] bg-[rgba(244,189,51,0.12)] p-4 text-sm font-semibold text-[var(--ink)]">
-            Billing portal unavailable for this membership. If this access was granted manually, there is nothing to manage in Stripe.
-          </div>
-        ) : null}
+				{billing === 'unavailable' ?
+					<div className="rounded-lg border border-[var(--line)] bg-[rgba(244,189,51,0.12)] p-4 text-sm font-semibold text-[var(--ink)]">
+						Billing portal unavailable for this membership. If this access was granted
+						manually, there is nothing to manage in Stripe.
+					</div>
+				:	null}
 
-        <div className="grid gap-5 lg:grid-cols-[1.2fr_0.8fr]">
-          <section className="rounded-lg border border-[var(--line)] bg-white p-5 sm:p-6">
-            <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <h2 className="font-display text-3xl font-semibold">
-                My courses
-              </h2>
-              <ButtonLink href="/courses" tone="secondary">
-                Find a course
-              </ButtonLink>
-            </div>
+				<div className="grid gap-5 lg:grid-cols-[1.2fr_0.8fr]">
+					<section className="rounded-lg border border-[var(--line)] bg-white p-5 sm:p-6">
+						<div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+							<h2 className="font-display text-3xl font-semibold">My courses</h2>
+							<ButtonLink
+								href="/courses"
+								tone="secondary"
+							>
+								Find a course
+							</ButtonLink>
+						</div>
 
-            {dashboardCourses.length === 0 ? (
-              <div className="rounded-lg border border-[var(--line)] bg-[var(--paper)] p-4 text-sm text-[var(--muted)]">
-                No courses yet.
-              </div>
-            ) : (
-              <div className="grid gap-4">
-                {dashboardCourses.map((course) => (
-                  <article
-                    key={course.slug}
-                    className="rounded-lg border border-[var(--line)] bg-[var(--paper)] p-4"
-                  >
-                    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                      <div>
-                        <p className="text-xs font-bold uppercase text-[var(--sapphire)]">
-                          {course.category}
-                        </p>
-                        <h3 className="mt-2 font-display text-2xl font-semibold">
-                          {course.title}
-                        </h3>
-                      </div>
-                      <div className="flex flex-wrap gap-2">
-                        <ButtonLink
-                          href={`/course/${course.slug}/classes`}
-                          tone="primary"
-                        >
-                          Classes
-                        </ButtonLink>
-                        <ButtonLink
-                          href={`/course/${course.slug}/forum`}
-                          tone="secondary"
-                        >
-                          Forum
-                        </ButtonLink>
-                      </div>
-                    </div>
-                  </article>
-                ))}
-              </div>
-            )}
-          </section>
+						{dashboardCourses.length === 0 ?
+							<div className="rounded-lg border border-[var(--line)] bg-[var(--paper)] p-4 text-sm text-[var(--muted)]">
+								No courses yet.
+							</div>
+						:	<div className="grid gap-4">
+								{dashboardCourses.map(course => (
+									<article
+										key={course.slug}
+										className="rounded-lg border border-[var(--line)] bg-[var(--paper)] p-4"
+									>
+										<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+											<div>
+												<p className="text-xs font-bold uppercase text-[var(--sapphire)]">
+													{course.category}
+												</p>
+												<h3 className="mt-2 font-display text-2xl font-semibold">
+													{course.title}
+												</h3>
+												<p className="mt-2 text-sm text-[var(--muted)]">
+													{courseProgress.get(course.uuid ?? '')?.completed ?? 0} of{' '}
+													{courseProgress.get(course.uuid ?? '')?.total ?? 0} classes
+													completed
+												</p>
+											</div>
+											<div className="flex flex-wrap gap-2">
+												<ButtonLink
+													href={`/course/${course.slug}/classes`}
+													tone="primary"
+												>
+													Classes
+												</ButtonLink>
+												<ButtonLink
+													href={`/course/${course.slug}/forum`}
+													tone="secondary"
+												>
+													Forum
+												</ButtonLink>
+											</div>
+										</div>
+									</article>
+								))}
+							</div>
+						}
+					</section>
 
-          {paidBooks.length > 0 ? (
-            <section className="rounded-lg border border-[var(--line)] bg-white p-5 sm:p-6">
-              <h2 className="font-display text-3xl font-semibold">My books</h2>
-              <div className="mt-5 grid gap-3">
-                {paidBooks.map((sale) => (
-                  <article
-                    key={sale.uuid}
-                    className="rounded-lg border border-[var(--line)] bg-[var(--paper)] p-4"
-                  >
-                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                      <div>
-                        <p className="text-xs font-bold uppercase text-[var(--sapphire)]">
-                          Book
-                        </p>
-                        <h3 className="mt-1 font-semibold text-[var(--ink)]">
-                          {sale.bookTitle}
-                        </h3>
-                      </div>
-                      {sale.accessToken ? (
-                        <Link
-                          href={`/api/books/download?token=${sale.accessToken}`}
-                          className="inline-flex min-h-10 items-center justify-center rounded-full border border-[var(--sapphire)] px-4 text-sm font-semibold text-[var(--sapphire)] transition hover:bg-[var(--sapphire)] hover:text-white"
-                        >
-                          Download
-                        </Link>
-                      ) : null}
-                    </div>
-                  </article>
-                ))}
-              </div>
-            </section>
-          ) : null}
+					{paidBooks.length > 0 ?
+						<section className="rounded-lg border border-[var(--line)] bg-white p-5 sm:p-6">
+							<h2 className="font-display text-3xl font-semibold">My books</h2>
+							<div className="mt-5 grid gap-3">
+								{paidBooks.map(sale => (
+									<article
+										key={sale.uuid}
+										className="rounded-lg border border-[var(--line)] bg-[var(--paper)] p-4"
+									>
+										<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+											<div>
+												<p className="text-xs font-bold uppercase text-[var(--sapphire)]">
+													Book
+												</p>
+												<h3 className="mt-1 font-semibold text-[var(--ink)]">
+													{sale.bookTitle}
+												</h3>
+											</div>
+											{sale.accessToken ?
+												<Link
+													href={`/api/books/download?token=${sale.accessToken}`}
+													className="inline-flex min-h-10 items-center justify-center rounded-full border border-[var(--sapphire)] px-4 text-sm font-semibold text-[var(--sapphire)] transition hover:bg-[var(--sapphire)] hover:text-white"
+												>
+													Download
+												</Link>
+											:	null}
+										</div>
+									</article>
+								))}
+							</div>
+						</section>
+					:	null}
 
-          <aside className="grid gap-5">
-            <section className="rounded-lg border border-[var(--line)] bg-[#050608] p-5 text-white sm:p-6">
-              <p className="text-xs font-bold uppercase text-white/60">
-                Community subscription
-              </p>
-              <h2 className="mt-3 font-display text-3xl font-semibold">
-                {hasActiveCommunity ? "Active" : "Not subscribed"}
-              </h2>
-              <p className="mt-3 text-sm leading-6 text-white/70">
-                {hasActiveCommunity
-                  ? communityUser?.stripeSubscriptionId
-                    ? "Renews at $19 USD/month."
-                    : "Community access is active."
-                  : "Subscribe to unlock the community forum and papers."}
-              </p>
-              <div className="mt-5 flex flex-col gap-2 sm:flex-row lg:flex-col">
-                {hasActiveCommunity ? (
-                  <ButtonLink href="/community/forum" tone="dark">
-                    Community forum
-                  </ButtonLink>
-                ) : (
-                  <ButtonLink href="/checkout-community" tone="dark">
-                    Subscribe
-                  </ButtonLink>
-                )}
-                <ButtonLink
-                  href="/community/papers"
-                  tone="quiet"
-                  className="text-white hover:bg-white/10"
-                >
-                  Papers
-                </ButtonLink>
-                <ButtonLink
-                  href="/support"
-                  tone="quiet"
-                  className="text-white hover:bg-white/10"
-                >
-                  Technical support
-                </ButtonLink>
-              </div>
-              {communityUser?.stripeCustomerId ? (
-                <form action="/api/community/customer-portal" method="get" className="mt-3">
-                  <button
-                    type="submit"
-                    className="inline-flex min-h-10 items-center justify-center rounded-full border border-white/20 px-4 text-sm font-semibold text-white transition hover:bg-white/10"
-                  >
-                    Manage billing
-                  </button>
-                </form>
-              ) : null}
-            </section>
+					<aside className="grid gap-5">
+						<section className="rounded-lg border border-[var(--line)] bg-[#050608] p-5 text-white sm:p-6">
+							<p className="text-xs font-bold uppercase text-white/60">
+								Community subscription
+							</p>
+							<h2 className="mt-3 font-display text-3xl font-semibold">
+								{hasActiveCommunity ? 'Active' : 'Not subscribed'}
+							</h2>
+							<p className="mt-3 text-sm leading-6 text-white/70">
+								{hasActiveCommunity ?
+									communityUser?.stripeSubscriptionId ?
+										'Renews at $19 USD/month.'
+									:	'Community access is active.'
+								:	'Subscribe to unlock the community forum and papers.'}
+							</p>
+							<div className="mt-5 flex flex-col gap-2 sm:flex-row lg:flex-col">
+								{hasActiveCommunity ?
+									<ButtonLink
+										href="/community/forum"
+										tone="dark"
+									>
+										Community forum
+									</ButtonLink>
+								:	<ButtonLink
+										href="/checkout-community"
+										tone="dark"
+									>
+										Subscribe
+									</ButtonLink>
+								}
+								<ButtonLink
+									href="/community/papers"
+									tone="quiet"
+									className="text-white hover:bg-white/10"
+								>
+									Papers
+								</ButtonLink>
+								<ButtonLink
+									href="/support"
+									tone="quiet"
+									className="text-white hover:bg-white/10"
+								>
+									Technical support
+								</ButtonLink>
+							</div>
+							{communityUser?.stripeCustomerId ?
+								<form
+									action="/api/community/customer-portal"
+									method="get"
+									className="mt-3"
+								>
+									<button
+										type="submit"
+										className="inline-flex min-h-10 items-center justify-center rounded-full border border-white/20 px-4 text-sm font-semibold text-white transition hover:bg-white/10"
+									>
+										Manage billing
+									</button>
+								</form>
+							:	null}
+						</section>
 
-            <section className="rounded-lg border border-[var(--line)] bg-white p-5 sm:p-6">
-              <h2 className="font-display text-3xl font-semibold">
-                Forum activity
-              </h2>
-              <div className="mt-5 grid gap-3">
-                {forumResult.items.length === 0 ? (
-                  <p className="text-sm text-[var(--muted)]">
-                    No announcements yet.
-                  </p>
-                ) : (
-                  forumResult.items.map((thread) => (
-                    <Link
-                      key={thread.uuid}
-                      href="/forum"
-                      className="rounded-lg border border-[var(--line)] bg-[var(--paper)] p-4 transition hover:border-[var(--sapphire)]"
-                    >
-                      <span className="text-xs font-bold uppercase text-[var(--muted)]">
-                        {thread.area}
-                      </span>
-                      <span className="mt-2 block text-sm font-semibold leading-6">
-                        {thread.title}
-                      </span>
-                      <span className="mt-2 block text-xs text-[var(--sapphire)]">
-                        {thread.unreadCount ?? 0} unread updates
-                      </span>
-                    </Link>
-                  ))
-                )}
-              </div>
-            </section>
+						<section className="rounded-lg border border-[var(--line)] bg-white p-5 sm:p-6">
+							<h2 className="font-display text-3xl font-semibold">Forum activity</h2>
+							<div className="mt-5 grid gap-3">
+								{forumResult.items.length === 0 ?
+									<p className="text-sm text-[var(--muted)]">No announcements yet.</p>
+								:	forumResult.items.map(thread => (
+										<Link
+											key={thread.uuid}
+											href="/forum"
+											className="rounded-lg border border-[var(--line)] bg-[var(--paper)] p-4 transition hover:border-[var(--sapphire)]"
+										>
+											<span className="text-xs font-bold uppercase text-[var(--muted)]">
+												{thread.area}
+											</span>
+											<span className="mt-2 block text-sm font-semibold leading-6">
+												{thread.title}
+											</span>
+											<span className="mt-2 block text-xs text-[var(--sapphire)]">
+												{thread.unreadCount ?? 0} unread updates
+											</span>
+										</Link>
+									))
+								}
+							</div>
+						</section>
 
-            <section className="rounded-lg border border-[var(--line)] bg-white p-5 sm:p-6">
-              <h2 className="font-display text-3xl font-semibold">Preferences</h2>
-              <EmailPreferencesToggle enabled={user.emailNotifications ?? true} />
-            </section>
-          </aside>
-        </div>
-      </Section>
-    </PageShell>
-  );
+						<section className="rounded-lg border border-[var(--line)] bg-white p-5 sm:p-6">
+							<h2 className="font-display text-3xl font-semibold">Preferences</h2>
+							<EmailPreferencesToggle enabled={user.emailNotifications ?? true} />
+						</section>
+					</aside>
+				</div>
+			</Section>
+		</PageShell>
+	)
 }

@@ -19,6 +19,7 @@ import {
 	Mail,
 	Bot,
 	MessageSquare,
+	Search,
 	Contact,
 	Send,
 } from 'lucide-react'
@@ -96,7 +97,10 @@ const navGroups: NavGroup[] = [
 	{
 		label: 'Forum',
 		icon: MessageSquare,
-		links: [{ href: '/admin/forum', label: 'Forum' }],
+		links: [
+			{ href: '/admin/forum', label: 'Forum' },
+			{ href: '/admin/moderation', label: 'Moderation Queue' },
+		],
 	},
 	{
 		label: 'Contact Inquiries',
@@ -127,6 +131,7 @@ const navGroups: NavGroup[] = [
 		links: [
 			{ href: '/admin/config', label: 'Configuration' },
 			{ href: '/admin/analytics', label: 'Analytics' },
+			{ href: '/admin/audit-logs', label: 'Audit Logs' },
 		],
 	},
 ]
@@ -152,10 +157,9 @@ function CollapsibleGroup({
 	depth?: number
 }) {
 	const groupIsActive =
-		links.some((link) => isLinkActive(pathname, link.href)) ||
-		(subGroups?.some((sg) =>
-			sg.links.some((link) => isLinkActive(pathname, link.href))
-		) ?? false)
+		links.some(link => isLinkActive(pathname, link.href)) ||
+		(subGroups?.some(sg => sg.links.some(link => isLinkActive(pathname, link.href))) ??
+			false)
 	const [manualOpen, setManualOpen] = useState(false)
 	const open = groupIsActive || manualOpen
 
@@ -167,12 +171,15 @@ function CollapsibleGroup({
 	const childGap = depth === 0 ? 'gap-0.5 pb-1 pt-0.5' : 'gap-0.5 pb-0.5 pt-0.5'
 
 	return (
-		<Collapsible open={open} onOpenChange={setManualOpen}>
+		<Collapsible
+			open={open}
+			onOpenChange={setManualOpen}
+		>
 			<CollapsibleTrigger
 				className={`flex w-full items-center gap-2.5 rounded-md text-sm font-semibold transition hover:bg-[rgba(244,189,51,0.1)] hover:text-[var(--gold)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gold)] ${padding} ${
-					groupIsActive
-						? 'text-[var(--gold)] bg-[rgba(244,189,51,0.08)]'
-						: 'text-[var(--muted)]'
+					groupIsActive ?
+						'text-[var(--gold)] bg-[rgba(244,189,51,0.08)]'
+					:	'text-[var(--muted)]'
 				}`}
 			>
 				<Icon className={`${iconSize} shrink-0`} />
@@ -183,7 +190,7 @@ function CollapsibleGroup({
 			</CollapsibleTrigger>
 			<CollapsibleContent className="overflow-hidden data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
 				<div className={`grid ${childGap} ${childIndent}`}>
-					{links.map((link) => {
+					{links.map(link => {
 						const active = isLinkActive(pathname, link.href)
 						return (
 							<Link
@@ -191,16 +198,16 @@ function CollapsibleGroup({
 								href={link.href}
 								aria-current={active ? 'page' : undefined}
 								className={`rounded-md font-semibold transition ${linkPadding} text-sm ${
-									active
-										? 'text-[var(--gold)] bg-[rgba(244,189,51,0.12)]'
-										: 'text-[var(--muted)] hover:bg-[rgba(244,189,51,0.1)] hover:text-[var(--gold)]'
+									active ?
+										'text-[var(--gold)] bg-[rgba(244,189,51,0.12)]'
+									:	'text-[var(--muted)] hover:bg-[rgba(244,189,51,0.1)] hover:text-[var(--gold)]'
 								}`}
 							>
 								{link.label}
 							</Link>
 						)
 					})}
-					{subGroups?.map((sg) => (
+					{subGroups?.map(sg => (
 						<CollapsibleGroup
 							key={sg.label}
 							label={sg.label}
@@ -218,10 +225,25 @@ function CollapsibleGroup({
 
 export default function AdminNav() {
 	const pathname = usePathname()
-	const { openChat } = useAdminChat()
+	const { openChat, openCommand } = useAdminChat()
 
 	return (
-		<nav className="grid gap-1" aria-label="Admin navigation">
+		<nav
+			className="grid gap-1"
+			aria-label="Admin navigation"
+		>
+			<button
+				type="button"
+				onClick={openCommand}
+				className="flex w-full items-center gap-2.5 rounded-md border border-[var(--line)] bg-[rgba(244,189,51,0.04)] px-3 py-2 text-sm font-semibold text-[var(--muted)] transition hover:bg-[rgba(244,189,51,0.1)] hover:text-[var(--gold)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gold)]"
+			>
+				<Search className="h-4 w-4 shrink-0" />
+				<span className="text-left leading-tight">Command palette</span>
+				<span className="ml-auto text-[0.65rem] font-bold text-[var(--muted)]">
+					Ctrl K
+				</span>
+			</button>
+
 			<button
 				type="button"
 				onClick={openChat}
@@ -233,7 +255,7 @@ export default function AdminNav() {
 
 			<hr className="my-2 border-t border-[var(--line)]" />
 
-			{navGroups.map((group) => (
+			{navGroups.map(group => (
 				<CollapsibleGroup
 					key={group.label}
 					label={group.label}

@@ -1,70 +1,100 @@
-import "server-only";
+import 'server-only'
 
-import { CourseEnrollmentModel, type TypeCourseEnrollment } from "@/models/course-enrollments";
-import { MongoDBStorage } from "@/services/MongoDBStorage";
+import {
+	CourseEnrollmentModel,
+	type TypeCourseEnrollment,
+	type TypeCourseEnrollmentInput,
+} from '@/models/course-enrollments'
+import { MongoDBStorage } from '@/services/MongoDBStorage'
 
 export class CourseEnrollmentStorage extends MongoDBStorage<TypeCourseEnrollment> {
-	static readonly COLLECTION = "course_enrollments";
-	private static indexesReady = false;
+	static readonly COLLECTION = 'course_enrollments'
+	private static indexesReady = false
 
 	constructor() {
-		super(CourseEnrollmentStorage.COLLECTION);
+		super(CourseEnrollmentStorage.COLLECTION)
 	}
 
 	static async ensureIndexes() {
 		if (CourseEnrollmentStorage.indexesReady) {
-			return;
+			return
 		}
 
 		const collection = await MongoDBStorage.getCollection<TypeCourseEnrollment>(
 			CourseEnrollmentStorage.COLLECTION,
-		);
+		)
 
 		await Promise.all([
 			collection.createIndex({ uuid: 1 }, { unique: true }),
 			collection.createIndex(
-				{ "data.courseUuid": 1, "data.userUuid": 1 },
+				{ 'data.courseUuid': 1, 'data.userUuid': 1 },
 				{ unique: true },
 			),
-			collection.createIndex({ "data.status": 1 }),
-		]);
+			collection.createIndex({ 'data.status': 1 }),
+			collection.createIndex({ 'data.source': 1 }),
+			collection.createIndex({ 'data.grantedByOperatorUuid': 1 }),
+		])
 
-		CourseEnrollmentStorage.indexesReady = true;
+		CourseEnrollmentStorage.indexesReady = true
 	}
 
-	static async create(input: Partial<TypeCourseEnrollment>) {
-		await CourseEnrollmentStorage.ensureIndexes();
-		const enrollment = new CourseEnrollmentModel(input as TypeCourseEnrollment);
+	static async create(input: TypeCourseEnrollmentInput) {
+		await CourseEnrollmentStorage.ensureIndexes()
+		const enrollment = new CourseEnrollmentModel(input)
 		await MongoDBStorage._insert<TypeCourseEnrollment>(
 			CourseEnrollmentStorage.COLLECTION,
 			enrollment,
-		);
-		return enrollment.getData();
+		)
+		return enrollment.getData()
+	}
+
+	static async list() {
+		await CourseEnrollmentStorage.ensureIndexes()
+		const docs = await MongoDBStorage._find<TypeCourseEnrollment>(
+			CourseEnrollmentStorage.COLLECTION,
+			{},
+			undefined,
+			{ _added: -1 },
+		)
+
+		return docs.map(doc => doc.data)
 	}
 
 	static async listByUser(userUuid: string) {
-		await CourseEnrollmentStorage.ensureIndexes();
+		await CourseEnrollmentStorage.ensureIndexes()
 		const docs = await MongoDBStorage._find<TypeCourseEnrollment>(
 			CourseEnrollmentStorage.COLLECTION,
-			{ "data.userUuid": userUuid, "data.status": "active" },
+			{ 'data.userUuid': userUuid, 'data.status': 'active' },
 			undefined,
 			{ _added: -1 },
-		);
+		)
 
-		return docs.map((doc) => doc.data);
+		return docs.map(doc => doc.data)
+	}
+
+	static async listAllByUser(userUuid: string) {
+		await CourseEnrollmentStorage.ensureIndexes()
+		const docs = await MongoDBStorage._find<TypeCourseEnrollment>(
+			CourseEnrollmentStorage.COLLECTION,
+			{ 'data.userUuid': userUuid },
+			undefined,
+			{ _added: -1 },
+		)
+
+		return docs.map(doc => doc.data)
 	}
 
 	static async isEnrolled(userUuid: string, courseUuid: string) {
-		await CourseEnrollmentStorage.ensureIndexes();
+		await CourseEnrollmentStorage.ensureIndexes()
 		const doc = await MongoDBStorage._findOne<TypeCourseEnrollment>(
 			CourseEnrollmentStorage.COLLECTION,
 			{
-				"data.userUuid": userUuid,
-				"data.courseUuid": courseUuid,
-				"data.status": "active",
+				'data.userUuid': userUuid,
+				'data.courseUuid': courseUuid,
+				'data.status': 'active',
 			},
-		);
+		)
 
-		return Boolean(doc);
+		return Boolean(doc)
 	}
 }

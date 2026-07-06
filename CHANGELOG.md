@@ -1,6 +1,18 @@
 # Changelog
 
+## 2026-07-06
+
+- Complete the `PROJECT_IMPROVEMENTS.md` backlog: add a course-level material library on `/admin/courses/[uuid]`, upload progress for class files, class completion tracking, user access diagnostics, a global admin command palette, moderation queue, upload cleanup tooling, and audit-log visibility.
+- Add student class progress persistence in `course_class_progress`, protected `GET/PATCH /api/courses/classes/[classUuid]/progress`, class completion controls on purchased course class pages, and per-course progress summaries on the student dashboard.
+- Extend course enrollments with access-source metadata (`stripe`, `coupon`, `manual`, `system`) and manual-grant operator details for admin diagnostics.
+- Formalize `audit_logs` with Zod-backed model storage and log class material upload, metadata edit, admin download, student download, and delete events tied to operator/student UUIDs plus course/class/file UUIDs.
+- Add admin moderation metadata (`ownerOperatorUuid`, `dueAt`) to contacts and forum threads, plus `/admin/moderation` and `PATCH /api/admin/moderation/[kind]/[uuid]`.
+- Add upload cleanup scan/delete support at `/api/admin/uploads/cleanup` and a Configuration panel that reports orphaned public uploads and private class files before deletion.
+- Improve operational admin views with payment summary metrics, subscription setup warnings, analytics revenue/attention signals, `/admin/users/[uuid]` diagnostics, `/admin/audit-logs`, and command-palette quick actions.
+- Add Playwright API E2E coverage for class material upload, metadata update, admin download, enrolled-student download, and class progress update.
+
 ## 2026-07-05
+
 - Add unrestricted course class material uploads: admin class files now accept any file type, store editable title/description metadata, and expose admin `GET`/`PATCH /api/admin/classes/[uuid]/files/[fileUuid]` for downloads and metadata updates.
 - Wire purchased course class pages to live classes and protected class-material downloads for actively enrolled students.
 - Clean up class material files and MongoDB records when deleting a class, preventing orphaned class uploads.
@@ -9,6 +21,7 @@
 - Add `DESIGN.md` for the existing InterJudaica visual system and `PROJECT_IMPROVEMENTS.md` with a prioritized improvement backlog.
 
 ## 2026-06-18
+
 - Home page: replace hardcoded "$19 USD" community price with dynamic most expensive plan from `SubscriptionPlanStorage.list()`. Falls back to "$19 USD" if no plans exist.
 - Login page: fix "Forgot password?" and "Create student account" link spacing — now wrapped in flex-col container with proper gap.
 - Navbar: reduce primary nav items from 7 to 5 (remove "About Ernesto" and "Contact" — keep Home, Courses, Books, Community, Forum) to prevent Login/Enroll button overflow on medium screens. Add active-section highlighting via new `NavLinks` client component using `usePathname()` — current route gets gold bottom border.
@@ -17,6 +30,7 @@
 - Fix CRM group "Generate query" button: field name mismatch — form sent `{ description }` but `/api/agentes/generate-query` expects `{ promoting }`. Changed to `{ promoting: form.description }`.
 
 ## 2026-06-12
+
 - Add CRM Contact Groups module: new entity for segmenting CRM contacts into groups (separate from Email Groups). Model (`models/crm-groups.ts`) with uuid, name, slug, description, query (MongoDB JSON string), contactCount. Storage (`services/crm-groups-storage.ts`) on `crm_groups` collection. Admin CRUD API at `/api/admin/crm/groups` with preview endpoints. Admin pages: list (`/admin/crm/groups`), new (`/admin/crm/groups/new`), edit (`/admin/crm/groups/[uuid]`). AI create button using `AiCreateModal` with `entityType="crm-group"`. "Run" button on list page previews matching contacts. Updated admin nav: CRM section now has Contacts, Campaigns, Groups (→ `/admin/crm/groups`); Email section has Templates, Campaigns, Groups (→ `/admin/email/groups`). 16 unit tests in `tests/unit/models/crm-groups.test.ts`.
 - Reorganize admin navigation: promote Forum, Contact Inquiries, and CRM to top-level sections (previously sub-items under Marketing). CRM now groups Contacts, Campaigns, and Email Groups. Marketing section removed; Email (Templates, Campaigns) is now a standalone section. Added MessageSquare, Contact, and Send icons from lucide-react to admin nav.
 - Add ▶ Run button to email groups list page (`app/admin/email/groups/groups-list.tsx`). Each group with a query now shows a "Run" button in the Actions column that calls the `/api/admin/email/groups/[uuid]/preview` endpoint and displays matching contact count + up to 5 preview contacts inline. Error and loading states handled.
@@ -39,19 +53,22 @@
 - Create reusable STT microphone component (`components/share/stt-microphone.tsx`) using browser Web Speech API. Renders microphone button with pulsing red dot recording indicator, emits transcribed text via `onTranscription(text)` callback, handles mic-denied/no-speech/unsupported errors. 7 unit tests in `tests/unit/components/stt-microphone.test.ts`.
 
 ## 2026-06-11
+
 - refactor: rename Rabbi→Ernesto/Owner across entire codebase — `rabbi_bio` collection → `owner_bio`, `RabbiBioModel` → `OwnerBioModel`, `/api/rabbi-bio` → `/api/owner-bio`, `/api/admin/rabbi-bio` → `/api/admin/owner-bio`, `/admin/rabbi-bio` → `/admin/owner-bio`, forum creator enum `"rabbi"` → `"ernesto"`, instructor defaults `"Rabbi Yattah"` → `"Ernesto Yattah"`, function `getRabbiBio()` → `getOwnerBio()`. Updated test fixtures, assertions, and AGENTS.md.
 - Create `Dockerfile` with `oven/bun:1` base image, single-stage build: install dependencies with `--frozen-lockfile`, build Next.js app, expose port 3025, run `bun run start`.
 - Add `.github/workflows/ci.yml` GitHub Actions workflow triggered on push/PR to main with steps: checkout, setup Bun (`oven-sh/setup-bun@v2`), install (`--frozen-lockfile`), lint, type check (`tsc --noEmit`), unit tests (`bun test`), and Docker build. 15-minute timeout, no deploy or E2E steps.
-- Create `.dockerignore` to exclude node_modules, .next, .env*, .git, .omo, tests, Playwright artifacts, IDE files, and docs from Docker build context, reducing image size and preventing secrets from leaking into images.
+- Create `.dockerignore` to exclude node_modules, .next, .env\*, .git, .omo, tests, Playwright artifacts, IDE files, and docs from Docker build context, reducing image size and preventing secrets from leaking into images.
 - Set up `bun test` TDD infrastructure: create `tests/setup.ts` with MongoDB mock helpers (`mockDb`, `createMockCollection` with full CRUD stubs), create `tests/unit/models/sample.test.ts` with 10 example tests verifying the mock infrastructure, add `tests/unit/` directory structure mirroring source layout.
 
 ## 2026-06-11
+
 - Add `docker-compose.yml` with app + MongoDB 7 services. App builds from Dockerfile, exposes port 3025, connects to MongoDB via `mongodb://mongo:27017`, and uses `$${VAR:-default}` env var syntax. MongoDB uses named volume `mongo_data` for persistence.
 - Fix CSRF token missing on client forms: create `lib/csrf-client.ts` with `getCsrfToken()` and `csrfFetch()` wrapper that reads the `__Host-interjudaica_csrf` cookie and sends it as `x-csrf-token` header. Create `proxy.ts` (Next.js 16 proxy convention, replacing deprecated `middleware.ts`) to set the CSRF cookie on page loads with `httpOnly: false` so client JS can read it. Update 11 client forms to use `csrfFetch()` instead of raw `fetch()` for CSRF-protected POST endpoints: login, register, forgot-password, reset-password, contact, operator-login, 3 forum thread forms, and 2 checkout forms. `verify-email`, `resend-verify`, `resend-reset`, and `forums/upload-image` endpoints lack CSRF checks so their forms keep `fetch()`.
 - Add comprehensive E2E tests for AI assistant (`tests/e2e/ai-assistant.e2e.ts`, Task 28): 21 tests covering admin chat workflow (SSE headers, streaming data events, thread CRUD), student chat (auth gating, course discovery, thread management), auth (401 for no auth and invalid cookies), error handling (400 for invalid JSON, 404 for missing threads, 403 for cross-user access), and rate limiting (429 for students exceeding 20 req/hr). Tests include CSRF token generation matching server config (.env NEXTAUTH_SECRET), parallel worker-safe student setup with retry, and LLM-agnostic assertions (accept 200 or 500).
 - Fix rate limiter bug in `services/rate-limiter.ts`: `updated.data?.count` → `updated.count` (rate limit collection stores documents directly without MongoDBStorage data wrapper). Rate limiting was always allowing requests.
 
 ## 2026-06-10
+
 - Add chat history UI and API endpoints (Task 27): create `app/admin/components/ai-chat-history.tsx` ("use client" sidebar component) with thread list, active thread gold accent, relative timestamps, message count badges, "New Chat" button, and delete-with-confirmation dialog. Create `GET /api/agentes/chats` (list threads with `displayTitle` derived from first user message), `GET /api/agentes/chats/[uuid]` (get messages with ownership check), and `DELETE /api/agentes/chats/[uuid]` (cascade delete with ownership check). Auth supports both operators and users.
 - Add admin AI chat drawer component at `app/admin/components/ai-chat-drawer.tsx` (Task 24): full-screen Sheet (`!w-full !max-w-full`) with Vercel AI SDK `useChat` + `DefaultChatTransport` targeting `/api/agentes/chat`. Renders text, reasoning (DeepSeek R1 "Thinking..." collapsible), and tool call parts. Tool calls render as expandable cards (collapsed by default) showing tool name, parameters, result, and error states. Destructive approval flow with Approve/Deny buttons when `part.state === 'approval-requested'` via `addToolApprovalResponse()`. Auto-submit on approval via `sendAutomaticallyWhen: lastAssistantMessageIsCompleteWithApprovalResponses`. Enter to send, Shift+Enter for newline, auto-scroll to bottom. Close preserves chat state.
 - Add admin AI tools for forums, social proof, pages, and config (Task 19): 6 forum tools (list, get, create, update, delete with approval, feature), 4 testimonial tools (list, create, update, delete with approval), 5 page tools (list, get, create, update, delete with approval), and 2 config tools (get, update). Config tool filters out secret keys (AUTH_SECRET, DEEPSEEK_API_KEY, STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET, RESEND_API_KEY) using blocklist. All tools registered with `role: 'admin'`. Updated barrel export (`tools/index.ts`) with 8 tool files in alphabetical order.
@@ -80,6 +97,7 @@
 - Add unit tests for contact form CAPTCHA enforcement (`tests/contact-captcha.test.ts`) covering all 4 scenarios.
 
 ## 2026-06-04
+
 - Translate Spanish copy on `/community` plans section to English ("Planes" → "Plans", "Elegí tu plan" → "Choose your plan").
 - Replace `\n` with `<br />` elements in subscription plan descriptions on `/community` and add `whitespace-pre-line` to the checkout form description.
 - Route the `/community` hero Subscribe button to the most expensive active plan and hide it when no plans exist.
@@ -87,11 +105,13 @@
 - Show a US states dropdown (all 50) on `/register` when United States is selected; fall back to a text input for other countries.
 
 ## 2026-05-24
+
 - Confirm community membership immediately on Stripe return by passing the checkout session ID back to the dashboard, validating it server-side, and activating the student before rendering membership status.
 - Use the community membership registry as the canonical access check for community pages, papers, downloads, and forum APIs.
 - Complete the student password recovery UX with a 6-digit OTP input, visible email confirmation, 15-minute code messaging, and 60-second reset-code resend cooldown.
 
 ## 2026-05-22
+
 - Refine the home page for production: cap the desktop content width, replace the desktop course carousel with a responsive featured grid, hide empty testimonial publishing states, add compact hero proof points, and link the Rabbi CTA to `/ernesto-yattah`.
 - Use the official `public/logo-interjudaica.png` in public brand chrome and contact surfaces.
 - Add Playwright E2E coverage for public route smoke tests, protected-route redirects, home responsiveness/overflow, contact and login form states, security headers, and unauthenticated API behavior.
@@ -101,6 +121,7 @@
 - Tighten security headers with production-only removal of CSP `unsafe-eval`, worker/manifest directives, DNS prefetch, cross-domain policy, and COOP headers.
 
 ## 2026-05-20
+
 - Add Stripe Customer Portal route at `/api/community/customer-portal` and dashboard CTA for self-service subscription management
 - Reuse existing Stripe customer IDs during community checkout to keep subscriptions attached to the same billing profile
 - Add Bun test script plus broader route/unit coverage for operator login, customer portal, user registration, password reset, course/community/book checkout flows, webhook signature handling, base URL resolution, and error serialization
@@ -112,6 +133,7 @@
 - Improve markdown CMS image rendering with `next/image`
 
 ## 2026-05-14
+
 - Overhaul public CMS page rendering (`app/page/markdown-page.tsx`): gold headings (h1-h3), styled lists with bullets/numbers, bold/italic emphasis, blockquotes with gold left border, styled images with border, proper code blocks, tables, and dark-theme links
 - Enable images in markdown content via rehype-sanitize schema allowing `<img>` elements with safe attributes
 - Fix build failure: extract client-safe components (CourseGrid, CourseCard, etc.) into `portal-ui-client.tsx` to prevent server-only modules from leaking into client bundle
@@ -127,6 +149,7 @@
 - Admin `/admin/payments`: wire to live CoursePaymentStorage, UserStorage, and CourseStorage instead of static placeholder
 
 ## 2026-05-13
+
 - **Complete security hardening (9 items)**:
   - Session invalidation on password reset (passwordChangedAt + iat in tokens)
   - Coupon race condition fix (atomic claimCoupon with findOneAndUpdate)
@@ -137,7 +160,7 @@
   - Audit logging (audit_logs collection: login, register, verify, reset events)
   - Security headers: CSP, HSTS, X-Content-Type-Options, X-Frame-Options, Referrer-Policy, Permissions-Policy
 - **Configuration system**: Admin-configurable settings in MongoDB `config` collection. Moved upload size limits, community price, attachment limits to config. `/admin/config` page with grouped form.
-- **Security audit and hardening**: Fixed path traversal, host header poisoning, Math.random→crypto.randomInt, rate limiting on all auth endpoints, safeParse in user endpoints, cookie hardening (__Host- prefix, Secure, SameSite strict/lax), password max length, kind sanitization, file validation, forum createdBy fix, attachment validation, email normalization
+- **Security audit and hardening**: Fixed path traversal, host header poisoning, Math.random→crypto.randomInt, rate limiting on all auth endpoints, safeParse in user endpoints, cookie hardening (\_\_Host- prefix, Secure, SameSite strict/lax), password max length, kind sanitization, file validation, forum createdBy fix, attachment validation, email normalization
 - Rename all Spanish route directories to English across admin and public pages
 - Books module: admin CRUD, sales list, public landing, Stripe checkout (no login), email confirmation
 - CMS dynamic pages: admin CRUD with markdown editor, /page/[slug] routes, More content dropdown in header, footer link list
@@ -145,33 +168,41 @@
 - New services: BookSaleStorage, ConfigStorage, PageStorage, createRateLimiter, WebhookEventStorage, AuditLogStorage, CSRF service, magic-bytes validator
 
 ## 2026-05-05
+
 - Read MONGODB_URI/MONGODB_DATABASE env vars as fallbacks for MongoDB connection.
 
 ## 2026-05-05
+
 - Remove hardcoded course catalog from app/lib/content and load course pages from the database/public endpoint instead.
 
 ## 2026-05-05
+
 - Home now lists all public courses and renders them in a horizontal carousel when there are many.
 
 ## 2026-05-05
+
 - Home no longer filters out courses missing summaries; show all published courses.
 
 ## 2026-05-05
+
 - Remove debug logging from public course loader.
 
 ## 2026-05-05
+
 - Add student Login button to header navigation.
 - Header now shows the logged-in student profile shortcut (and hides Login/Enroll when signed in).
 
 ## 2026-05-05
+
 - Add /contact page and API route using Resend with React email templates (user confirmation + admin notification).
 
 ## 2026-05-05
+
 - Fix header Contact link and redesign /contact page as a two-column layout.
 
 ## 2026-05-05
-- Hide contact form after successful submit and show a confirmation message.
 
+- Hide contact form after successful submit and show a confirmation message.
 
 ## 2026-05-05
 
@@ -185,8 +216,8 @@
 - Documented all current API endpoints in `AGENTS.md`.
 - Added mandatory project workflow rules requiring changelog updates and descriptive commits after changes.
 
-
 ## Unreleased
+
 - Add OTP email verification for student signup (model, API, UI, resend flow, IP+email rate limits, and email template).
 - Guard duplicate signup by email and ignore existing user text index conflicts.
 - Move user index initialization to boot and avoid ensureIndexes during signup.
@@ -215,101 +246,134 @@
 - Improve contact email templates styling to match the dark/gold website theme and include the brand logo.
 
 ## Unreleased
+
 - Add Rabbi Ernesto Yattah block to contact emails (photo + bio + response promise).
 
 ## Unreleased
+
 - Document installed UI components and add student header popover with dashboard + logout.
 
 ## Unreleased
+
 - Refactor forms to use components/ui primitives (Input, Label, Textarea, Button).
 - Fix eslint warnings for email templates and effect lint rule in ui kit.
 
 ## Unreleased
+
 - Refactor register form to use components/ui primitives (Input, Label, Button).
 
 ## Unreleased
+
 - Refactor forgot/reset password screens to use components/ui primitives.
 
 ## Unreleased
+
 - Start migrating admin list filters to components/ui Input.
 
 ## Unreleased
+
 - Refactor admin course form inputs/textareas/buttons to components/ui primitives.
 
 ## Unreleased
+
 - Refactor admin instructor form inputs/textareas/buttons to components/ui primitives.
 
 ## Unreleased
+
 - Refactor admin operator form inputs/buttons to components/ui primitives.
 
 ## Unreleased
+
 - Refactor admin paper form inputs/textareas/buttons to components/ui primitives.
 
 ## Unreleased
+
 - Refactor admin course category form inputs/textareas/buttons to components/ui primitives.
 
 ## Unreleased
+
 - Refactor admin paper category form inputs/textareas/buttons to components/ui primitives.
 
 ## Unreleased
+
 - Refactor admin forum form inputs/buttons to components/ui primitives.
 
 ## Unreleased
+
 - Refactor admin collection manager form controls to components/ui primitives (Input, Textarea, Label, Button).
 
 ## Unreleased
+
 - Use components/ui Select for admin course form (category, instructor, level, status).
 
 ## Unreleased
+
 - Use components/ui Select for admin paper form (category, status, visibility).
 
 ## Unreleased
+
 - Use components/ui Select for admin forum form (area, related course, status).
 
 ## Unreleased
+
 - Use components/ui Select for admin operator form (level).
 
 ## Unreleased
+
 - Use components/ui Select for admin course list filters.
 
 ## Unreleased
+
 - Use components/ui Select for admin paper list filters.
 
 ## Unreleased
+
 - Use components/ui Select for admin forum list filters.
 
 ## Unreleased
+
 - Use components/ui Select for admin operator list filters.
 
 ## Unreleased
+
 - Use components/ui Select for admin instructor list filters.
 
 ## Unreleased
+
 - Use components/ui Select for admin course category list filters.
 
 ## Unreleased
+
 - Use components/ui Select for admin paper category list filters.
 
 ## Unreleased
+
 - Use components/ui Select for admin collection manager select fields.
 
 ## Unreleased
+
 - Use components/ui Switch for admin enabled/featured toggles.
 
 ## Unreleased
+
 - Use components/ui Switch for admin collection manager checkbox fields.
 
 ## Unreleased
+
 - Use components/ui Button for admin list action buttons (Edit/Delete).
 
 ## Unreleased
+
 - Use components/ui Button for admin list primary CTAs (New ...).
 
 ## Unreleased
+
 - Centralize admin filter text input classes via app/admin/components/admin-controls.
 
 ## Unreleased
+
 - Extract admin list stat pills into AdminStatPill component.
 
 ## Unreleased
+
 - Fix SelectItem empty value usage by mapping All/None options to sentinel values.

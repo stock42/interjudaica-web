@@ -24,6 +24,14 @@ interface UnifiedPayment {
 	stripePaymentIntentId: string
 }
 
+type PaymentSummary = {
+	totalAmount: number
+	paidCount: number
+	pendingCount: number
+	failedCount: number
+	refundedCount: number
+}
+
 async function buildUnifiedPayments(): Promise<UnifiedPayment[]> {
 	const [coursePayments, bookSales, communityUsers, users, courses, plans] =
 		await Promise.all([
@@ -35,9 +43,9 @@ async function buildUnifiedPayments(): Promise<UnifiedPayment[]> {
 			SubscriptionPlanStorage.list(),
 		])
 
-	const userByUuid = new Map(users.map((u) => [u.uuid, u]))
-	const courseById = new Map(courses.map((c) => [c.uuid, c]))
-	const planById = new Map(plans.map((p) => [p.uuid, p]))
+	const userByUuid = new Map(users.map(u => [u.uuid, u]))
+	const courseById = new Map(courses.map(c => [c.uuid, c]))
+	const planById = new Map(plans.map(p => [p.uuid, p]))
 
 	const unified: UnifiedPayment[] = []
 
@@ -119,7 +127,7 @@ function unifiedToCSV(payments: UnifiedPayment[]): string {
 		'Stripe Session ID',
 		'Stripe Payment Intent ID',
 	]
-	const rows = payments.map((p) => [
+	const rows = payments.map(p => [
 		csvEscape(p.id),
 		csvEscape(p.type),
 		csvEscape(p.status),
@@ -132,7 +140,7 @@ function unifiedToCSV(payments: UnifiedPayment[]): string {
 		csvEscape(p.stripeSessionId),
 		csvEscape(p.stripePaymentIntentId),
 	])
-	return [headers.join(','), ...rows.map((r) => r.join(','))].join('\n')
+	return [headers.join(','), ...rows.map(r => r.join(','))].join('\n')
 }
 
 export async function GET(request: NextRequest) {
@@ -152,12 +160,12 @@ export async function GET(request: NextRequest) {
 		// Filter by type
 		let filtered = unified
 		if (typeFilter && ['course', 'book', 'subscription'].includes(typeFilter)) {
-			filtered = filtered.filter((p) => p.type === typeFilter)
+			filtered = filtered.filter(p => p.type === typeFilter)
 		}
 
 		// Filter by search (case-insensitive on user name, email, item)
 		if (search) {
-			filtered = filtered.filter((p) => {
+			filtered = filtered.filter(p => {
 				const name = p.user.name.toLowerCase()
 				const email = p.user.email.toLowerCase()
 				const item = p.item.toLowerCase()
@@ -184,11 +192,20 @@ export async function GET(request: NextRequest) {
 		}
 
 		const totalItems = filtered.length
+		const summary: PaymentSummary = {
+			totalAmount: filtered
+				.filter(payment => payment.status === 'paid')
+				.reduce((total, payment) => total + payment.amount, 0),
+			paidCount: filtered.filter(payment => payment.status === 'paid').length,
+			pendingCount: filtered.filter(payment => payment.status === 'pending').length,
+			failedCount: filtered.filter(payment => payment.status === 'failed').length,
+			refundedCount: filtered.filter(payment => payment.status === 'refunded').length,
+		}
 		const totalPages = Math.ceil(totalItems / limit)
 		const start = (page - 1) * limit
 		const items = filtered.slice(start, start + limit)
 
-		return NextResponse.json({ items, page, totalPages, totalItems })
+		return NextResponse.json({ items, page, totalPages, totalItems, summary })
 	} catch (error) {
 		return routeError(error)
 	}

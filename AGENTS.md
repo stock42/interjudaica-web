@@ -93,8 +93,10 @@ Collection names currently in use:
 - `course_categories`
 - `course_classes`
 - `course_class_files`
+- `course_class_progress`
 - `course_enrollments`
 - `course_payments`
+- `audit_logs`
 - `contacts`
 - `password_reset_attempts`
 - `owner_bio`
@@ -170,143 +172,148 @@ This inventory must be updated whenever an API route is added, removed, renamed,
 
 Student/user auth endpoints:
 
-| Method | Path | Notes |
-| --- | --- | --- |
-| `POST` | `/api/user-auth/register` | Registers a student and sends verification email. |
-| `POST` | `/api/user-auth/login` | Authenticates a student user, sets `interjudaica_user_session`, returns `{ user }`. |
-| `POST` | `/api/user-auth/logout` | Clears `interjudaica_user_session` and redirects to `/login`. |
-| `GET` | `/api/user-auth/me` | Returns current student user or `401` with `{ user: null }`. |
-| `POST` | `/api/user-auth/verify` | Verifies email with a 6-digit code, activates the user, and sends a welcome email. |
-| `POST` | `/api/user-auth/resend-verify` | Resends the 6-digit verification code email. |
-| `POST` | `/api/user-auth/forgot-password` | Sends a 6-digit password reset code email. |
-| `POST` | `/api/user-auth/resend-reset` | Resends a password reset code email. |
-| `POST` | `/api/user-auth/reset-password` | Resets a password with email + code. |
+| Method | Path                             | Notes                                                                               |
+| ------ | -------------------------------- | ----------------------------------------------------------------------------------- |
+| `POST` | `/api/user-auth/register`        | Registers a student and sends verification email.                                   |
+| `POST` | `/api/user-auth/login`           | Authenticates a student user, sets `interjudaica_user_session`, returns `{ user }`. |
+| `POST` | `/api/user-auth/logout`          | Clears `interjudaica_user_session` and redirects to `/login`.                       |
+| `GET`  | `/api/user-auth/me`              | Returns current student user or `401` with `{ user: null }`.                        |
+| `POST` | `/api/user-auth/verify`          | Verifies email with a 6-digit code, activates the user, and sends a welcome email.  |
+| `POST` | `/api/user-auth/resend-verify`   | Resends the 6-digit verification code email.                                        |
+| `POST` | `/api/user-auth/forgot-password` | Sends a 6-digit password reset code email.                                          |
+| `POST` | `/api/user-auth/resend-reset`    | Resends a password reset code email.                                                |
+| `POST` | `/api/user-auth/reset-password`  | Resets a password with email + code.                                                |
 
 Operator/auth endpoints:
 
-| Method | Path | Notes |
-| --- | --- | --- |
-| `POST` | `/api/auth/login` | Authenticates an operator, sets `interjudaica_operator_session`, returns `{ operator }`. |
-| `POST` | `/api/auth/logout` | Clears `interjudaica_operator_session` and redirects to `/operator-login`. |
-| `GET` | `/api/auth/me` | Returns current operator or `401` with `{ operator: null }`. |
+| Method | Path               | Notes                                                                                    |
+| ------ | ------------------ | ---------------------------------------------------------------------------------------- |
+| `POST` | `/api/auth/login`  | Authenticates an operator, sets `interjudaica_operator_session`, returns `{ operator }`. |
+| `POST` | `/api/auth/logout` | Clears `interjudaica_operator_session` and redirects to `/operator-login`.               |
+| `GET`  | `/api/auth/me`     | Returns current operator or `401` with `{ operator: null }`.                             |
 
 Public content endpoints:
 
-| Method | Path | Notes |
-| --- | --- | --- |
-| `GET` | `/api/courses/[slug]/classes` | Lists classes for a published course as `{ items }`. |
-| `GET` | `/api/courses/classes/files/[fileUuid]` | Downloads a class file for enrolled students. |
-| `POST` | `/api/checkout` | Creates a Stripe checkout session for a course. |
-| `POST` | `/api/stripe/webhook` | Handles Stripe webhook events and enrolls students. |
-| `POST` | `/api/contact` | Saves a contact message and sends emails. |
-| `POST` | `/api/community/checkout` | Creates a Stripe checkout session for community membership. |
-| `GET` | `/api/forums` | Lists forum threads by area/course with pagination. |
-| `POST` | `/api/forums` | Creates a forum thread (student).
-| `POST` | `/api/forums/upload-image` | Uploads an image for a forum thread.
-| `GET` | `/api/papers` | Lists published papers by visibility. |
-| `GET` | `/api/papers/[slug]` | Returns one published paper by slug. |
-| `GET` | `/api/papers/[slug]/download` | Downloads a paper markdown file. |
-| `GET` | `/api/owner-bio` | Returns the public owner bio. |
-| `GET` | `/api/social-proof` | Lists published testimonials as `{ items }`. |
-| `POST` | `/api/books/checkout` | Creates a Stripe checkout session for a book. |
-| `GET` | `/api/books/[slug]` | Returns one published book by slug. |
+| Method  | Path                                        | Notes                                                                |
+| ------- | ------------------------------------------- | -------------------------------------------------------------------- |
+| `GET`   | `/api/courses/[slug]/classes`               | Lists classes for a published course as `{ items }`.                 |
+| `GET`   | `/api/courses/classes/files/[fileUuid]`     | Downloads a class file for enrolled students.                        |
+| `GET`   | `/api/courses/classes/[classUuid]/progress` | Returns the current student's progress record for an enrolled class. |
+| `PATCH` | `/api/courses/classes/[classUuid]/progress` | Marks an enrolled class complete/incomplete for the current student. |
+| `POST`  | `/api/checkout`                             | Creates a Stripe checkout session for a course.                      |
+| `POST`  | `/api/stripe/webhook`                       | Handles Stripe webhook events and enrolls students.                  |
+| `POST`  | `/api/contact`                              | Saves a contact message and sends emails.                            |
+| `POST`  | `/api/community/checkout`                   | Creates a Stripe checkout session for community membership.          |
+| `GET`   | `/api/forums`                               | Lists forum threads by area/course with pagination.                  |
+| `POST`  | `/api/forums`                               | Creates a forum thread (student).                                    |
+| `POST`  | `/api/forums/upload-image`                  | Uploads an image for a forum thread.                                 |
+| `GET`   | `/api/papers`                               | Lists published papers by visibility.                                |
+| `GET`   | `/api/papers/[slug]`                        | Returns one published paper by slug.                                 |
+| `GET`   | `/api/papers/[slug]/download`               | Downloads a paper markdown file.                                     |
+| `GET`   | `/api/owner-bio`                            | Returns the public owner bio.                                        |
+| `GET`   | `/api/social-proof`                         | Lists published testimonials as `{ items }`.                         |
+| `POST`  | `/api/books/checkout`                       | Creates a Stripe checkout session for a book.                        |
+| `GET`   | `/api/books/[slug]`                         | Returns one published book by slug.                                  |
 
 Admin utility endpoints:
 
-| Method | Path | Notes |
-| --- | --- | --- |
-| `POST` | `/api/admin/uploads/course-image` | Requires operator auth; accepts `multipart/form-data` with `file` and optional `kind`; returns `{ url }`. |
-| `POST` | `/api/admin/uploads/class-image` | Requires operator auth; accepts `multipart/form-data` with `file`; returns `{ url }`. |
-| `GET` | `/api/admin/contacts` | Lists contact messages as `{ items }`. |
-| `GET` | `/api/admin/contacts/[uuid]` | Gets a contact message by UUID. |
-| `POST` | `/api/admin/contacts/[uuid]/reply` | Sends a reply email (supports attachments) and marks as replied. |
-| `POST` | `/api/admin/contacts/[uuid]/mark-unread` | Marks a contact as new. |
-| `GET` | `/api/admin/password-resets` | Lists password reset attempts as `{ items }`. |
-| `GET` | `/api/admin/owner-bio` | Returns the current owner bio. |
-| `PUT` | `/api/admin/owner-bio` | Updates the owner bio content. |
-| `POST` | `/api/admin/uploads/instructor-photo` | Requires operator auth; accepts `multipart/form-data` with `file`; returns `{ url }`. |
-| `POST` | `/api/admin/uploads/forum-asset` | Requires operator auth; accepts `multipart/form-data` with `file`; returns `{ url }`. |
-| `POST` | `/api/admin/uploads/book-cover` | Requires operator auth; accepts `multipart/form-data` with `file`; returns `{ url }`. |
-| `POST` | `/api/admin/enrollments` | Creates a course enrollment for a student. |
-| `POST` | `/api/admin/community-users` | Grants community access to a student. |
-| `GET` | `/api/admin/coupons` | Lists coupons as `{ items }`. |
-| `POST` | `/api/admin/coupons` | Creates a coupon and returns `{ item }`. |
-| `GET` | `/api/admin/coupons/[uuid]` | Gets one coupon by UUID. |
-| `PATCH` | `/api/admin/coupons/[uuid]` | Updates one coupon by UUID. |
-| `DELETE` | `/api/admin/coupons/[uuid]` | Deletes one coupon by UUID. |
+| Method   | Path                                     | Notes                                                                                                         |
+| -------- | ---------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `POST`   | `/api/admin/uploads/course-image`        | Requires operator auth; accepts `multipart/form-data` with `file` and optional `kind`; returns `{ url }`.     |
+| `POST`   | `/api/admin/uploads/class-image`         | Requires operator auth; accepts `multipart/form-data` with `file`; returns `{ url }`.                         |
+| `GET`    | `/api/admin/contacts`                    | Lists contact messages as `{ items }`.                                                                        |
+| `GET`    | `/api/admin/contacts/[uuid]`             | Gets a contact message by UUID.                                                                               |
+| `POST`   | `/api/admin/contacts/[uuid]/reply`       | Sends a reply email (supports attachments) and marks as replied.                                              |
+| `POST`   | `/api/admin/contacts/[uuid]/mark-unread` | Marks a contact as new.                                                                                       |
+| `GET`    | `/api/admin/password-resets`             | Lists password reset attempts as `{ items }`.                                                                 |
+| `GET`    | `/api/admin/owner-bio`                   | Returns the current owner bio.                                                                                |
+| `PUT`    | `/api/admin/owner-bio`                   | Updates the owner bio content.                                                                                |
+| `POST`   | `/api/admin/uploads/instructor-photo`    | Requires operator auth; accepts `multipart/form-data` with `file`; returns `{ url }`.                         |
+| `POST`   | `/api/admin/uploads/forum-asset`         | Requires operator auth; accepts `multipart/form-data` with `file`; returns `{ url }`.                         |
+| `POST`   | `/api/admin/uploads/book-cover`          | Requires operator auth; accepts `multipart/form-data` with `file`; returns `{ url }`.                         |
+| `GET`    | `/api/admin/uploads/cleanup`             | Requires operator auth; dry-runs orphaned upload cleanup and returns `{ report }`.                            |
+| `POST`   | `/api/admin/uploads/cleanup`             | Requires operator auth; accepts `{ confirm: true }` to delete orphaned upload files and returns `{ report }`. |
+| `PATCH`  | `/api/admin/moderation/[kind]/[uuid]`    | Requires operator auth; updates contact/forum moderation status, owner, and due date.                         |
+| `POST`   | `/api/admin/enrollments`                 | Creates a course enrollment for a student.                                                                    |
+| `POST`   | `/api/admin/community-users`             | Grants community access to a student.                                                                         |
+| `GET`    | `/api/admin/coupons`                     | Lists coupons as `{ items }`.                                                                                 |
+| `POST`   | `/api/admin/coupons`                     | Creates a coupon and returns `{ item }`.                                                                      |
+| `GET`    | `/api/admin/coupons/[uuid]`              | Gets one coupon by UUID.                                                                                      |
+| `PATCH`  | `/api/admin/coupons/[uuid]`              | Updates one coupon by UUID.                                                                                   |
+| `DELETE` | `/api/admin/coupons/[uuid]`              | Deletes one coupon by UUID.                                                                                   |
 
 Admin CRUD endpoints, all requiring operator auth:
 
-| Method | Path | Notes |
-| --- | --- | --- |
-| `GET` | `/api/admin/course-categories` | Lists course categories as `{ items }`. |
-| `POST` | `/api/admin/course-categories` | Creates a course category and returns `{ item }`. |
-| `GET` | `/api/admin/classes` | Lists course classes by `courseUuid` as `{ items }`. |
-| `POST` | `/api/admin/classes` | Creates a course class and returns `{ item }`. |
-| `GET` | `/api/admin/classes/[uuid]` | Gets one course class by UUID. |
-| `PATCH` | `/api/admin/classes/[uuid]` | Updates one course class by UUID. |
-| `DELETE` | `/api/admin/classes/[uuid]` | Deletes one course class by UUID. |
-| `GET` | `/api/admin/classes/[uuid]/files` | Lists files for a class as `{ items }`. |
-| `POST` | `/api/admin/classes/[uuid]/files` | Uploads any file type for a class with optional title/description and returns `{ item }`. |
-| `GET` | `/api/admin/classes/[uuid]/files/[fileUuid]` | Downloads a class file for an operator. |
-| `PATCH` | `/api/admin/classes/[uuid]/files/[fileUuid]` | Updates class file title/description by UUID. |
-| `DELETE` | `/api/admin/classes/[uuid]/files/[fileUuid]` | Deletes a class file by UUID. |
-| `GET` | `/api/admin/course-categories/[uuid]` | Gets one course category by UUID. |
-| `PATCH` | `/api/admin/course-categories/[uuid]` | Updates one course category by UUID. |
-| `DELETE` | `/api/admin/course-categories/[uuid]` | Deletes one course category by UUID. |
-| `GET` | `/api/admin/courses` | Lists courses as `{ items }`. |
-| `POST` | `/api/admin/courses` | Creates a course and returns `{ item }`. |
-| `GET` | `/api/admin/courses/[uuid]` | Gets one course by UUID. |
-| `PATCH` | `/api/admin/courses/[uuid]` | Updates one course by UUID. |
-| `DELETE` | `/api/admin/courses/[uuid]` | Deletes one course by UUID. |
-| `GET` | `/api/admin/forums` | Lists forum threads as `{ items }`. |
-| `POST` | `/api/admin/forums` | Creates a forum thread and returns `{ item }`. |
-| `GET` | `/api/admin/forums/[uuid]` | Gets one forum thread by UUID. |
-| `PATCH` | `/api/admin/forums/[uuid]` | Updates one forum thread by UUID. |
-| `DELETE` | `/api/admin/forums/[uuid]` | Deletes one forum thread by UUID. |
-| `GET` | `/api/admin/instructors` | Lists instructors as `{ items }`. |
-| `POST` | `/api/admin/instructors` | Creates an instructor and returns `{ item }`. |
-| `GET` | `/api/admin/instructors/[uuid]` | Gets one instructor by UUID. |
-| `PATCH` | `/api/admin/instructors/[uuid]` | Updates one instructor by UUID. |
-| `DELETE` | `/api/admin/instructors/[uuid]` | Deletes one instructor by UUID. |
-| `GET` | `/api/admin/operators` | Lists operators as `{ items }`, without password fields. |
-| `POST` | `/api/admin/operators` | Creates an operator and returns `{ item }`. |
-| `GET` | `/api/admin/operators/[uuid]` | Gets one operator by UUID, without password fields. |
-| `PATCH` | `/api/admin/operators/[uuid]` | Updates one operator by UUID. |
-| `DELETE` | `/api/admin/operators/[uuid]` | Deletes one operator by UUID. |
-| `GET` | `/api/admin/paper-categories` | Lists paper categories as `{ items }`. |
-| `POST` | `/api/admin/paper-categories` | Creates a paper category and returns `{ item }`. |
-| `GET` | `/api/admin/paper-categories/[uuid]` | Gets one paper category by UUID. |
-| `PATCH` | `/api/admin/paper-categories/[uuid]` | Updates one paper category by UUID. |
-| `DELETE` | `/api/admin/paper-categories/[uuid]` | Deletes one paper category by UUID. |
-| `GET` | `/api/admin/papers` | Lists papers as `{ items }`. |
-| `POST` | `/api/admin/papers` | Creates a paper and returns `{ item }`. |
-| `GET` | `/api/admin/papers/[uuid]` | Gets one paper by UUID. |
-| `PATCH` | `/api/admin/papers/[uuid]` | Updates one paper by UUID. |
-| `DELETE` | `/api/admin/papers/[uuid]` | Deletes one paper by UUID. |
-| `GET` | `/api/admin/social-proof` | Lists testimonials as `{ items }`. |
-| `POST` | `/api/admin/social-proof` | Creates a testimonial and returns `{ item }`. |
-| `GET` | `/api/admin/social-proof/[uuid]` | Gets one testimonial by UUID. |
-| `PATCH` | `/api/admin/social-proof/[uuid]` | Updates one testimonial by UUID. |
-| `DELETE` | `/api/admin/social-proof/[uuid]` | Deletes one testimonial by UUID. |
-| `GET` | `/api/admin/users` | Lists users as `{ items }`, without password fields. |
-| `POST` | `/api/admin/users` | Creates a user and returns `{ item }`, without password fields. |
-| `GET` | `/api/admin/users/[uuid]` | Gets one user by UUID, without password fields. |
-| `PATCH` | `/api/admin/users/[uuid]` | Updates one user by UUID. |
-| `DELETE` | `/api/admin/users/[uuid]` | Deletes one user by UUID. |
-| `GET` | `/api/admin/books` | Lists books as `{ items }`. |
-| `POST` | `/api/admin/books` | Creates a book and returns `{ item }`. |
-| `GET` | `/api/admin/books/[uuid]` | Gets one book by UUID. |
-| `PATCH` | `/api/admin/books/[uuid]` | Updates one book by UUID. |
-| `DELETE` | `/api/admin/books/[uuid]` | Deletes one book by UUID. |
-| `GET` | `/api/admin/book-sales` | Lists book sales as `{ items }`. |
-| `GET` | `/api/admin/pages` | Lists CMS pages as `{ items }`. |
-| `POST` | `/api/admin/pages` | Creates a CMS page and returns `{ item }`. |
-| `GET` | `/api/admin/pages/[uuid]` | Gets one CMS page by UUID. |
-| `PATCH` | `/api/admin/pages/[uuid]` | Updates one CMS page by UUID. |
-| `DELETE` | `/api/admin/pages/[uuid]` | Deletes one CMS page by UUID. |
-| `GET` | `/api/admin/config` | Returns all configuration entries as `{ items }`. |
-| `PUT` | `/api/admin/config` | Updates configuration entries by key-value map.
+| Method   | Path                                         | Notes                                                                                     |
+| -------- | -------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| `GET`    | `/api/admin/course-categories`               | Lists course categories as `{ items }`.                                                   |
+| `POST`   | `/api/admin/course-categories`               | Creates a course category and returns `{ item }`.                                         |
+| `GET`    | `/api/admin/classes`                         | Lists course classes by `courseUuid` as `{ items }`.                                      |
+| `POST`   | `/api/admin/classes`                         | Creates a course class and returns `{ item }`.                                            |
+| `GET`    | `/api/admin/classes/[uuid]`                  | Gets one course class by UUID.                                                            |
+| `PATCH`  | `/api/admin/classes/[uuid]`                  | Updates one course class by UUID.                                                         |
+| `DELETE` | `/api/admin/classes/[uuid]`                  | Deletes one course class by UUID.                                                         |
+| `GET`    | `/api/admin/classes/[uuid]/files`            | Lists files for a class as `{ items }`.                                                   |
+| `POST`   | `/api/admin/classes/[uuid]/files`            | Uploads any file type for a class with optional title/description and returns `{ item }`. |
+| `GET`    | `/api/admin/classes/[uuid]/files/[fileUuid]` | Downloads a class file for an operator.                                                   |
+| `PATCH`  | `/api/admin/classes/[uuid]/files/[fileUuid]` | Updates class file title/description by UUID.                                             |
+| `DELETE` | `/api/admin/classes/[uuid]/files/[fileUuid]` | Deletes a class file by UUID.                                                             |
+| `GET`    | `/api/admin/course-categories/[uuid]`        | Gets one course category by UUID.                                                         |
+| `PATCH`  | `/api/admin/course-categories/[uuid]`        | Updates one course category by UUID.                                                      |
+| `DELETE` | `/api/admin/course-categories/[uuid]`        | Deletes one course category by UUID.                                                      |
+| `GET`    | `/api/admin/courses`                         | Lists courses as `{ items }`.                                                             |
+| `POST`   | `/api/admin/courses`                         | Creates a course and returns `{ item }`.                                                  |
+| `GET`    | `/api/admin/courses/[uuid]`                  | Gets one course by UUID.                                                                  |
+| `PATCH`  | `/api/admin/courses/[uuid]`                  | Updates one course by UUID.                                                               |
+| `DELETE` | `/api/admin/courses/[uuid]`                  | Deletes one course by UUID.                                                               |
+| `GET`    | `/api/admin/forums`                          | Lists forum threads as `{ items }`.                                                       |
+| `POST`   | `/api/admin/forums`                          | Creates a forum thread and returns `{ item }`.                                            |
+| `GET`    | `/api/admin/forums/[uuid]`                   | Gets one forum thread by UUID.                                                            |
+| `PATCH`  | `/api/admin/forums/[uuid]`                   | Updates one forum thread by UUID.                                                         |
+| `DELETE` | `/api/admin/forums/[uuid]`                   | Deletes one forum thread by UUID.                                                         |
+| `GET`    | `/api/admin/instructors`                     | Lists instructors as `{ items }`.                                                         |
+| `POST`   | `/api/admin/instructors`                     | Creates an instructor and returns `{ item }`.                                             |
+| `GET`    | `/api/admin/instructors/[uuid]`              | Gets one instructor by UUID.                                                              |
+| `PATCH`  | `/api/admin/instructors/[uuid]`              | Updates one instructor by UUID.                                                           |
+| `DELETE` | `/api/admin/instructors/[uuid]`              | Deletes one instructor by UUID.                                                           |
+| `GET`    | `/api/admin/operators`                       | Lists operators as `{ items }`, without password fields.                                  |
+| `POST`   | `/api/admin/operators`                       | Creates an operator and returns `{ item }`.                                               |
+| `GET`    | `/api/admin/operators/[uuid]`                | Gets one operator by UUID, without password fields.                                       |
+| `PATCH`  | `/api/admin/operators/[uuid]`                | Updates one operator by UUID.                                                             |
+| `DELETE` | `/api/admin/operators/[uuid]`                | Deletes one operator by UUID.                                                             |
+| `GET`    | `/api/admin/paper-categories`                | Lists paper categories as `{ items }`.                                                    |
+| `POST`   | `/api/admin/paper-categories`                | Creates a paper category and returns `{ item }`.                                          |
+| `GET`    | `/api/admin/paper-categories/[uuid]`         | Gets one paper category by UUID.                                                          |
+| `PATCH`  | `/api/admin/paper-categories/[uuid]`         | Updates one paper category by UUID.                                                       |
+| `DELETE` | `/api/admin/paper-categories/[uuid]`         | Deletes one paper category by UUID.                                                       |
+| `GET`    | `/api/admin/papers`                          | Lists papers as `{ items }`.                                                              |
+| `POST`   | `/api/admin/papers`                          | Creates a paper and returns `{ item }`.                                                   |
+| `GET`    | `/api/admin/papers/[uuid]`                   | Gets one paper by UUID.                                                                   |
+| `PATCH`  | `/api/admin/papers/[uuid]`                   | Updates one paper by UUID.                                                                |
+| `DELETE` | `/api/admin/papers/[uuid]`                   | Deletes one paper by UUID.                                                                |
+| `GET`    | `/api/admin/social-proof`                    | Lists testimonials as `{ items }`.                                                        |
+| `POST`   | `/api/admin/social-proof`                    | Creates a testimonial and returns `{ item }`.                                             |
+| `GET`    | `/api/admin/social-proof/[uuid]`             | Gets one testimonial by UUID.                                                             |
+| `PATCH`  | `/api/admin/social-proof/[uuid]`             | Updates one testimonial by UUID.                                                          |
+| `DELETE` | `/api/admin/social-proof/[uuid]`             | Deletes one testimonial by UUID.                                                          |
+| `GET`    | `/api/admin/users`                           | Lists users as `{ items }`, without password fields.                                      |
+| `POST`   | `/api/admin/users`                           | Creates a user and returns `{ item }`, without password fields.                           |
+| `GET`    | `/api/admin/users/[uuid]`                    | Gets one user by UUID, without password fields.                                           |
+| `PATCH`  | `/api/admin/users/[uuid]`                    | Updates one user by UUID.                                                                 |
+| `DELETE` | `/api/admin/users/[uuid]`                    | Deletes one user by UUID.                                                                 |
+| `GET`    | `/api/admin/books`                           | Lists books as `{ items }`.                                                               |
+| `POST`   | `/api/admin/books`                           | Creates a book and returns `{ item }`.                                                    |
+| `GET`    | `/api/admin/books/[uuid]`                    | Gets one book by UUID.                                                                    |
+| `PATCH`  | `/api/admin/books/[uuid]`                    | Updates one book by UUID.                                                                 |
+| `DELETE` | `/api/admin/books/[uuid]`                    | Deletes one book by UUID.                                                                 |
+| `GET`    | `/api/admin/book-sales`                      | Lists book sales as `{ items }`.                                                          |
+| `GET`    | `/api/admin/pages`                           | Lists CMS pages as `{ items }`.                                                           |
+| `POST`   | `/api/admin/pages`                           | Creates a CMS page and returns `{ item }`.                                                |
+| `GET`    | `/api/admin/pages/[uuid]`                    | Gets one CMS page by UUID.                                                                |
+| `PATCH`  | `/api/admin/pages/[uuid]`                    | Updates one CMS page by UUID.                                                             |
+| `DELETE` | `/api/admin/pages/[uuid]`                    | Deletes one CMS page by UUID.                                                             |
+| `GET`    | `/api/admin/config`                          | Returns all configuration entries as `{ items }`.                                         |
+| `PUT`    | `/api/admin/config`                          | Updates configuration entries by key-value map.                                           |
 
 ## Components (installed UI kit)
 
@@ -315,6 +322,7 @@ This repo includes a pre-installed UI component kit under `./components/ui/*`.
 **Rule:** Always prefer these components first. Only create a new component when it does not exist in the list below, and when creating new shared components place them under `./components/share/*`.
 
 Available components (`components/ui`):
+
 - accordion
 - alert-dialog
 - alert
@@ -408,7 +416,7 @@ Public route map:
 Admin route map:
 
 - `/admin`
-- `/admin/users`
+- `/admin/users`, `/admin/users/[uuid]`
 - `/admin/operators`, `/admin/operators/new`, `/admin/operators/[uuid]`
 - `/admin/courses`, `/admin/courses/new`, `/admin/courses/[uuid]`
 - `/admin/classes/[courseUuid]`, `/admin/classes/[courseUuid]/new`, `/admin/classes/[courseUuid]/edit/[classUuid]`
@@ -423,16 +431,18 @@ Admin route map:
 - `/admin/papers`, `/admin/papers/new`, `/admin/papers/[uuid]`
 - `/admin/paper-categories`, `/admin/paper-categories/new`, `/admin/paper-categories/[uuid]`
 - `/admin/forum`, `/admin/forum/new`, `/admin/forum/[uuid]`
+- `/admin/moderation`
 - `/admin/social-proof`, `/admin/social-proof/new`, `/admin/social-proof/[uuid]`
 - `/admin/books`, `/admin/books/new`, `/admin/books/[uuid]`
 - `/admin/book-sales`
 - `/admin/pages`, `/admin/pages/new`, `/admin/pages/[uuid]`
 - `/admin/config`
+- `/admin/audit-logs`
 - `/admin/subscriptions`
 - `/admin/payments`
 - `/admin/analytics`
 
-Some public and admin pages are still static placeholders, especially password recovery, email verification, payments, subscriptions, analytics, and parts of the student dashboard/forum. Do not describe them as fully integrated unless you implement the backing flow.
+Some public and admin pages are still static placeholders, especially parts of password recovery, email verification, and the student dashboard/forum. Do not describe them as fully integrated unless you implement the backing flow.
 
 ## Admin UI Patterns
 
@@ -448,7 +458,7 @@ Prefer dedicated route-level screens for create/edit flows, matching existing mo
 
 List screens usually provide client-side filtering and delete actions, then call `router.refresh()`.
 
-`AdminCollectionManager` exists for generic CRUD management and is currently used by `/admin/users`. Prefer module-specific forms/lists for richer entities.
+`AdminCollectionManager` exists for generic CRUD management. Prefer module-specific forms/lists for richer entities; `/admin/users` now uses a diagnostics-focused access list instead of the generic manager.
 
 ## Next.js Conventions
 

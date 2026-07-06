@@ -36,6 +36,13 @@ interface PaymentsResponse {
 	page: number
 	totalPages: number
 	totalItems: number
+	summary: {
+		totalAmount: number
+		paidCount: number
+		pendingCount: number
+		failedCount: number
+		refundedCount: number
+	}
 }
 
 const LIMIT = 30
@@ -57,10 +64,7 @@ const TYPE_LABEL: Record<PaymentType, string> = {
 	subscription: 'Subscription',
 }
 
-function getPaginationRange(
-	current: number,
-	total: number,
-): (number | 'ellipsis')[] {
+function getPaginationRange(current: number, total: number): (number | 'ellipsis')[] {
 	if (total <= 1) return []
 	const range: (number | 'ellipsis')[] = []
 	const delta = 2
@@ -125,11 +129,8 @@ export function PaymentsContent({
 	const [searchInput, setSearchInput] = useState(initialSearch)
 	const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined)
 
-	function buildUrl(
-		updates: Partial<{ search: string; type: string; page: number }>,
-	) {
-		const s =
-			updates.search !== undefined ? updates.search : initialSearch
+	function buildUrl(updates: Partial<{ search: string; type: string; page: number }>) {
+		const s = updates.search !== undefined ? updates.search : initialSearch
 		const t = updates.type !== undefined ? updates.type : initialType
 		const p = updates.page !== undefined ? updates.page : initialPage
 		const params = new URLSearchParams()
@@ -199,7 +200,7 @@ export function PaymentsContent({
 	}
 
 	const csvExportData =
-		data?.items.map((p) => ({
+		data?.items.map(p => ({
 			id: p.id,
 			type: p.type,
 			status: p.status,
@@ -230,7 +231,7 @@ export function PaymentsContent({
 							type="search"
 							placeholder="User name, email, or item"
 							value={searchInput}
-							onChange={(e) => handleSearchChange(e.target.value)}
+							onChange={e => handleSearchChange(e.target.value)}
 						/>
 					</label>
 					<label className="grid w-full gap-2 text-sm font-semibold text-[var(--ink)] xl:w-56">
@@ -238,7 +239,7 @@ export function PaymentsContent({
 						<select
 							className={adminTextControlClass}
 							value={initialType}
-							onChange={(e) => handleTypeChange(e.target.value)}
+							onChange={e => handleTypeChange(e.target.value)}
 						>
 							<option value="">All types</option>
 							<option value="course">Courses</option>
@@ -254,29 +255,54 @@ export function PaymentsContent({
 				</form>
 				{data && (
 					<p className="mt-3 text-xs text-[var(--muted)]">
-						{data.totalItems} payment{data.totalItems !== 1 ? 's' : ''}{' '}
-						found
-						{data.totalItems > LIMIT &&
-							` (page ${data.page} of ${data.totalPages})`}
+						{data.totalItems} payment{data.totalItems !== 1 ? 's' : ''} found
+						{data.totalItems > LIMIT && ` (page ${data.page} of ${data.totalPages})`}
 					</p>
 				)}
 			</section>
 
+			{data ?
+				<section className="grid gap-3 md:grid-cols-4">
+					{[
+						[
+							'Paid revenue',
+							`$${data.summary.totalAmount.toFixed(2)} USD`,
+							`${data.summary.paidCount} paid`,
+						],
+						['Pending', String(data.summary.pendingCount), 'Needs reconciliation'],
+						['Failed', String(data.summary.failedCount), 'Review payment issues'],
+						['Refunded', String(data.summary.refundedCount), 'Closed out'],
+					].map(([label, value, note]) => (
+						<div
+							key={label}
+							className="rounded-lg border border-[var(--line)] bg-[var(--surface)] p-4 shadow-[var(--shadow)]"
+						>
+							<p className="text-xs font-bold uppercase tracking-[0.12em] text-[var(--gold)]">
+								{label}
+							</p>
+							<p className="mt-2 text-lg font-semibold tabular-nums text-[var(--ink)]">
+								{value}
+							</p>
+							<p className="mt-1 text-xs text-[var(--muted)]">{note}</p>
+						</div>
+					))}
+				</section>
+			:	null}
+
 			{/* Table */}
-			{error ? (
+			{error ?
 				<div className="rounded-lg border border-[var(--line)] bg-[var(--surface)] p-8 text-center text-[var(--muted)] shadow-[var(--shadow)]">
 					{error}
 				</div>
-			) : loading ? (
+			: loading ?
 				<div className="rounded-lg border border-[var(--line)] bg-[var(--surface)] p-8 text-center text-sm text-[var(--muted)] shadow-[var(--shadow)]">
 					Loading payments&hellip;
 				</div>
-			) : (data?.items.length ?? 0) === 0 ? (
+			: (data?.items.length ?? 0) === 0 ?
 				<div className="rounded-lg border border-[var(--line)] bg-[var(--surface)] p-8 text-center text-sm text-[var(--muted)] shadow-[var(--shadow)]">
 					No payments match this filter.
 				</div>
-			) : (
-				<>
+			:	<>
 					<section className="overflow-hidden rounded-lg border border-[var(--line)] bg-[var(--surface)] shadow-[var(--shadow)]">
 						<div className="overflow-x-auto">
 							<table className="w-full min-w-[56rem] border-collapse text-left text-sm">
@@ -291,14 +317,14 @@ export function PaymentsContent({
 									</tr>
 								</thead>
 								<tbody>
-									{data?.items.map((p) => (
+									{data?.items.map(p => (
 										<tr
 											key={p.id}
 											className="border-t border-[var(--line)] cursor-pointer transition-colors hover:bg-[rgba(244,189,51,0.08)]"
 											onClick={() => handleRowClick(p)}
 											tabIndex={0}
 											role="button"
-											onKeyDown={(e) => {
+											onKeyDown={e => {
 												if (e.key === 'Enter' || e.key === ' ') {
 													e.preventDefault()
 													handleRowClick(p)
@@ -307,23 +333,19 @@ export function PaymentsContent({
 										>
 											<td className="px-4 py-4">
 												<p className="font-mono text-xs text-[var(--muted)]">
-													{p.stripeSessionId
-														? p.stripeSessionId.slice(-12)
-														: p.stripePaymentIntentId
-															? p.stripePaymentIntentId.slice(-12)
-															: '—'}
+													{p.stripeSessionId ?
+														p.stripeSessionId.slice(-12)
+													: p.stripePaymentIntentId ?
+														p.stripePaymentIntentId.slice(-12)
+													:	'—'}
 												</p>
-												<p className="mt-1 text-xs text-[var(--muted)]">
-													{p.item}
-												</p>
+												<p className="mt-1 text-xs text-[var(--muted)]">{p.item}</p>
 											</td>
 											<td className="px-4 py-4">
 												<p className="font-semibold text-[var(--ink)]">
 													{p.user.name || p.user.email}
 												</p>
-												<p className="mt-1 text-xs text-[var(--muted)]">
-													{p.user.email}
-												</p>
+												<p className="mt-1 text-xs text-[var(--muted)]">{p.user.email}</p>
 											</td>
 											<td className="px-4 py-4 text-[var(--muted)]">
 												{TYPE_LABEL[p.type] ?? p.type}
@@ -354,7 +376,7 @@ export function PaymentsContent({
 					{data && data.totalPages > 1 && (
 						<Pagination>
 							<PaginationContent>
-								{initialPage > 1 ? (
+								{initialPage > 1 ?
 									<PaginationItem>
 										<PaginationPrevious
 											href={buildUrl({
@@ -362,21 +384,19 @@ export function PaymentsContent({
 											})}
 										/>
 									</PaginationItem>
-								) : (
-									<PaginationItem>
+								:	<PaginationItem>
 										<PaginationPrevious
 											aria-disabled
 											href="#"
 										/>
 									</PaginationItem>
-								)}
+								}
 
 								{pageRange.map((item, i) => (
 									<PaginationItem key={i}>
-										{item === 'ellipsis' ? (
+										{item === 'ellipsis' ?
 											<PaginationEllipsis />
-										) : (
-											<PaginationLink
+										:	<PaginationLink
 												href={buildUrl({
 													page: item,
 												})}
@@ -384,11 +404,11 @@ export function PaymentsContent({
 											>
 												{item}
 											</PaginationLink>
-										)}
+										}
 									</PaginationItem>
 								))}
 
-								{initialPage < data.totalPages ? (
+								{initialPage < data.totalPages ?
 									<PaginationItem>
 										<PaginationNext
 											href={buildUrl({
@@ -396,19 +416,18 @@ export function PaymentsContent({
 											})}
 										/>
 									</PaginationItem>
-								) : (
-									<PaginationItem>
+								:	<PaginationItem>
 										<PaginationNext
 											aria-disabled
 											href="#"
 										/>
 									</PaginationItem>
-								)}
+								}
 							</PaginationContent>
 						</Pagination>
 					)}
 				</>
-			)}
+			}
 			<PaymentDetailModal
 				payment={selectedPayment}
 				open={modalOpen}

@@ -1,100 +1,125 @@
-import "server-only";
+import 'server-only'
 
-import { ContactModel, type TypeContact } from "@/models/contacts";
-import { MongoDBStorage } from "@/services/MongoDBStorage";
+import { ContactModel, type TypeContact } from '@/models/contacts'
+import { MongoDBStorage } from '@/services/MongoDBStorage'
 
 export class ContactStorage extends MongoDBStorage<TypeContact> {
-	static readonly COLLECTION = "contacts";
-	private static indexesReady = false;
+	static readonly COLLECTION = 'contacts'
+	private static indexesReady = false
 
 	constructor() {
-		super(ContactStorage.COLLECTION);
+		super(ContactStorage.COLLECTION)
 	}
 
 	static async ensureIndexes() {
 		if (ContactStorage.indexesReady) {
-			return;
+			return
 		}
 
 		const collection = await MongoDBStorage.getCollection<TypeContact>(
 			ContactStorage.COLLECTION,
-		);
+		)
 
 		await Promise.all([
 			collection.createIndex({ uuid: 1 }, { unique: true }),
-			collection.createIndex({ "data.status": 1, _added: -1 }),
-			collection.createIndex({ "data.email": 1 }),
-		]);
+			collection.createIndex({ 'data.status': 1, _added: -1 }),
+			collection.createIndex({ 'data.email': 1 }),
+			collection.createIndex({ 'data.ownerOperatorUuid': 1 }),
+			collection.createIndex({ 'data.dueAt': 1 }),
+		])
 
-		ContactStorage.indexesReady = true;
+		ContactStorage.indexesReady = true
 	}
 
 	static async list() {
-		await ContactStorage.ensureIndexes();
+		await ContactStorage.ensureIndexes()
 		const docs = await MongoDBStorage._find<TypeContact>(
 			ContactStorage.COLLECTION,
 			{},
 			undefined,
 			{ _added: -1 },
-		);
+		)
 
-		return docs.map((doc) => doc.data);
+		return docs.map(doc => doc.data)
 	}
 
 	static async get(uuid: string) {
-		await ContactStorage.ensureIndexes();
+		await ContactStorage.ensureIndexes()
 		const doc = await MongoDBStorage._getByUUID<TypeContact>(
 			ContactStorage.COLLECTION,
 			uuid,
-		);
+		)
 
-		return doc?.data ?? null;
+		return doc?.data ?? null
 	}
 
 	static async create(input: Partial<TypeContact>) {
-		await ContactStorage.ensureIndexes();
+		await ContactStorage.ensureIndexes()
 		const contact = new ContactModel({
-			status: "new",
+			status: 'new',
 			createdAt: new Date().toISOString(),
 			...input,
-		} as TypeContact);
-		await MongoDBStorage._insert<TypeContact>(
-			ContactStorage.COLLECTION,
-			contact,
-		);
-		return contact.getData();
+		} as TypeContact)
+		await MongoDBStorage._insert<TypeContact>(ContactStorage.COLLECTION, contact)
+		return contact.getData()
 	}
 
 	static async markReplied(
 		uuid: string,
 		payload: { replySubject: string; replyMessage: string },
 	) {
-		await ContactStorage.ensureIndexes();
+		await ContactStorage.ensureIndexes()
 		return MongoDBStorage._update<TypeContact>(
 			ContactStorage.COLLECTION,
-			{ "data.uuid": uuid },
+			{ 'data.uuid': uuid },
 			{
-				status: "replied",
+				status: 'replied',
 				repliedAt: new Date().toISOString(),
 				replySubject: payload.replySubject,
 				replyMessage: payload.replyMessage,
 			},
 			{ upsert: false },
-		);
+		)
 	}
 
 	static async markUnread(uuid: string) {
-		await ContactStorage.ensureIndexes();
+		await ContactStorage.ensureIndexes()
 		return MongoDBStorage._update<TypeContact>(
 			ContactStorage.COLLECTION,
-			{ "data.uuid": uuid },
+			{ 'data.uuid': uuid },
 			{
-				status: "new",
-				repliedAt: "",
-				replySubject: "",
-				replyMessage: "",
+				status: 'new',
+				repliedAt: '',
+				replySubject: '',
+				replyMessage: '',
 			},
 			{ upsert: false },
-		);
+		)
+	}
+
+	static async update(uuid: string, input: Partial<TypeContact>) {
+		await ContactStorage.ensureIndexes()
+		const existing = await MongoDBStorage._getByUUID<TypeContact>(
+			ContactStorage.COLLECTION,
+			uuid,
+		)
+
+		if (!existing) {
+			return null
+		}
+
+		const contact = new ContactModel({
+			...existing.data,
+			...input,
+			uuid,
+		})
+
+		await MongoDBStorage._replaceData<TypeContact>(
+			ContactStorage.COLLECTION,
+			uuid,
+			contact.getData(),
+		)
+
+		return contact.getData()
 	}
 }

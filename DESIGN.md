@@ -8,22 +8,22 @@ InterJudaica feels like a focused study room: dark, calm, scholarly, and usable 
 
 ### Palette
 
-| Role | Token | Value | Usage |
-| --- | --- | --- | --- |
-| Background | `--background` | `#050608` | Global page background |
-| Foreground | `--foreground` | `#f8f2e8` | Default readable text |
-| Paper | `--paper` | `#0d1013` | Nested panels and table rows |
-| Surface | `--surface` | `#11161a` | Admin cards, panels, and lists |
-| Surface soft | `--surface-soft` | `#171c20` | Inputs and slightly raised controls |
-| Ink | `--ink` | `#f8f2e8` | Main headings and high-emphasis copy |
-| Muted | `--muted` | `#c1b8a8` | Secondary text and descriptions |
-| Line | `--line` | `rgba(235, 177, 42, 0.28)` | Gold dividers and panel borders |
-| Line soft | `--line-soft` | `rgba(255, 255, 255, 0.1)` | Quiet separators |
-| Sapphire | `--sapphire` | `#f3bc32` | Legacy accent mapped to gold |
-| Jade | `--jade` | `#cf9d22` | Secondary warm accent |
-| Sumac | `--sumac` | `#b26a22` | Warning/earth accent |
-| Gold | `--gold` | `#f4bd33` | Primary action, focus, active navigation |
-| Gold soft | `--gold-soft` | `#946a13` | Lower-emphasis gold states |
+| Role         | Token            | Value                      | Usage                                    |
+| ------------ | ---------------- | -------------------------- | ---------------------------------------- |
+| Background   | `--background`   | `#050608`                  | Global page background                   |
+| Foreground   | `--foreground`   | `#f8f2e8`                  | Default readable text                    |
+| Paper        | `--paper`        | `#0d1013`                  | Nested panels and table rows             |
+| Surface      | `--surface`      | `#11161a`                  | Admin cards, panels, and lists           |
+| Surface soft | `--surface-soft` | `#171c20`                  | Inputs and slightly raised controls      |
+| Ink          | `--ink`          | `#f8f2e8`                  | Main headings and high-emphasis copy     |
+| Muted        | `--muted`        | `#c1b8a8`                  | Secondary text and descriptions          |
+| Line         | `--line`         | `rgba(235, 177, 42, 0.28)` | Gold dividers and panel borders          |
+| Line soft    | `--line-soft`    | `rgba(255, 255, 255, 0.1)` | Quiet separators                         |
+| Sapphire     | `--sapphire`     | `#f3bc32`                  | Legacy accent mapped to gold             |
+| Jade         | `--jade`         | `#cf9d22`                  | Secondary warm accent                    |
+| Sumac        | `--sumac`        | `#b26a22`                  | Warning/earth accent                     |
+| Gold         | `--gold`         | `#f4bd33`                  | Primary action, focus, active navigation |
+| Gold soft    | `--gold-soft`    | `#946a13`                  | Lower-emphasis gold states               |
 
 ### Rules
 
@@ -36,15 +36,15 @@ InterJudaica feels like a focused study room: dark, calm, scholarly, and usable 
 
 ### Scale
 
-| Level | Size | Weight | Line Height | Tracking | Usage |
-| --- | --- | --- | --- | --- | --- |
-| Display | `3rem` | 600 | 1.1 | 0 | Page titles |
-| H1 | `2.25rem` | 600 | 1.15 | 0 | Section titles |
-| H2 | `1.875rem` | 600 | 1.2 | 0 | Admin module headings |
-| H3 | `1.25rem` | 600 | 1.35 | 0 | Card and form titles |
-| Body | `1rem` | 400 | 1.6 | 0 | Main copy |
-| Body small | `0.875rem` | 400/600 | 1.5 | 0 | Tables, forms, metadata |
-| Caption | `0.75rem` | 700 | 1.4 | 0.12em | Labels and overlines |
+| Level      | Size       | Weight  | Line Height | Tracking | Usage                   |
+| ---------- | ---------- | ------- | ----------- | -------- | ----------------------- |
+| Display    | `3rem`     | 600     | 1.1         | 0        | Page titles             |
+| H1         | `2.25rem`  | 600     | 1.15        | 0        | Section titles          |
+| H2         | `1.875rem` | 600     | 1.2         | 0        | Admin module headings   |
+| H3         | `1.25rem`  | 600     | 1.35        | 0        | Card and form titles    |
+| Body       | `1rem`     | 400     | 1.6         | 0        | Main copy               |
+| Body small | `0.875rem` | 400/600 | 1.5         | 0        | Tables, forms, metadata |
+| Caption    | `0.75rem`  | 700     | 1.4         | 0.12em   | Labels and overlines    |
 
 ### Font Stack
 
@@ -64,15 +64,15 @@ InterJudaica feels like a focused study room: dark, calm, scholarly, and usable 
 
 All spacing maps to a 4px base unit through Tailwind utilities.
 
-| Token | Value | Usage |
-| --- | --- | --- |
-| `--space-1` | 4px | Tight icon-label gaps |
-| `--space-2` | 8px | Compact rows |
-| `--space-3` | 12px | Input padding and dense groups |
-| `--space-4` | 16px | Form groups |
-| `--space-5` | 20px | Admin panel padding |
-| `--space-6` | 24px | Standard section groups |
-| `--space-8` | 32px | Major admin blocks |
+| Token       | Value | Usage                          |
+| ----------- | ----- | ------------------------------ |
+| `--space-1` | 4px   | Tight icon-label gaps          |
+| `--space-2` | 8px   | Compact rows                   |
+| `--space-3` | 12px  | Input padding and dense groups |
+| `--space-4` | 16px  | Form groups                    |
+| `--space-5` | 20px  | Admin panel padding            |
+| `--space-6` | 24px  | Standard section groups        |
+| `--space-8` | 32px  | Major admin blocks             |
 
 ### Grid
 
@@ -124,13 +124,58 @@ All spacing maps to a 4px base unit through Tailwind utilities.
 - **Accessibility**: downloads are links with visible labels.
 - **Motion**: standard link/button transitions only.
 
+### Course Material Library
+
+- **Structure**: course-level panel, summary counts, warning chips, class sections, file rows.
+- **Variants**: no classes, empty class, file missing description, populated class.
+- **Spacing**: panel `p-4 sm:p-5`, file rows `p-3`, `gap-3`.
+- **States**: download link hover/focus, warning chips for attention-needed items.
+- **Accessibility**: all edit/download actions are links with clear labels.
+- **Motion**: hover/focus transitions only.
+
+### Admin Command Palette
+
+- **Structure**: command dialog, search input, quick-action group, result group.
+- **Variants**: empty, loading, quick actions, search results.
+- **Spacing**: compact rows with icon, label, and shortcut/subtitle.
+- **States**: keyboard open via Ctrl/Cmd K, selected item, focus ring.
+- **Accessibility**: command dialog title/description and keyboard navigation come from the UI kit.
+- **Motion**: dialog open/close motion from the UI kit only.
+
+### Moderation Queue
+
+- **Structure**: filters for status/owner/due date plus repeated queue records.
+- **Variants**: contact, forum, unassigned, overdue, empty filter.
+- **Spacing**: filter panel `p-4 sm:p-5`, queue record `p-4`.
+- **States**: saving, filtered empty, hover/focus on open action.
+- **Accessibility**: uses native select/input controls and links to source records.
+- **Motion**: no decorative motion.
+
+### User Access Diagnostics
+
+- **Structure**: searchable user access list and per-user detail tables.
+- **Variants**: no enrollments, manual grant, Stripe/coupon source, no activity.
+- **Spacing**: operational tables with `px-4 py-3` cells.
+- **States**: row hover, diagnostics link focus, empty filter state.
+- **Accessibility**: table semantics and explicit diagnostics links.
+- **Motion**: hover/focus only.
+
+### Upload Cleanup Panel
+
+- **Structure**: scan/delete command group, summary counts, candidate list.
+- **Variants**: unscanned, clean, orphaned files, deletion result, error.
+- **Spacing**: `p-4 sm:p-5`, candidate rows `px-3 py-2`.
+- **States**: disabled destructive action until a scan finds orphaned files.
+- **Accessibility**: destructive action is a button with explicit label.
+- **Motion**: none.
+
 ## 6. Motion & Interaction
 
-| Type | Duration | Easing | Usage |
-| --- | --- | --- | --- |
-| Micro | 100-150ms | ease-out | Button active states |
-| Standard | 200ms | ease-in-out | Collapsible admin groups |
-| Focus | immediate | none | Keyboard ring visibility |
+| Type     | Duration  | Easing      | Usage                    |
+| -------- | --------- | ----------- | ------------------------ |
+| Micro    | 100-150ms | ease-out    | Button active states     |
+| Standard | 200ms     | ease-in-out | Collapsible admin groups |
+| Focus    | immediate | none        | Keyboard ring visibility |
 
 ### Rules
 
@@ -144,11 +189,11 @@ All spacing maps to a 4px base unit through Tailwind utilities.
 
 Mixed, leaning tonal-shift: surface hierarchy comes from dark token changes, gold borders, and occasional existing `--shadow` for major panels.
 
-| Level | Treatment | Usage |
-| --- | --- | --- |
-| Base | `--background` | Page backdrop |
-| Panel | `--surface` with `--line` border | Admin sections and cards |
-| Nested | `--paper` with `--line` border | Forms, rows, nested records |
+| Level    | Treatment                        | Usage                                |
+| -------- | -------------------------------- | ------------------------------------ |
+| Base     | `--background`                   | Page backdrop                        |
+| Panel    | `--surface` with `--line` border | Admin sections and cards             |
+| Nested   | `--paper` with `--line` border   | Forms, rows, nested records          |
 | Elevated | `--shadow` plus gradient surface | Sidebar and major public auth panels |
 
 ### Rules

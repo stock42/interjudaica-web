@@ -1,6 +1,6 @@
 # InterJudaica Project Improvements
 
-## Resolved in this pass
+## Resolved
 
 - Class materials now accept any file type instead of a narrow MIME allowlist.
 - Each class material has editable title and description metadata.
@@ -9,23 +9,28 @@
 - Operators can download class materials through the authenticated admin file route.
 - Deleting a class now also removes its stored class-material files and database records.
 - Admin class editing now has a dedicated material manager with empty, loading, error, upload, edit, delete, and download states.
+- `/admin/courses/[uuid]` now has a course-level material library with missing-description and empty-class warnings.
+- Class material uploads now show browser upload progress.
+- Purchased course class pages now support student completion tracking, and the student dashboard shows per-course progress.
+- `/admin/users` now links into `/admin/users/[uuid]` access diagnostics with enrollments, payment source, granted-by operator, progress, and last access.
+- Analytics, payments, and subscriptions now show live operational metrics and attention-needed signals.
+- The admin has a global command palette using `/api/admin/search` plus quick actions for course creation, enrollment grants, contacts, and moderation.
+- `/admin/moderation` provides contact/forum queue filters for status, owner, and due date.
+- `/admin/config` now includes upload cleanup scanning/deletion for orphaned upload files.
+- `audit_logs` now records class material upload, edit, admin download, student download, and delete events tied to operator/student UUIDs.
+- Playwright API E2E coverage now exercises class material upload, edit, admin download, enrolled-student download, and progress update.
 - Admin navigation now starts collapsed except for the active section, keeps the InterJudaica brand visible, and gives the AI assistant a clearer command treatment.
 - Admin routes no longer inherit the public site header/footer chrome.
 - Admin overview now includes operational signals and priority action shortcuts instead of only static record counts.
 - A root `DESIGN.md` now documents the existing InterJudaica visual system and admin UI patterns.
 
-## High-impact next improvements
+## Remaining real improvements
 
-1. Add a file library view under `/admin/courses/[uuid]` showing all classes and materials for a course in one place, with missing-description and empty-class warnings.
-2. Add upload progress for large class files by switching the material upload client from `fetch` to `XMLHttpRequest` or a resumable upload strategy.
-3. Add student-facing class completion tracking so the dashboard can show progress per purchased course.
-4. Add course access diagnostics in admin user detail pages: enrolled courses, payment source, granted-by operator, and last access time.
-5. Replace remaining placeholder admin pages for analytics, payments, and subscriptions with live operational views or mark them explicitly as not configured.
-6. Add a global admin command palette that reuses `/api/admin/search` and supports quick actions such as “new course”, “grant enrollment”, and “open contact”.
-7. Add a moderation queue for forum threads and contact messages, with status, owner, and due-date filters.
-8. Add storage cleanup jobs for orphaned upload files in `uploads/classes`, `public/uploads/courses`, `public/uploads/books`, and forum assets.
-9. Add audit logging for class material uploads, edits, downloads, and deletes, tied to operator/student UUIDs.
-10. Add targeted Playwright coverage for the class material admin flow and enrolled-student download flow.
+1. Add resumable/chunked upload support for very large class files if course materials exceed the configured upload limit.
+2. Add background scheduling for upload cleanup so the admin tool can be run automatically with a dry-run notification first.
+3. Add richer activity analytics from audit logs, including per-course material download rates and inactive enrolled students.
+4. Add batch moderation actions for assigning owners and due dates to multiple queue items.
+5. Add visual regression coverage for the new admin surfaces after the operational flows stabilize.
 
 ## UI/UX direction for admin
 
